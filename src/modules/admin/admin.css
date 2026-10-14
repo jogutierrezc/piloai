@@ -1,0 +1,536 @@
+/* =============================================================================
+   Administración de Pilo · el esqueleto.
+   Sustituye a la hoja heredada de PDI (pilares, presupuesto, usuarios, roles…):
+   aquí solo queda lo que el esqueleto y las pantallas de Pilo usan de verdad.
+
+   Los colores salen de --pa-* (src/styles/admin-tokens.css); cada uno trae
+   como respaldo el token equivalente de tokens.css, así que la hoja se ve bien
+   aunque los tokens de la administración no estén cargados.
+
+   Ancho del menú: completo (248 px), íconos (68 px) u oculto. En el móvil
+   (≤ 900 px) el menú es un cajón que entra por la izquierda.
+   ========================================================================== */
+
+.admin-shell {
+  --pa-nav-w: 248px;
+  display: grid;
+  grid-template-columns: var(--pa-nav-w) minmax(0, 1fr);
+  min-height: 100vh;
+  color: var(--pa-ink, var(--ink));
+  background: var(--pa-bg, var(--page));
+  font-family: var(--pa-font-body, var(--font-sans));
+}
+
+.admin-shell[data-nav="iconos"] { --pa-nav-w: 68px; }
+/* Oculto: el menú sale de la cuadrícula (display: none), así que la cuadrícula
+   debe quedarse con UNA sola columna. Si conservara dos, el cuerpo caería en
+   la primera —la de 0 px— y todo el contenido se aplastaría. */
+.admin-shell[data-nav="oculto"] { --pa-nav-w: 0px; grid-template-columns: minmax(0, 1fr); }
+
+/* --- El menú ---------------------------------------------------------------- */
+
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  /* Por encima de la cabecera y de la barra de guardado (también 20): el
+     nombre que sale en el modo de íconos cruza hacia el contenido. */
+  z-index: calc(var(--z-sticky, 20) + 2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5, 20px);
+  height: 100vh;
+  padding: var(--space-4, 16px) var(--space-3, 12px);
+  overflow: hidden auto;
+  color: var(--pa-stage-ink, #fff);
+  background: var(--pa-stage, var(--brand-navy));
+  border-right: 1px solid var(--pa-stage-line, rgba(255, 255, 255, 0.14));
+}
+
+.admin-shell[data-nav="oculto"] .admin-sidebar { display: none; }
+
+.admin-sidebar__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+  min-height: 44px;
+}
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  min-width: 0;
+  padding: var(--space-1, 4px);
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--pa-radius-sm, 10px);
+}
+
+.admin-brand img {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--pa-stage-2, rgba(255, 255, 255, 0.08));
+}
+
+.admin-brand__text { display: grid; min-width: 0; line-height: 1.15; }
+
+.admin-brand strong {
+  font-family: var(--pa-font-display, var(--font-display));
+  font-size: var(--text-md, 1.0625rem);
+  letter-spacing: -0.01em;
+}
+
+.admin-brand small {
+  color: var(--pa-stage-muted, #c3d5f2);
+  font-size: var(--text-xs, 0.75rem);
+}
+
+.admin-sidebar__btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  color: var(--pa-stage-muted, #c3d5f2);
+  background: transparent;
+  border: 0;
+  border-radius: var(--pa-radius-sm, 10px);
+  font: inherit;
+  font-size: var(--text-sm, 0.8125rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--pa-dur-fast, 180ms) ease, background-color var(--pa-dur-fast, 180ms) ease, transform var(--pa-dur-press, 140ms) var(--pa-ease, ease-out);
+}
+
+.admin-sidebar__fold { flex: none; width: 36px; height: 36px; justify-content: center; }
+
+.admin-sidebar__hide { width: 100%; padding: 10px var(--space-3, 12px); text-align: left; }
+
+.admin-sidebar__btn:active { transform: scale(0.97); }
+
+.admin-nav { display: grid; gap: var(--space-4, 16px); align-content: start; flex: 1 1 auto; }
+
+.admin-nav__group { display: grid; gap: 2px; }
+
+.admin-nav__group-label {
+  margin: 0;
+  padding: 0 var(--space-3, 12px) var(--space-1, 4px);
+  color: var(--pa-stage-muted, #c3d5f2);
+  font-size: var(--text-2xs, 0.6875rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-nav ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+
+.admin-nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  min-height: 40px;
+  padding: 8px var(--space-3, 12px);
+  color: var(--pa-stage-muted, #c3d5f2);
+  border-radius: var(--pa-radius-sm, 10px);
+  font-size: var(--text-sm, 0.8125rem);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--pa-dur-fast, 180ms) ease, background-color var(--pa-dur-fast, 180ms) ease;
+}
+
+.admin-nav a svg, .admin-sidebar__btn svg { flex: none; }
+
+.admin-nav__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.admin-nav a.is-active {
+  color: var(--pa-stage-ink, #fff);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.admin-nav a.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  bottom: 9px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--pa-pilo-cyan, var(--pilo-accent));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .admin-nav a:hover,
+  .admin-sidebar__btn:hover {
+    color: var(--pa-stage-ink, #fff);
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.admin-nav a:focus-visible,
+.admin-brand:focus-visible,
+.admin-sidebar__btn:focus-visible {
+  outline: 2px solid var(--pa-pilo-cyan, var(--pilo-accent));
+  outline-offset: -2px;
+}
+
+.admin-sidebar__foot { padding-top: var(--space-3, 12px); border-top: 1px solid var(--pa-stage-line, rgba(255, 255, 255, 0.14)); }
+
+/* Solo íconos: se va el rótulo y el nombre aparece al pasar o enfocar. */
+.admin-shell[data-nav="iconos"] .admin-brand__text,
+.admin-shell[data-nav="iconos"] .admin-nav__text,
+.admin-shell[data-nav="iconos"] .admin-nav__group-label { display: none; }
+
+.admin-shell[data-nav="iconos"] .admin-sidebar {
+  padding-inline: var(--space-2, 8px);
+  /* Sin barra de desplazamiento visible: al aparecer le quitaba ancho a la
+     columna y descentraba los íconos. Sigue desplazándose con rueda o teclado. */
+  scrollbar-width: none;
+}
+.admin-shell[data-nav="iconos"] .admin-sidebar::-webkit-scrollbar { display: none; }
+.admin-shell[data-nav="iconos"] .admin-sidebar__head { flex-direction: column; justify-content: center; gap: var(--space-2, 8px); }
+.admin-shell[data-nav="iconos"] .admin-brand { padding: 0; }
+.admin-shell[data-nav="iconos"] .admin-nav a,
+.admin-shell[data-nav="iconos"] .admin-sidebar__hide { justify-content: center; gap: 0; padding-inline: 0; }
+.admin-shell[data-nav="iconos"] .admin-nav a.is-active::before { top: 8px; bottom: 8px; }
+
+/* Sin los rótulos de grupo, una raya separa un bloque del siguiente. */
+.admin-shell[data-nav="iconos"] .admin-nav { gap: var(--space-3, 12px); }
+.admin-shell[data-nav="iconos"] .admin-nav__group + .admin-nav__group {
+  padding-top: var(--space-3, 12px);
+  border-top: 1px solid var(--pa-stage-line, rgba(255, 255, 255, 0.14));
+}
+
+/* El nombre al pasar o enfocar. Va en `fixed` porque el menú recorta lo que
+   sobresale; su altura (--tip-y) la fija AdminShell al entrar el puntero. */
+.admin-shell[data-nav="iconos"] [data-tip]:hover::after,
+.admin-shell[data-nav="iconos"] [data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: fixed;
+  top: var(--tip-y, 0);
+  left: 76px;
+  transform: translateY(-50%);
+  z-index: calc(var(--z-sticky, 20) + 5);
+  padding: 6px 10px;
+  color: var(--pa-ink, var(--ink));
+  background: var(--pa-surface, var(--surface));
+  border: 1px solid var(--pa-line, var(--line));
+  border-radius: var(--pa-radius-sm, 10px);
+  box-shadow: var(--pa-shadow-md, var(--shadow-md));
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.admin-scrim { display: none; }
+
+/* --- Cabecera y cuerpo ------------------------------------------------------ */
+
+.admin-body { display: flex; flex-direction: column; min-width: 0; }
+
+.admin-topbar {
+  --topbar-pad: var(--space-7, 32px);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky, 20);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  background: color-mix(in srgb, var(--pa-surface, var(--surface)) 82%, transparent);
+  border-bottom: 1px solid var(--pa-line, var(--line));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.admin-topbar__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 16px);
+  min-height: 60px;
+  padding: var(--space-2, 8px) var(--topbar-pad);
+}
+
+.admin-topbar[data-rail] .admin-topbar__row { padding-bottom: 0; }
+
+.admin-topbar__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.admin-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2, 8px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--pa-ink-muted, var(--ink-muted));
+  font-size: var(--text-2xs, 0.6875rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-crumbs li + li::before { content: "›"; margin-right: var(--space-2, 8px); }
+
+.admin-topbar h1 {
+  margin: 0;
+  overflow: hidden;
+  color: var(--pa-ink, var(--ink));
+  font-family: var(--pa-font-display, var(--font-display));
+  font-size: var(--text-lg, 1.2rem);
+  line-height: 1.25;
+  letter-spacing: -0.018em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-topbar .admin-topbar__meta {
+  margin: 0;
+  overflow: hidden;
+  color: var(--pa-ink-muted, var(--ink-muted));
+  font-size: var(--text-sm, 0.8125rem);
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-topbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2, 8px);
+  flex: 0 0 auto;
+  max-width: 70%;
+  min-width: 0;
+}
+
+.admin-who { display: flex; align-items: center; gap: var(--space-2, 8px); min-width: 0; padding-inline: var(--space-2, 8px); }
+
+.admin-who__av {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--pa-accent-ink, #fff);
+  background: var(--pa-accent, var(--brand-blue));
+  border-radius: 50%;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 800;
+}
+
+.admin-who__id { display: grid; min-width: 0; line-height: 1.2; }
+
+.admin-who__name {
+  max-width: 18ch;
+  overflow: hidden;
+  color: var(--pa-ink, var(--ink));
+  font-size: var(--text-sm, 0.8125rem);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-who__role { color: var(--pa-accent-text, var(--brand-blue-strong)); font-size: var(--text-xs, 0.75rem); font-weight: 700; }
+
+.admin-topbar .icon-button,
+.admin-nav-toggle,
+.admin-nav-restore { width: 40px; height: 40px; border-color: var(--pa-line, var(--line)); color: var(--pa-ink-2, var(--ink-secondary)); }
+
+.admin-topbar .icon-button:focus-visible { outline: 2px solid var(--pa-focus, var(--brand-blue)); outline-offset: 2px; }
+
+.admin-nav-toggle { display: none; }
+
+.admin-main {
+  flex: 1 1 auto;
+  display: grid;
+  gap: var(--space-6, 24px);
+  align-content: start;
+  padding: var(--space-7, 32px);
+}
+
+/* --- Riel de la pantalla ---------------------------------------------------- */
+/* Las vistas de la pantalla, colgadas del borde bajo de la cabecera. Si no
+   caben, se desplazan dentro del riel. Las pantallas de Pilo lo usan. */
+
+.admin-topbar__rail {
+  padding: 0 var(--topbar-pad);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.admin-topbar__rail::-webkit-scrollbar { display: none; }
+
+.admin-rail { display: flex; gap: 2px; margin-left: -12px; }
+
+.admin-rail__tab {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  height: 40px;
+  padding: 0 12px;
+  color: var(--pa-ink-2, var(--ink-secondary));
+  background: transparent;
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  font: inherit;
+  font-size: var(--text-sm, 0.8125rem);
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--pa-dur-fast, 180ms) ease, color var(--pa-dur-fast, 180ms) ease, box-shadow var(--pa-dur-fast, 180ms) ease;
+}
+
+.admin-rail__tab[aria-current="page"] {
+  color: var(--pa-accent-text, var(--brand-blue-strong));
+  box-shadow: inset 0 -2px 0 var(--pa-accent, var(--brand-blue));
+}
+
+.admin-rail__tab:focus-visible { outline: 2px solid var(--pa-focus, var(--brand-blue)); outline-offset: -2px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .admin-rail__tab:hover { color: var(--pa-ink, var(--ink)); background: var(--pa-surface-2, var(--surface-2)); }
+  .admin-rail__tab[aria-current="page"]:hover { color: var(--pa-accent-text, var(--brand-blue-strong)); }
+}
+
+.admin-rail__count {
+  min-width: 20px;
+  padding: 1px 6px;
+  color: var(--pa-ink-2, var(--ink-secondary));
+  background: var(--pa-surface-3, var(--surface-3));
+  border-radius: 999px;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.admin-rail__tab[aria-current="page"] .admin-rail__count { color: var(--pa-accent-text, var(--brand-blue-strong)); background: var(--pa-accent-soft, var(--brand-blue-soft)); }
+
+/* --- Barra de guardado ------------------------------------------------------ */
+/* Fija abajo: la acción principal no se pierde al desplazar. */
+
+.admin-savebar {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-sticky, 20);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4, 16px);
+  padding: var(--space-4, 16px) var(--space-7, 32px);
+  color: var(--pa-ink-2, var(--ink-secondary));
+  background: color-mix(in srgb, var(--pa-surface, var(--surface)) 88%, transparent);
+  border-top: 1px solid var(--pa-line, var(--line));
+  box-shadow: var(--pa-shadow-md, var(--shadow-md));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: var(--text-sm, 0.8125rem);
+}
+
+.admin-savebar span { display: inline-flex; align-items: center; gap: var(--space-2, 8px); }
+
+.admin-savebar .button-primary:disabled,
+.button-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* --- Aviso de solo lectura -------------------------------------------------- */
+
+.admin-readonly {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  color: var(--pa-ink-2, var(--ink-secondary));
+  background: var(--pa-surface-2, var(--surface-2));
+  border: 1px solid var(--pa-line, var(--line));
+  border-radius: var(--pa-radius-sm, var(--radius-sm));
+  font-size: var(--text-sm, 0.8125rem);
+}
+
+/* --- Botonera de los modales ------------------------------------------------ */
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3, 12px);
+}
+
+/* --- Adaptación ------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .admin-topbar { --topbar-pad: var(--space-5, 20px); }
+  .admin-main { padding: var(--space-5, 20px); }
+  .admin-savebar { padding-inline: var(--space-5, 20px); }
+  .admin-who__id { display: none; }
+}
+
+/* En el móvil el menú es un cajón; los modos de ancho no aplican. */
+@media (max-width: 900px) {
+  .admin-shell,
+  .admin-shell[data-nav] { grid-template-columns: minmax(0, 1fr); --pa-nav-w: 0px; }
+
+  .admin-sidebar,
+  .admin-shell[data-nav="oculto"] .admin-sidebar {
+    display: flex;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: calc(var(--z-sticky, 20) + 10);
+    width: min(280px, 86vw);
+    visibility: hidden;
+    transform: translateX(-100%);
+  }
+
+  .admin-shell.nav-open .admin-sidebar { visibility: visible; transform: none; }
+
+  /* En el cajón siempre hay rótulos, aunque el escritorio esté en íconos. */
+  .admin-shell[data-nav="iconos"] .admin-brand__text,
+  .admin-shell[data-nav="iconos"] .admin-nav__text,
+  .admin-shell[data-nav="iconos"] .admin-nav__group-label { display: revert; }
+  .admin-shell[data-nav="iconos"] .admin-nav a,
+  .admin-shell[data-nav="iconos"] .admin-sidebar__hide { justify-content: flex-start; padding-inline: var(--space-3, 12px); }
+  .admin-shell[data-nav="iconos"] .admin-sidebar__head { flex-direction: row; }
+  .admin-shell[data-nav="iconos"] [data-tip]::after { display: none; }
+  .admin-sidebar__fold, .admin-sidebar__foot { display: none; }
+
+  .admin-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-sticky, 20) + 9);
+    background: rgba(4, 17, 42, 0.5);
+    border: 0;
+  }
+
+  .admin-nav-toggle { display: grid; }
+  .admin-nav-restore { display: none; }
+  .admin-topbar__actions { max-width: none; }
+  .admin-topbar__meta { display: none; }
+}
+
+@media (max-width: 560px) {
+  .admin-topbar__row { gap: var(--space-2, 8px); }
+  .admin-who { display: none; }
+  .admin-topbar { --topbar-pad: var(--space-3, 12px); }
+  .admin-main { padding: var(--space-4, 16px) var(--space-3, 12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-nav a,
+  .admin-sidebar__btn,
+  .admin-rail__tab { transition: none; }
+  .admin-sidebar__btn:active { transform: none; }
+}

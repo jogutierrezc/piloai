@@ -1,0 +1,424 @@
+/* =============================================================================
+   Mr. Pilo · Mis clases (beta) · /app/clases.
+
+   Todo con el prefijo «pcl-». Los colores son los del tema
+   (pilo-app-themes.css): aquí no hay ninguno escrito a mano; los bordes
+   suaves salen de mezclar la tinta del tema con transparente. Las piezas
+   comunes (campos, mensajes, chips, etiquetas) son las de la cuenta
+   (account.css) y la autorización es la de terms/.
+
+   Todo lo que se toca mide 44 px o más y nada desborda a 360 px: las filas
+   son de una columna y los botones se acomodan en varias líneas.
+
+   Movimiento: solo transform y opacidad, y lo que se toca cede a 0.97. Ningún
+   texto nace oculto en esta hoja: el estado oculto de la entrada lo pone y lo
+   quita GSAP.
+   ========================================================================== */
+
+.pcl {
+  --pcl-line: color-mix(in srgb, var(--c-ink2) 42%, transparent);
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.pcl-start {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.pcl-start:focus-visible,
+.pcl h2:focus-visible {
+  outline: none;
+}
+
+/* La cara oficial, entera y a su proporción: solo cambia el tamaño de su caja. */
+.pcl-face {
+  flex: none;
+  width: 84px;
+  height: 84px;
+}
+
+.pcl-face--sm {
+  width: 52px;
+  height: 52px;
+}
+
+/* --- La etiqueta «Beta» junto al título de la página ------------------------------------------ */
+
+.pcl-beta {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+  font: 800 0.75rem/1.5 var(--font-sans);
+  letter-spacing: 0;
+  vertical-align: middle;
+}
+
+/* --- Las tarjetas: el paso de Moodle y los avisos ---------------------------------------------- */
+
+.pcl-card,
+.pcl .pcl-consent {
+  max-width: 560px;
+}
+
+.pcl-card {
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--pcl-line);
+  border-radius: var(--radius-lg, 20px);
+  background: var(--c-sheet);
+  color: var(--c-ink);
+}
+
+.pcl-card__head {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 20px 22px;
+  background: var(--c-bar);
+  color: var(--c-bar-ink);
+}
+
+.pcl-card__head h2 {
+  margin: 0;
+  font: 700 1.3rem/1.15 var(--font-display);
+  text-wrap: balance;
+}
+
+.pcl-card__head p {
+  margin: 2px 0 0;
+  font-size: 0.875rem;
+  color: var(--c-bar-muted);
+}
+
+.pcl-card__body {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding: 20px 22px 24px;
+}
+
+.pcl-card--note {
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 20px 22px;
+}
+
+.pcl-card--note h2 {
+  margin: 0 0 4px;
+  font: 700 1.2rem/1.2 var(--font-display);
+}
+
+.pcl-card--note p {
+  color: var(--c-ink2);
+}
+
+.pcl-card--note .pcl-tools {
+  margin-top: 12px;
+}
+
+.pcl-granted {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--c-ok);
+}
+
+.pcl-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+}
+
+.pcl-row .pa-btn {
+  min-width: 160px;
+  padding-inline: 20px;
+}
+
+.pcl-row .pa-btn:disabled,
+.pcl .pc-chip:disabled,
+.pcl .pc-quiet:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* --- Conectado: el estado -------------------------------------------------------------------- */
+
+.pcl-state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.pcl-state__who {
+  display: flex;
+  flex: 1 1 240px;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.pcl-state__who p {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  min-width: 0;
+}
+
+.pcl-state__who b {
+  overflow-wrap: anywhere;
+}
+
+.pcl-state__who small {
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pcl-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.pcl a.pc-chip {
+  text-decoration: none;
+}
+
+/* --- Los bloques: entregas y cursos ---------------------------------------------------------- */
+
+.pcl-block {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pcl-block__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pcl-block__head h2 {
+  margin: 0;
+  font: 700 1.2rem/1.2 var(--font-display);
+  letter-spacing: -0.015em;
+}
+
+.pcl-group {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pcl-group h3 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--c-ink2);
+}
+
+.pcl-group h3 span {
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--c-chip);
+  color: var(--c-ink);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pcl-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.pcl-list[hidden] {
+  display: none;
+}
+
+.pcl-list > li {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-top: 1px solid var(--c-line);
+}
+
+.pcl-list > li:first-child {
+  border-top: 0;
+}
+
+.pcl-item__main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pcl-item__main strong {
+  overflow-wrap: anywhere;
+}
+
+.pcl-item__main small {
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+  overflow-wrap: anywhere;
+}
+
+.pcl-when {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink);
+}
+
+/* Lo vencido no se dice solo con color: el texto ya lo dice («ya venció»). */
+.pcl-when[data-past] {
+  color: var(--c-warn);
+}
+
+.pcl-empty {
+  padding: 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+  color: var(--c-ink2);
+}
+
+/* --- Un curso abierto ------------------------------------------------------------------------- */
+
+.pcl-course {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--c-line);
+}
+
+.pcl-course[hidden] {
+  display: none;
+}
+
+.pcl-section {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pcl-section h4 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+.pcl-section ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pcl-section li {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--c-bubble);
+  border: 1px solid var(--c-line);
+}
+
+.pcl-section li strong {
+  overflow-wrap: anywhere;
+}
+
+.pcl-section li small {
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+  overflow-wrap: anywhere;
+}
+
+.pcl-text {
+  max-width: 70ch;
+  font-size: 0.875rem;
+  color: var(--c-ink2);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.pcl-notes {
+  display: grid;
+  gap: 4px;
+  max-width: 70ch;
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* --- Pantallas estrechas y anchas -------------------------------------------------------------- */
+
+@media (max-width: 420px) {
+  .pcl-card__head,
+  .pcl-card--note {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .pcl-card__body {
+    padding: 16px;
+  }
+
+  .pcl-card__head .pcl-face,
+  .pcl-card--note .pcl-face {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+@media (min-width: 960px) {
+  /* En el escritorio, una fila: lo que es a la izquierda y lo que se puede hacer a la derecha. */
+  .pcl-list > li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 20px;
+  }
+
+  .pcl-list > li > .pcl-tools {
+    justify-content: flex-end;
+    max-width: 440px;
+  }
+
+  .pcl-list > li > .pcl-course {
+    grid-column: 1 / -1;
+  }
+}

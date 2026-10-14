@@ -1,0 +1,246 @@
+/* La capa profunda de Pilo · una sola escena, pensada para proyectar. Sobre blanco de partida; el botón
+   «Fondo» pasa a la noche de Pilo con su cian (data-fondo="noche"), la escena con que nació. No cambia con el
+   tema de la intranet: sus colores son propios (--cpp-*), y la malla del lienzo los sigue (stageTheme). */
+.cpp {
+  color-scheme: light;
+  --cpp-bg: #ffffff;
+  --cpp-bg-2: #f4f8fd;
+  --cpp-panel: #ffffff;
+  --cpp-ink: #0d1c31;
+  --cpp-ink-2: #45566d;
+  --cpp-ink-3: #62748c;
+  --cpp-line: rgba(13, 40, 84, 0.13);
+  --cpp-accent: #0a7d8c;
+  --cpp-accent-ink: #ffffff;
+  --cpp-accent-soft: rgba(10, 125, 140, 0.09);
+  --cpp-accent-line: rgba(10, 125, 140, 0.32);
+  --cpp-amber: #8a5700;
+  --cpp-amber-soft: rgba(176, 125, 0, 0.1);
+  --cpp-indigo: #3d4bb8;
+  --cpp-indigo-soft: rgba(61, 75, 184, 0.08);
+  --cpp-bubble: #0a2d63;
+  --cpp-bubble-ink: #ffffff;
+  --cpp-shadow: 0 14px 34px -14px rgba(13, 40, 84, 0.28);
+  --cpp-s-pdi: #6b3fa0; --cpp-s-cifras: #1f5fbf; --cpp-s-obs: #0b7481; --cpp-s-bol: #a4471f; --cpp-s-imp: #2e6b2f;
+  --cpp-s-innovacion: #0b6aa8; --cpp-s-politicas: #8a3b8f; --cpp-s-global: #8a5700; --cpp-s-moodle: #ad2f58; --cpp-s-guias: #1a6b5a;
+  --cpp-ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+.cpp[data-fondo="noche"] {
+  color-scheme: dark;
+  --cpp-bg: #040d1f;
+  --cpp-bg-2: #0b2750;
+  --cpp-panel: #071a38;
+  --cpp-ink: #eef4ff;
+  --cpp-ink-2: #b9c9e6;
+  --cpp-ink-3: #8196ba;
+  --cpp-line: rgba(185, 201, 230, 0.16);
+  --cpp-accent: #7fe7f0;
+  --cpp-accent-ink: #04212a;
+  --cpp-accent-soft: rgba(127, 231, 240, 0.1);
+  --cpp-accent-line: rgba(127, 231, 240, 0.32);
+  --cpp-amber: #fbbf24;
+  --cpp-amber-soft: rgba(251, 191, 36, 0.12);
+  --cpp-indigo: #a5b4fc;
+  --cpp-indigo-soft: rgba(99, 102, 241, 0.16);
+  --cpp-bubble: #eef4ff;
+  --cpp-bubble-ink: #0a1830;
+  --cpp-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.7);
+  --cpp-s-pdi: #b592e6; --cpp-s-cifras: #6fa4f5; --cpp-s-obs: #4fc2cf; --cpp-s-bol: #e58a5c; --cpp-s-imp: #7cc27d;
+  --cpp-s-innovacion: #38bdf8; --cpp-s-politicas: #a78bfa; --cpp-s-global: #fbbf24; --cpp-s-moodle: #f87171; --cpp-s-guias: #34d399;
+}
+.cpp ::selection { background: var(--cpp-accent); color: var(--cpp-accent-ink); }
+.cpp :where(button) { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.cpp :focus-visible { outline: 2px solid var(--cpp-accent); outline-offset: 3px; border-radius: 8px; }
+
+.cpp {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  color: var(--cpp-ink);
+  font: 500 15px/1.55 "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  grid-template-columns: minmax(0, 43fr) minmax(0, 57fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: radial-gradient(90% 90% at 72% 50%, var(--cpp-bg-2) 0%, var(--cpp-bg) 62%);
+}
+
+/* Cabecera */
+.cpp-top { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; padding: 14px 32px 0; }
+.cpp-pilo {
+  flex: none; width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--cpp-accent-line); background: var(--cpp-accent-soft);
+  display: grid; place-items: center; overflow: hidden;
+  transition: transform 160ms var(--cpp-ease);
+}
+.cpp-pilo > * { display: block; }
+.cpp-pilo:active { transform: scale(0.95); }
+.cpp-brand { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.cpp-brand b { font-size: 0.9rem; font-weight: 800; letter-spacing: -0.01em; }
+.cpp-brand span { font-size: 0.72rem; font-weight: 600; color: var(--cpp-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cpp-tag {
+  margin-left: auto; padding: 5px 13px; border-radius: 999px;
+  border: 1px solid var(--cpp-accent-line); background: var(--cpp-accent-soft);
+  font-size: 0.73rem; font-weight: 700; color: var(--cpp-accent); white-space: nowrap;
+}
+.cpp-ghost {
+  padding: 8px 13px; border-radius: 999px; border: 1px solid var(--cpp-line);
+  display: inline-flex; align-items: center; text-decoration: none;
+  font-size: 0.78rem; font-weight: 700; color: var(--cpp-ink-2); white-space: nowrap;
+  transition: background-color 180ms ease, color 180ms ease, transform 140ms var(--cpp-ease);
+}
+.cpp-ghost:active { transform: scale(0.96); }
+
+/* La narración */
+.cpp-story {
+  min-height: 0; overflow-y: auto; padding: 28px 40px 28px 48px;
+  display: flex; flex-direction: column;
+  scrollbar-width: thin; scrollbar-color: var(--cpp-accent-line) transparent;
+}
+.cpp-story > :first-child { margin-top: auto; }
+.cpp-story > :last-child { margin-bottom: auto; }
+.cpp-story h1 {
+  margin: 18px 0 0; max-width: 21ch;
+  font: 700 clamp(1.7rem, 1.45vw + 1rem, 2.6rem)/1.1 "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  letter-spacing: -0.025em; text-wrap: balance;
+}
+.cpp-story p { margin: 20px 0 0; max-width: 52ch; font-size: 1.03rem; line-height: 1.68; color: var(--cpp-ink-2); text-wrap: pretty; }
+.cpp-extra { margin-top: 28px; display: grid; gap: 16px; justify-items: start; max-width: 52ch; }
+.cpp-extra > :not(.cpp-q):not(.cpp-credits):not(.cpp-hemi-title) { width: 100%; }
+.cpp-extra > .cpp-hemi-title { margin-top: 6px; margin-bottom: -6px; }
+.cpp-story .cpp-extra p { margin: 0; }
+.cpp-story p b { color: var(--cpp-ink); font-weight: 700; }
+.cpp-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cpp-research-tag {
+  padding: 4px 9px; border-radius: 6px; background: var(--cpp-indigo-soft); border: 1px solid color-mix(in srgb, var(--cpp-indigo) 35%, transparent);
+  font: 700 0.68rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--cpp-indigo);
+}
+.cpp-layer { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; font-weight: 800; color: var(--cpp-accent); }
+.cpp-layer i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: var(--cpp-accent-soft); font-style: normal; font-variant-numeric: tabular-nums; }
+
+.cpp-spec-grid, .cpp-actions-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; max-width: 52ch; }
+.cpp-spec-box { display: grid; gap: 3px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--cpp-line); background: var(--cpp-panel); }
+.cpp-spec-box span, .cpp-hemi-title { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cpp-ink-3); }
+.cpp-spec-box b { font: 700 0.98rem/1.25 ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+.cpp-spec-box small { font-size: 0.7rem; color: var(--cpp-accent); font-weight: 700; }
+.cpp-action-card { display: grid; gap: 6px; padding: 13px 14px; align-content: start; border-radius: 12px; border: 1px solid var(--cpp-line); background: var(--cpp-panel); }
+.cpp-action-card b { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; font-weight: 800; }
+.cpp-action-card b svg { flex: none; color: var(--cpp-accent); }
+.cpp-action-card span { font-size: 0.74rem; line-height: 1.4; color: var(--cpp-ink-3); }
+.cpp-chips { display: flex; flex-wrap: wrap; gap: 8px; max-width: 52ch; }
+.cpp-chip {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 11px 6px 8px; border-radius: 999px;
+  border: 1px solid var(--cpp-line); background: var(--cpp-panel); font-size: 0.78rem; font-weight: 700; color: var(--cpp-ink-2);
+  transition: opacity 180ms ease, transform 140ms var(--cpp-ease);
+}
+button.cpp-chip:active { transform: scale(0.96); }
+.cpp-chip[aria-pressed="false"] { opacity: 0.45; }
+.cpp-chip i { width: 9px; height: 9px; border-radius: 50%; }
+.cpp-meter { display: flex; flex-wrap: wrap; gap: 22px; }
+.cpp-meter div { display: grid; gap: 2px; }
+.cpp-meter b { font: 700 1.7rem/1 "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums; }
+.cpp-meter small { font-size: 0.72rem; font-weight: 700; color: var(--cpp-ink-3); }
+.cpp-q {
+  align-self: flex-start; max-width: 52ch; padding: 12px 16px; border-radius: 18px 18px 18px 4px;
+  background: var(--cpp-bubble); color: var(--cpp-bubble-ink); font-weight: 700; box-shadow: var(--cpp-shadow);
+}
+.cpp-card { display: grid; gap: 12px; max-width: 52ch; padding: 18px 20px; border-radius: 14px; border: 1px solid var(--cpp-line); background: var(--cpp-panel); }
+.cpp-card--amber { border-color: color-mix(in srgb, var(--cpp-amber) 35%, transparent); background: var(--cpp-amber-soft); }
+.cpp-story .cpp-card p { font-size: 0.93rem; color: var(--cpp-ink); }
+.cpp-badge { justify-self: start; padding: 4px 10px; border-radius: 999px; background: var(--cpp-accent-soft); border: 1px solid var(--cpp-accent-line); font-size: 0.7rem; font-weight: 800; color: var(--cpp-accent); }
+.cpp-badge--amber { background: transparent; border-color: color-mix(in srgb, var(--cpp-amber) 45%, transparent); color: var(--cpp-amber); }
+.cpp-lines { display: grid; gap: 5px; font-size: 0.85rem; color: var(--cpp-ink-2); }
+.cpp-lines b { color: var(--cpp-ink); }
+.cpp-cite { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 6px; vertical-align: 2px; background: var(--cpp-accent); color: var(--cpp-accent-ink); font-size: 0.68rem; font-weight: 800; }
+.cpp-credits { font-size: 0.78rem; font-weight: 700; color: var(--cpp-ink-3); }
+.cpp-credits b { color: var(--cpp-accent); }
+.cpp-mini {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; max-width: 52ch;
+  padding: 9px 9px 9px 14px; border-radius: 999px; border: 1px solid var(--cpp-accent-line); background: var(--cpp-accent-soft);
+  font-size: 0.8rem; font-weight: 700; color: var(--cpp-ink-2);
+}
+.cpp-mini button { padding: 7px 14px; border-radius: 999px; background: var(--cpp-accent); color: var(--cpp-accent-ink); font-weight: 800; font-size: 0.78rem; transition: transform 140ms var(--cpp-ease); }
+.cpp-mini button:active { transform: scale(0.96); }
+
+/* El lienzo */
+.cpp-stage { position: relative; min-width: 0; min-height: 0; }
+.cpp-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.cpp-tip {
+  position: absolute; display: grid; gap: 4px; max-width: 320px; padding: 10px 14px; border-radius: 12px;
+  border: 1px solid var(--cpp-accent-line); background: var(--cpp-panel); box-shadow: var(--cpp-shadow);
+  font-size: 0.78rem; line-height: 1.45; pointer-events: none; opacity: 0; transform: translateY(4px) scale(0.97);
+  transition: opacity 140ms ease, transform 140ms var(--cpp-ease);
+}
+.cpp-tip[data-on] { opacity: 1; transform: none; }
+.cpp-tip b { font-size: 0.85rem; }
+.cpp-tip span { color: var(--cpp-ink-3); }
+.cpp-tip-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0; }
+.cpp-tip-chip { padding: 2px 6px; border-radius: 4px; border: 1px solid var(--cpp-accent-line); background: var(--cpp-accent-soft); font: 700 0.65rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--cpp-accent); }
+
+/* El riel de fases */
+.cpp-rail { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; padding: 10px 28px calc(18px + env(safe-area-inset-bottom, 0px)); }
+.cpp-steps { flex: 1; display: flex; gap: 6px; min-width: 0; }
+.cpp-step { flex: 1; display: grid; gap: 7px; min-width: 0; padding: 6px 2px; text-align: left; }
+.cpp-step i { position: relative; display: block; height: 3px; overflow: hidden; border-radius: 999px; background: var(--cpp-line); }
+.cpp-step i::after { content: ""; position: absolute; inset: 0; background: var(--cpp-accent); transform: scaleX(var(--f, 0)); transform-origin: left; transition: transform 420ms var(--cpp-ease); }
+.cpp-step span { overflow: hidden; font-size: 0.7rem; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; color: var(--cpp-ink-3); transition: color 180ms ease; }
+.cpp-step[aria-current="step"] span { color: var(--cpp-ink); }
+.cpp-nav { display: flex; gap: 8px; }
+.cpp-round { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--cpp-line); transition: background-color 180ms ease, opacity 180ms ease, transform 140ms var(--cpp-ease); }
+.cpp-round:active { transform: scale(0.94); }
+.cpp-round:disabled { opacity: 0.3; cursor: default; }
+.cpp-round--main { border-color: var(--cpp-accent); background: var(--cpp-accent); color: var(--cpp-accent-ink); }
+.cpp-keys { font-size: 0.7rem; white-space: nowrap; color: var(--cpp-ink-3); }
+
+/* --- La bienvenida de Pilo: la de la app al abrirla por primera vez, a la medida de la sala --- */
+.pw { position: absolute; inset: 0; z-index: 10; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; }
+.pw-bg { position: absolute; inset: 0; background: radial-gradient(80% 70% at 50% 38%, var(--cpp-bg-2) 0%, var(--cpp-bg) 70%); background-color: var(--cpp-bg); }
+.pw-glow { position: absolute; left: 50%; top: 34%; width: min(560px, 90vw); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(closest-side, var(--cpp-accent-soft), transparent); }
+.pw-rings i { position: absolute; left: 50%; top: 34%; translate: -50% -50%; border-radius: 50%; border: 1px solid var(--cpp-accent-line); opacity: 0.6; }
+.pw-top, .pw-center, .pw-foot { position: relative; }
+.pw-top { display: flex; align-items: center; gap: 12px; padding: 16px 32px 0; }
+.pw-top .cpp-ghost { margin-left: auto; }
+.pw-center { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 8px 24px; text-align: center; }
+.pw-slot { width: clamp(120px, 20vh, 190px); aspect-ratio: 1; flex: none; }
+.pw-fly { width: 100%; height: 100%; filter: drop-shadow(0 14px 22px rgba(13, 40, 84, 0.22)); }
+.pw-title { margin: 0; font: 700 clamp(2rem, 3.4vw + 1rem, 3.6rem)/1.05 "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: -0.03em; }
+.pw-title .w { display: inline-block; white-space: nowrap; margin: 0 0.12em; }
+.pw-title .ch { display: inline-block; }
+.pw-mood { display: inline-flex; align-items: center; gap: 8px; padding: 5px 13px; border-radius: 999px; border: 1px solid var(--cpp-accent-line); background: var(--cpp-accent-soft); font-size: 0.76rem; font-weight: 700; color: var(--cpp-accent); }
+.pw-mood i { width: 7px; height: 7px; border-radius: 50%; background: var(--cpp-accent); }
+.pw-bubble { margin: 0; max-width: 34em; min-height: 4.8em; font-size: clamp(1.02rem, 0.7vw + 0.9rem, 1.3rem); font-weight: 600; line-height: 1.55; text-wrap: pretty; }
+.pw-bubble .wd { display: inline-block; white-space: pre; }
+.pw-exhibit { min-height: 40px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 46em; }
+.pw-know { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--cpp-line); background: var(--cpp-panel); font-size: 0.84rem; font-weight: 700; color: var(--cpp-ink-2); box-shadow: var(--cpp-shadow); }
+.pw-foot { display: flex; align-items: center; gap: 16px; padding: 12px 32px calc(20px + env(safe-area-inset-bottom, 0px)); }
+.pw-segs { flex: 1; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.pw-segs span { flex: 1; height: 4px; border-radius: 999px; background: var(--cpp-line); overflow: hidden; }
+.pw-segs span i { display: block; height: 100%; background: var(--cpp-accent); transform: scaleX(0); transform-origin: left; }
+.pw-segs small { font-size: 0.74rem; font-weight: 700; color: var(--cpp-ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pw-next { padding: 11px 22px; border-radius: 999px; background: var(--cpp-accent); color: var(--cpp-accent-ink); font-weight: 800; white-space: nowrap; transition: transform 140ms var(--cpp-ease); }
+.pw-next:active { transform: scale(0.97); }
+
+@media (hover: hover) and (pointer: fine) {
+  .cpp-ghost:hover, .cpp-round:not(:disabled):not(.cpp-round--main):hover { background: var(--cpp-accent-soft); color: var(--cpp-ink); }
+  .cpp-pilo:hover { transform: scale(1.05); }
+}
+@media (max-width: 900px) {
+  .cpp { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(200px, 34vh) minmax(0, 1fr) auto; }
+  .cpp-top { padding: 12px 16px 0; gap: 10px; }
+  .cpp-tag, .cpp-keys, .cpp-step span, .cpp-brand span { display: none; }
+  .cpp-brand { margin-right: auto; }
+  .cpp-stage { grid-row: 2; }
+  .cpp-story { grid-row: 3; padding: 20px 16px; }
+  .cpp-rail { padding-inline: 16px; }
+  .pw-top, .pw-foot { padding-inline: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cpp *,
+  .cpp *::after { transition-duration: 0.01ms !important; }
+}
+
+/* Lo que solo existe en la intranet: la voz de Pilo y la salida. */
+.pw-top .cpp-ghost + .cpp-ghost { margin-left: 0; }
+.pw-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.cpp-ghost[aria-disabled="true"] { opacity: 0.5; cursor: default; }
+

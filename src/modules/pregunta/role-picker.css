@@ -1,0 +1,257 @@
+/* Pregúntele a Pilo · quién pregunta (RolePicker.tsx). Solo usa los tokens del
+   tema (--ap-*) y los de la escena (--ap-stage-*): no trae colores propios.
+   Las reglas llevan «.ap» delante para ganarle al botón base de la página. */
+
+.ap-rolp {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+}
+
+.ap-rolp__q {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--ap-ink-2);
+}
+
+.ap-rolp__opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ap .ap-rolp__b {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--ap-line-2);
+  border-radius: 999px;
+  background: var(--ap-surface);
+  color: var(--ap-ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap .ap-rolp__b:active {
+  transform: scale(0.97);
+}
+
+.ap .ap-rolp__b[data-quiet] {
+  border-color: var(--ap-line);
+  background: transparent;
+  color: var(--ap-ink-2);
+}
+
+.ap .ap-rolp__b[aria-pressed="true"] {
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+}
+
+/* --- En la escena de bienvenida ------------------------------------------------------ */
+
+.apw-role {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.ap-rolp[data-variant="stage"] {
+  justify-items: center;
+}
+
+.ap-rolp[data-variant="stage"] .ap-rolp__opts {
+  justify-content: center;
+  gap: 10px;
+}
+
+.ap .ap-rolp[data-variant="stage"] .ap-rolp__b {
+  min-height: 50px;
+  padding: 0 26px;
+  border-color: transparent;
+  background: var(--ap-accent);
+  color: var(--ap-accent-ink);
+  font-size: 1rem;
+  font-weight: 800;
+  box-shadow: 0 10px 28px rgba(0, 8, 26, 0.28);
+}
+
+.ap .ap-rolp[data-variant="stage"] .ap-rolp__b[data-quiet] {
+  border-color: var(--ap-stage-line);
+  background: transparent;
+  color: var(--ap-stage-ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.ap .ap-rolp[data-variant="stage"] .ap-rolp__b[aria-pressed="true"] {
+  outline: 2px solid var(--ap-stage-ink);
+  outline-offset: 3px;
+}
+
+.ap .apw .ap-rolp__b:focus-visible {
+  outline: 2px solid var(--ap-stage-ink);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* --- En el chat emergente ------------------------------------------------------------ */
+
+.ap-rolp[data-variant="chat"] {
+  align-self: flex-start;
+  gap: 8px;
+}
+
+.ap-rolp[data-variant="chat"] .ap-rolp__q {
+  font-size: 0.82rem;
+}
+
+.ap-rolp[data-variant="chat"] .ap-rolp__opts {
+  gap: 6px;
+}
+
+.ap .ap-rolp[data-variant="chat"] .ap-rolp__b {
+  min-height: 36px;
+  padding: 0 13px;
+  font-size: 0.82rem;
+}
+
+/* --- El control de la barra y su menú ------------------------------------------------- */
+
+.ap-rol {
+  position: relative;
+  flex: none;
+  margin-left: auto;
+}
+
+.ap-readall + .ap-rol,
+.ap-rol + .ap-temas {
+  margin-left: 0;
+}
+
+.ap .ap-rol__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid var(--ap-line);
+  background: var(--ap-soft);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ap-ink-2);
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap .ap-rol__btn:active {
+  transform: scale(0.96);
+}
+
+.ap .ap-rol__btn[aria-expanded="true"] {
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+}
+
+.ap-rol__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  width: 236px;
+  padding: 14px;
+  border: 1px solid var(--ap-line);
+  border-radius: 16px;
+  background: var(--ap-surface);
+  box-shadow: var(--ap-shadow);
+  transform-origin: 100% 0;
+}
+
+.ap-rolp[data-variant="menu"] {
+  justify-items: stretch;
+}
+
+.ap-rolp[data-variant="menu"] .ap-rolp__q {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.ap-rolp[data-variant="menu"] .ap-rolp__opts {
+  display: grid;
+  gap: 6px;
+}
+
+.ap .ap-rolp[data-variant="menu"] .ap-rolp__b {
+  justify-content: flex-start;
+  border-radius: 10px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ap .ap-rolp__b:hover {
+    border-color: var(--ap-primary);
+  }
+
+  .ap .ap-rolp[data-variant="stage"] .ap-rolp__b:hover {
+    border-color: transparent;
+    box-shadow: 0 14px 32px rgba(0, 8, 26, 0.34);
+  }
+
+  .ap .ap-rolp[data-variant="stage"] .ap-rolp__b[data-quiet]:hover {
+    border-color: var(--ap-stage-line);
+    background: var(--ap-stage-chip);
+    box-shadow: none;
+  }
+
+  .ap .ap-rol__btn:hover {
+    border-color: var(--ap-line-2);
+  }
+}
+
+@media (max-width: 600px) {
+  .ap-rol__btn span {
+    display: none;
+  }
+
+  .ap .ap-rol__btn {
+    padding: 0 10px;
+  }
+
+  /* En el teléfono el botón queda a media barra: un panel colgado de su borde derecho se
+     salía por la izquierda. Aquí se ancla a la pantalla, bajo la barra, de margen a margen. */
+  .ap-rol__panel {
+    position: fixed;
+    top: calc(64px + env(safe-area-inset-top, 0px));
+    left: 16px;
+    right: 16px;
+    width: auto;
+    transform-origin: 50% 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .ap .ap-rolp[data-variant="stage"] .ap-rolp__b {
+    min-height: 46px;
+    padding: 0 20px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap .ap-rolp__b,
+  .ap .ap-rol__btn {
+    transition-property: background-color, border-color, color;
+  }
+
+  .ap .ap-rolp__b:active,
+  .ap .ap-rol__btn:active {
+    transform: none;
+  }
+}

@@ -1,0 +1,838 @@
+/* =============================================================================
+   PDI · Base — reset, tipografía, primitivas compartidas, cabecera y pie.
+   Todo lo de aquí se apoya solo en tokens.css.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + var(--space-6));
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--ink);
+  background: var(--page);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+p,
+figure {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--brand-navy);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+::selection {
+  background: var(--brand-blue);
+  color: #fff;
+}
+
+/* --- Foco visible: un solo anillo para todo el sitio ---------------------- */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--brand-blue);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* --- Utilidades ----------------------------------------------------------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.u-container {
+  width: min(var(--content-max), 100% - var(--gutter) * 2);
+  margin-inline: auto;
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: calc(var(--z-header) + 1);
+  padding: var(--space-3) var(--space-5);
+  color: var(--ink-on-accent);
+  background: var(--brand-blue);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  transform: translateY(calc(-100% - var(--space-4)));
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.eyebrow {
+  display: inline-block;
+  color: var(--brand-blue);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.lede {
+  max-width: var(--measure);
+  color: var(--ink-secondary);
+  font-size: var(--text-md);
+  line-height: var(--leading-relaxed);
+}
+
+/* =============================================================================
+   Botones
+   ========================================================================== */
+
+.button-primary,
+.button-secondary,
+.button-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    background-color var(--dur-base) ease,
+    border-color var(--dur-base) ease,
+    color var(--dur-base) ease,
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.button-primary {
+  color: #fff;
+  background: var(--brand-blue);
+  box-shadow: var(--shadow-accent);
+}
+
+.button-secondary {
+  color: var(--brand-navy);
+  background: var(--surface);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-xs);
+}
+
+.button-ghost {
+  color: var(--ink-secondary);
+  background: transparent;
+  border-color: var(--line);
+}
+
+/* La flecha se adelanta un poco: confirma la dirección del enlace. */
+.button-primary [data-arrow],
+.button-secondary [data-arrow],
+.button-ghost [data-arrow] {
+  display: inline-block;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button-primary:hover {
+    background: var(--brand-blue-strong);
+  }
+
+  .button-secondary:hover,
+  .button-ghost:hover {
+    color: var(--brand-navy);
+    background: var(--surface-3);
+    border-color: var(--brand-blue);
+  }
+
+  .button-primary:hover [data-arrow],
+  .button-secondary:hover [data-arrow],
+  .button-ghost:hover [data-arrow] {
+    transform: translateX(3px);
+  }
+}
+
+.button-primary:active,
+.button-secondary:active,
+.button-ghost:active {
+  transform: scale(0.97);
+}
+
+/* =============================================================================
+   Superficies
+   ========================================================================== */
+
+.card {
+  padding: var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.card--interactive {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) ease,
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card--interactive:hover {
+    transform: translateY(-3px);
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+.card--interactive:active {
+  transform: translateY(-1px) scale(0.995);
+}
+
+.section-heading {
+  display: grid;
+  gap: var(--space-3);
+  max-width: var(--measure);
+}
+
+.section-heading h2 {
+  font-size: var(--text-2xl);
+}
+
+.section-heading > p {
+  color: var(--ink-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.section-heading--centered {
+  justify-items: center;
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* =============================================================================
+   Datos: pistas de progreso y estados
+   ========================================================================== */
+
+.progress-track {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  background: var(--track);
+  border-radius: var(--radius-pill);
+}
+
+.progress-track__fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--brand-blue);
+  transform-origin: left center;
+  transition: width var(--dur-bar) var(--ease-out);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-self: start;
+  padding: 5px var(--space-3) 5px var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* El glifo es la codificación secundaria: el estado nunca depende del color. */
+.status-badge__glyph {
+  font-size: 0.8em;
+  line-height: 1;
+}
+
+.status-badge--cumplida {
+  color: var(--status-done);
+  background: var(--status-done-soft);
+  border-color: color-mix(in srgb, var(--status-done) 26%, transparent);
+}
+
+.status-badge--curso {
+  color: var(--status-active);
+  background: var(--status-active-soft);
+  border-color: color-mix(in srgb, var(--status-active) 26%, transparent);
+}
+
+.status-badge--pendiente {
+  color: var(--status-pending);
+  background: var(--status-pending-soft);
+  border-color: color-mix(in srgb, var(--status-pending) 26%, transparent);
+}
+
+.status-badge--riesgo {
+  color: var(--status-risk);
+  background: var(--status-risk-soft);
+  border-color: color-mix(in srgb, var(--status-risk) 26%, transparent);
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  color: var(--ink-secondary);
+  background: var(--surface-3);
+  border: 1px solid var(--line-faint);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/* =============================================================================
+   Cabecera del sitio
+   ========================================================================== */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  min-height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding-inline: var(--gutter);
+  background: var(--surface-glass);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 0 0 auto;
+  transition: opacity var(--dur-base) ease;
+}
+
+/* Alto fijo y ancho automático: el logotipo es un lockup de casi 2,8:1 y
+   forzarlo a un cuadrado lo deformaba. */
+.brand-logo {
+  height: 34px;
+  width: auto;
+  padding: var(--logo-plate-pad);
+  border-radius: 6px;
+  background: var(--logo-plate);
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--brand-navy);
+  letter-spacing: var(--tracking-tight);
+  white-space: nowrap;
+}
+
+.brand-title strong {
+  color: var(--brand-teal);
+}
+
+.site-navigation {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-right: auto;
+}
+
+.site-navigation a {
+  position: relative;
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink-secondary);
+  border-radius: var(--radius-xs);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  transition: color var(--dur-base) ease, background-color var(--dur-base) ease;
+}
+
+/* Subrayado del ítem activo: una sola barra que se dibuja, no un borde que salta. */
+.site-navigation a::after {
+  content: "";
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: 0;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-blue);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.site-navigation a.active {
+  color: var(--brand-navy);
+}
+
+.site-navigation a.active::after {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .site-navigation a:hover {
+    color: var(--brand-navy);
+    background: var(--surface-3);
+  }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-secondary);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    color var(--dur-base) ease,
+    background-color var(--dur-base) ease,
+    border-color var(--dur-base) ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .icon-button:hover {
+    color: var(--brand-navy);
+    background: var(--surface-3);
+    border-color: var(--line-strong);
+  }
+}
+
+.icon-button:active {
+  transform: scale(0.94);
+}
+
+.icon-button svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* El sol/luna gira al cambiar: el mismo objeto, no dos íconos que se cruzan. */
+.theme-toggle svg {
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.theme-toggle:active svg {
+  transform: rotate(45deg);
+}
+
+.menu-toggle {
+  display: none;
+}
+
+.site-header .button-primary {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-xs);
+}
+
+@media (max-width: 1180px) {
+  .site-navigation a {
+    padding-inline: var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .brand-title {
+    font-size: var(--text-base);
+  }
+}
+
+@media (max-width: 1080px) {
+  .site-header {
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+  }
+
+  .menu-toggle {
+    display: grid;
+  }
+
+  /* El botón de intranet sale de la cabecera y entra en el menú desplegable:
+     en móvil no cabe, pero seguir teniendo acceso a él sí importa. */
+  .site-header > .header-actions > .button-primary {
+    display: none;
+  }
+
+  .site-navigation {
+    order: 3;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+    overflow: hidden;
+    /* Se anima la altura del contenedor, no la de cada enlace. */
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--dur-slow) var(--ease-drawer);
+  }
+
+  .site-navigation > * {
+    min-height: 0;
+  }
+
+  .site-navigation.is-open {
+    grid-template-rows: 1fr;
+  }
+
+  .site-navigation__inner {
+    display: grid;
+    padding-bottom: var(--space-3);
+  }
+
+  .site-navigation a {
+    padding: var(--space-3) var(--space-2);
+    border-bottom: 1px solid var(--line-faint);
+  }
+
+  .site-navigation a::after {
+    display: none;
+  }
+
+  .site-navigation a.active {
+    color: var(--brand-blue);
+  }
+
+  .site-navigation__intranet {
+    margin-top: var(--space-3);
+    color: #fff !important;
+    background: var(--brand-blue);
+    border: 0 !important;
+    border-radius: var(--radius-pill);
+    text-align: center;
+  }
+}
+
+/* Fuera del menú móvil, el enlace de intranet duplicado no se muestra. */
+.site-navigation__intranet {
+  display: none;
+}
+
+@media (max-width: 1080px) {
+  .site-navigation__intranet {
+    display: block;
+  }
+}
+
+/* =============================================================================
+   Entrada de contenido
+   Escalonado corto y decorativo: nunca bloquea la interacción.
+   ========================================================================== */
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.stagger > * {
+  animation: rise-in var(--dur-slow) var(--ease-out) backwards;
+}
+
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 45ms; }
+.stagger > *:nth-child(3) { animation-delay: 90ms; }
+.stagger > *:nth-child(4) { animation-delay: 135ms; }
+.stagger > *:nth-child(5) { animation-delay: 180ms; }
+.stagger > *:nth-child(6) { animation-delay: 225ms; }
+.stagger > *:nth-child(n + 7) { animation-delay: 260ms; }
+
+/* =============================================================================
+   Movimiento reducido
+   Se conservan opacidad y color (ayudan a comprender); se retira el desplazamiento.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .stagger > * {
+    animation: none;
+  }
+
+  /* Lo único que sigue animándose: el color y la opacidad, sin movimiento. */
+  .button-primary,
+  .button-secondary,
+  .button-ghost,
+  .card--interactive,
+  .icon-button {
+    transition-property: background-color, border-color, color, opacity !important;
+    transition-duration: var(--dur-base) !important;
+  }
+
+  .button-primary:active,
+  .button-secondary:active,
+  .button-ghost:active,
+  .icon-button:active,
+  .card--interactive:hover,
+  .card--interactive:active {
+    transform: none !important;
+  }
+}
+
+/* =============================================================================
+   Estados de una consulta
+   Con datos remotos, "cargando", "error" y "vacío" son estados normales y
+   tienen que verse tan cuidados como el contenido.
+   ========================================================================== */
+
+@keyframes state-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.state-skeleton {
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.state-skeleton__row {
+  height: 14px;
+  background: var(--track);
+  border-radius: var(--radius-pill);
+  animation: state-pulse 1.4s ease-in-out infinite;
+}
+
+.state-skeleton__row:nth-child(2) { width: 82%; }
+.state-skeleton__row:nth-child(3) { width: 64%; }
+.state-skeleton__row:nth-child(4) { width: 74%; }
+.state-skeleton__row:nth-child(5) { width: 58%; }
+
+.state-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-5);
+  width: 100%;
+}
+
+/* El esqueleto imita la altura de la tarjeta real para que la página no salte
+   al llegar los datos. */
+.state-cards__card {
+  min-height: 15rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line-faint);
+  border-radius: var(--radius-xl);
+  animation: state-pulse 1.4s ease-in-out infinite;
+}
+
+.state-cards__card:nth-child(2) { animation-delay: 120ms; }
+.state-cards__card:nth-child(3) { animation-delay: 240ms; }
+.state-cards__card:nth-child(4) { animation-delay: 360ms; }
+.state-cards__card:nth-child(5) { animation-delay: 480ms; }
+.state-cards__card:nth-child(6) { animation-delay: 600ms; }
+
+.state-error {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-5) var(--space-6);
+  color: var(--status-risk);
+  background: var(--status-risk-soft);
+  border: 1px solid color-mix(in srgb, var(--status-risk) 28%, transparent);
+  border-radius: var(--radius-lg);
+}
+
+.state-error strong {
+  display: block;
+  font-size: var(--text-md);
+}
+
+.state-error p {
+  margin-top: var(--space-2);
+  color: color-mix(in srgb, var(--status-risk) 72%, var(--ink));
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.state-error code {
+  padding: 1px 5px;
+  background: var(--surface);
+  border-radius: 4px;
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, monospace;
+  font-size: 0.92em;
+}
+
+.state-error .button-secondary {
+  margin-top: var(--space-4);
+}
+
+.state-empty {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: center;
+  width: 100%;
+  padding: var(--space-9) var(--space-6);
+  color: var(--ink-muted);
+  background: var(--surface-2);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.state-empty strong {
+  color: var(--ink);
+  font-size: var(--text-md);
+}
+
+.state-empty p {
+  max-width: 34rem;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-skeleton__row,
+  .state-cards__card {
+    animation: none;
+  }
+}
+
+/* Qué hacer ante un error con causa conocida, y el mensaje técnico plegado. */
+.state-error__advice {
+  margin-top: var(--space-3) !important;
+  padding: var(--space-3) var(--space-4);
+  color: var(--ink-secondary) !important;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm) !important;
+}
+
+.state-error__detail {
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.state-error__detail summary {
+  color: var(--ink-muted);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.state-error__detail code {
+  display: block;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink-secondary);
+  background: var(--surface);
+  border-radius: var(--radius-xs);
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, monospace;
+  overflow-wrap: anywhere;
+}

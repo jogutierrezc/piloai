@@ -1,0 +1,40 @@
+{
+  "id": "/app",
+  "name": "Mr. Pilo",
+  "short_name": "Mr. Pilo",
+  "description": "Mr. Pilo, la Inteligencia Artificial de la Universidad de Santander: pregúntele por la universidad o por enseñar y aprender, en el teléfono o en el computador.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "/app",
+  "scope": "/app",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "launch_handler": { "client_mode": ["navigate-existing", "auto"] },
+  "orientation": "natural",
+  "handle_links": "preferred",
+  "prefer_related_applications": false,
+  "background_color": "#0a2d63",
+  "theme_color": "#0a2d63",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/pilo-app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pilo-app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/pilo-app/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Pilo de la Universidad",
+      "short_name": "Universidad",
+      "description": "Cifras, planes e impacto de la Universidad de Santander",
+      "url": "/app/universidad",
+      "icons": [{ "src": "/pilo-app/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Pilo en Enseñanza",
+      "short_name": "Enseñanza",
+      "description": "Enseñar y aprender en la Universidad de Santander",
+      "url": "/app/ensenanza",
+      "icons": [{ "src": "/pilo-app/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

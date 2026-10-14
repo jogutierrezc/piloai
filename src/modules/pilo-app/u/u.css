@@ -1,0 +1,711 @@
+/* =============================================================================
+   Mr. Pilo · Pilo U · todo con el prefijo «pu-».
+
+   El color sale solo de las variables del tema (pilo-app-themes.css); la letra,
+   de los tokens (Open Sans). La disposición depende del ancho de ESTA pantalla
+   (consulta de contenedor sobre .pu), no del de un teléfono: en el Fold abierto
+   y en el computador los grupos se acomodan en dos columnas.
+
+   Todo lo que se toca mide 48 px o más, cede a 0.97 al pulsarlo y tiene foco
+   visible. El estado nunca va solo en color: lleva glifo y palabra. Movimiento
+   solo en transform y opacidad; con «reducir movimiento» no hay ninguno.
+   ========================================================================== */
+
+.pu {
+  container-type: inline-size;
+  container-name: pu;
+  min-width: 0;
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+}
+
+/* En el teléfono (pestañas) ocupa el marco entero y se desplaza ella; en el computador la página ya se desplaza. */
+.pu[data-wide="false"] {
+  grid-row: 1 / -1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--c-bg);
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px));
+}
+
+.pu[data-wide="true"] {
+  max-width: 1040px;
+  margin-inline: auto;
+}
+
+.pu *:focus-visible {
+  outline: 2px solid var(--c-link);
+  outline-offset: 2px;
+}
+
+.pu-i {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pu-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.pu-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.pu-wait {
+  padding: 24px 0;
+  color: var(--c-ink2);
+  font-weight: 700;
+}
+
+/* --- Inicio ----------------------------------------------------------------------------- */
+
+.pu-hub {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.pu-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.pu-head > :first-child {
+  flex: none;
+}
+
+.pu-head h1 {
+  font: 700 1.45rem/1.15 var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.pu-head p {
+  margin-top: 2px;
+  color: var(--c-ink2);
+  max-width: 52ch;
+}
+
+.pu-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.pu-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--c-chip);
+  color: var(--c-ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.pu-chip .pu-i {
+  width: 14px;
+  height: 14px;
+}
+
+.pu-chip--mut {
+  background: none;
+  border: 1px solid var(--c-line);
+  color: var(--c-ink2);
+}
+
+.pu-chip--ok {
+  background: none;
+  border: 1px solid var(--c-ok);
+  color: var(--c-ok);
+}
+
+.pu-chip--go {
+  background: none;
+  border: 1px solid var(--c-link);
+  color: var(--c-link);
+}
+
+.pu-groups {
+  display: grid;
+  gap: 18px;
+  align-items: start;
+}
+
+.pu-group {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pu-group h2 {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--c-ink2);
+}
+
+.pu-group ul,
+.pu-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pu-row,
+.pu-item,
+.pu-mark {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+  color: var(--c-ink);
+  text-align: left;
+  text-decoration: none;
+}
+
+.pu-item {
+  grid-template-columns: 40px minmax(0, 1fr);
+}
+
+.pu-row,
+.pu-mark {
+  transition: transform 140ms var(--ease-out, ease-out), border-color 140ms ease;
+}
+
+.pu-row:active,
+.pu-mark:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) {
+  .pu-row:hover,
+  .pu-mark:hover {
+    border-color: var(--c-link);
+  }
+}
+
+.pu-ico {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--c-chip);
+  color: var(--c-link);
+  font-weight: 800;
+  font-size: 0.9375rem;
+}
+
+.pu-ico .pu-i {
+  width: 20px;
+  height: 20px;
+}
+
+.pu-ico--hora {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  width: 48px;
+}
+
+.pu-row__t,
+.pu-item__t {
+  display: grid;
+  min-width: 0;
+}
+
+.pu-row__t b,
+.pu-item__t b,
+.pu-mark b {
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.pu-row__t > span,
+.pu-item__t > span {
+  color: var(--c-ink2);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+/* En un teléfono angosto el estado baja bajo el título, para que el título respire. */
+@container pu (max-width: 430px) {
+  .pu-row {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .pu-row > .pu-chip {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@container pu (min-width: 720px) {
+  .pu-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .pu-head h1 {
+    font-size: 1.7rem;
+  }
+}
+
+/* --- Una vista --------------------------------------------------------------------------- */
+
+.pu-view {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.pu-top {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.pu-top h1 {
+  font: 700 1.2rem/1.2 var(--font-display);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.pu-back,
+.pu-round {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-left: -8px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--c-ink);
+  transition: transform 140ms var(--ease-out, ease-out), background-color 140ms ease;
+}
+
+.pu-round {
+  margin-left: 0;
+}
+
+.pu-back:active,
+.pu-round:active {
+  transform: scale(0.94);
+  background: var(--c-chip);
+}
+
+.pu-body {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.pu-stack {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.pu-lead {
+  color: var(--c-ink2);
+  max-width: 64ch;
+}
+
+.pu-empty {
+  padding: 18px 16px;
+  border: 1px dashed var(--c-line);
+  border-radius: var(--radius-md);
+  color: var(--c-ink2);
+}
+
+.pu-fine {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  color: var(--c-ink2);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  max-width: 64ch;
+}
+
+.pu-fine .pu-i {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+.pu-fine a {
+  color: var(--c-link);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+.pu-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+  font-weight: 700;
+}
+
+.pu-note > span {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.pu-ok {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--c-ok);
+  font-weight: 800;
+}
+
+/* --- Botones ----------------------------------------------------------------------------- */
+
+.pu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font: 800 0.9375rem/1.2 var(--font-sans);
+  text-align: center;
+  text-decoration: none;
+  transition: transform 140ms var(--ease-out, ease-out), opacity 140ms ease;
+}
+
+.pu-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.pu-btn:disabled {
+  opacity: 0.45;
+}
+
+.pu-btn--main {
+  background: var(--c-mine);
+  color: var(--c-mine-ink);
+}
+
+.pu-btn--line {
+  border-color: var(--c-line);
+  background: var(--c-sheet);
+  color: var(--c-ink);
+}
+
+.pu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* --- Entrada y «Próximamente» --------------------------------------------------------------- */
+
+.pu-gate,
+.pu-soon {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+  text-align: center;
+}
+
+.pu-gate p,
+.pu-soon p {
+  max-width: 46ch;
+  color: var(--c-ink2);
+}
+
+.pu-gate h1,
+.pu-soon h2 {
+  font: 700 1.25rem/1.2 var(--font-display);
+  color: var(--c-ink);
+}
+
+.pu-soon__why {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  text-align: left;
+  font-size: 0.8125rem;
+}
+
+.pu-soon__why .pu-i {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+/* --- Selector ---------------------------------------------------------------------------- */
+
+.pu-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pu-seg button {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  background: var(--c-sheet);
+  color: var(--c-ink);
+  font: 700 0.875rem/1.2 var(--font-sans);
+  transition: transform 140ms var(--ease-out, ease-out);
+}
+
+.pu-seg button:active {
+  transform: scale(0.97);
+}
+
+.pu-seg button[aria-pressed="true"] {
+  border-color: var(--c-mine);
+  background: var(--c-mine);
+  color: var(--c-mine-ink);
+}
+
+.pu-seg .pu-i {
+  width: 16px;
+  height: 16px;
+}
+
+/* --- Calendario -------------------------------------------------------------------------- */
+
+.pu-month {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: center;
+  text-align: center;
+}
+
+.pu-month h2 {
+  font: 700 1.05rem/1.2 var(--font-display);
+  text-transform: capitalize;
+}
+
+.pu-cal {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+
+.pu-cal th {
+  padding: 4px 0;
+  color: var(--c-ink2);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.pu-cal td {
+  position: relative;
+  height: 48px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.pu-cal td[data-hoy] {
+  background: var(--c-mine);
+  color: var(--c-mine-ink);
+}
+
+.pu-cal td[data-entrega]:not([data-hoy]) {
+  border-color: var(--c-link);
+}
+
+/* La entrega se ve con un punto Y con el borde; el lector de pantalla la lee en el texto oculto. */
+.pu-cal td i {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* --- Boletín ----------------------------------------------------------------------------- */
+
+.pu-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pu-stats p {
+  display: grid;
+  gap: 2px;
+  padding: 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.pu-stats b {
+  font: 800 1.9rem/1 var(--font-display);
+}
+
+.pu-stats span {
+  color: var(--c-ink2);
+  font-size: 0.8125rem;
+}
+
+.pu-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.pu-card h2 {
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+.pu-hrow {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 28px;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.8125rem;
+}
+
+.pu-hrow > b {
+  text-align: right;
+}
+
+.pu-bar {
+  height: 14px;
+  border-radius: var(--radius-pill);
+  background: var(--c-chip);
+  overflow: hidden;
+}
+
+.pu-bar i {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--c-s1);
+}
+
+.pu-plain {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* --- Asistencia -------------------------------------------------------------------------- */
+
+.pu-count {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.pu-count span {
+  display: grid;
+  justify-items: center;
+  padding: 8px 4px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-sheet);
+  color: var(--c-ink2);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.pu-count b {
+  color: var(--c-ink);
+  font-size: 1.25rem;
+}
+
+.pu-mark[data-m="P"] {
+  border-color: var(--c-ok);
+}
+
+.pu-mark[data-m="A"] {
+  border-color: var(--c-bad);
+}
+
+/* --- Mensaje ----------------------------------------------------------------------------- */
+
+.pu-field {
+  display: grid;
+  gap: 6px;
+  font-weight: 800;
+}
+
+.pu-field textarea {
+  min-height: 130px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-sheet);
+  color: var(--c-ink);
+  font: 500 1rem/1.4 var(--font-sans);
+  resize: vertical;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pu-row,
+  .pu-mark,
+  .pu-btn,
+  .pu-seg button,
+  .pu-back,
+  .pu-round {
+    transition-duration: 0.01ms;
+  }
+}

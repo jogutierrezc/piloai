@@ -1,0 +1,227 @@
+/* =============================================================================
+   Intranet · Mr. Pilo con IA · Páginas web (WebSection.tsx).
+
+   Una mesa de dos columnas dentro de la hoja de la sección: a la izquierda lo
+   que se le pide a Pilo; a la derecha la malla de la página y la consulta. La
+   malla usa la tinta de la malla de la memoria (mesh-view.css): nodos azul
+   marino, relaciones en línea tenue y el azul institucional solo para lo que
+   una consulta encendió. Un pasaje sin vector es un aro; indexado, se llena.
+   Los temas son rombos: ningún dato depende solo del color.
+   ========================================================================== */
+
+.pwb { display: grid; grid-template-columns: minmax(0, 21rem) minmax(0, 1fr); min-width: 0; }
+.pwb-rail { min-width: 0; border-right: 1px solid var(--line); }
+.pwb-work { min-width: 0; }
+.pwb-rail > .pis-group, .pwb-work > .pis-group { padding: var(--space-5); }
+
+@media (max-width: 1080px) {
+  .pwb { grid-template-columns: minmax(0, 1fr); }
+  .pwb-rail { border-right: 0; border-bottom: 1px solid var(--line); }
+}
+
+.pwb-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* --- La dirección ------------------------------------------------------------------- */
+
+.pwb-form { display: grid; gap: var(--space-3); }
+.pwb-field { display: grid; gap: 6px; min-width: 0; }
+.pwb-field > span { color: var(--ink-secondary); font-size: var(--text-xs); font-weight: 700; }
+.pwb-field input,
+.pwb-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0 var(--space-3);
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  caret-color: var(--brand-blue);
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+.pwb-field input::placeholder { color: var(--ink-muted); font-weight: 500; }
+.pwb-field input:focus,
+.pwb-field select:focus { border-color: var(--brand-blue); outline: none; box-shadow: var(--ring); }
+.pwb-field input[aria-invalid="true"] { border-color: var(--status-risk); }
+
+/* La casilla «Abrir con navegador» (0132): solo aparece con el servicio encendido. */
+.pwb-check { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-2); align-items: start; min-height: 44px; cursor: pointer; }
+.pwb-check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--brand-blue); }
+.pwb-check input:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
+.pwb-check span { color: var(--ink); font-size: var(--text-sm); font-weight: 700; line-height: 1.35; }
+.pwb-check small { display: block; margin-top: 2px; color: var(--ink-muted); font-size: var(--text-xs); font-weight: 600; line-height: 1.4; }
+
+/* --- Pilo y los pasos ------------------------------------------------------------------ */
+
+.pwb-pilo { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: var(--space-3); align-items: center; }
+.pwb-pilo p { margin: 0; color: var(--ink); font-size: var(--text-sm); font-weight: 700; line-height: 1.35; }
+
+.pwb-steps { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.pwb-steps li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; padding: 6px 0; align-items: start; }
+.pwb-steps b { display: block; color: var(--ink-muted); font-size: var(--text-sm); font-weight: 700; transition: color var(--dur-fast) ease; }
+.pwb-steps li > div > span { display: block; min-height: 1.2em; color: var(--ink-muted); font-size: var(--text-sm); line-height: 1.4; font-variant-numeric: tabular-nums; }
+.pwb-steps li:not([data-state="pending"]) b { color: var(--ink); }
+
+.pwb-glyph { width: 22px; height: 22px; margin-top: 1px; }
+.pwb-glyph * { fill: none; opacity: 0; transition: opacity var(--dur-fast) ease; }
+.pwb-glyph__ring { stroke: var(--line-strong); stroke-width: 1.6; }
+.pwb-glyph__disc { fill: var(--status-done-soft); }
+.pwb-glyph__arc { stroke: var(--brand-blue); stroke-width: 2; stroke-linecap: round; transform-origin: 11px 11px; }
+.pwb-glyph__tick { stroke: var(--status-done); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pwb-glyph__dash { stroke: var(--status-pending); stroke-width: 2; stroke-linecap: round; }
+.pwb-glyph__cross { stroke: var(--status-risk); stroke-width: 2; stroke-linecap: round; }
+li[data-state="pending"] .pwb-glyph__ring { opacity: 1; }
+li[data-state="run"] .pwb-glyph__ring { opacity: 0.5; }
+li[data-state="run"] .pwb-glyph__arc { opacity: 1; animation: pwb-spin 0.7s linear infinite; }
+li[data-state="done"] .pwb-glyph__disc, li[data-state="done"] .pwb-glyph__tick { opacity: 1; }
+li[data-state="skip"] .pwb-glyph__ring, li[data-state="skip"] .pwb-glyph__dash { opacity: 1; }
+li[data-state="fail"] .pwb-glyph__ring, li[data-state="fail"] .pwb-glyph__cross { opacity: 1; }
+li[data-state="fail"] .pwb-glyph__ring { stroke: var(--status-risk); }
+@keyframes pwb-spin { to { transform: rotate(360deg); } }
+
+/* --- Páginas leídas -------------------------------------------------------------------- */
+
+.pwb-pages { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.pwb-pages button {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, transform var(--dur-press) var(--ease-out);
+}
+.pwb-pages button:active:not(:disabled) { transform: scale(0.99); }
+.pwb-pages button:disabled { cursor: default; opacity: 0.6; }
+.pwb-pages button[aria-pressed="true"] { background: var(--brand-blue-soft); border-color: var(--line); }
+.pwb-pages button:focus-visible { outline: none; box-shadow: var(--ring); }
+.pwb-pages strong { font-size: var(--text-sm); font-weight: 700; overflow-wrap: anywhere; }
+.pwb-pages em { color: var(--ink-muted); font-size: var(--text-xs); font-style: normal; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+@media (hover: hover) and (pointer: fine) {
+  .pwb-pages button[aria-pressed="false"]:not(:disabled):hover { background: var(--surface-3); }
+}
+
+/* --- La malla ---------------------------------------------------------------------------- */
+
+.pwb-meta { margin: 0; color: var(--ink-muted); font-size: var(--text-sm); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.pwb-meta strong { color: var(--ink); font-weight: 800; }
+
+.pwb-key { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--ink-muted); font-size: var(--text-xs); font-weight: 600; }
+.pwb-key span { display: inline-flex; align-items: center; gap: 6px; }
+.pwb-key i { display: inline-block; width: 9px; height: 9px; background: var(--brand-navy); border-radius: 50%; }
+.pwb-key__pag { width: 8px !important; height: 10px !important; border-radius: 2px !important; }
+.pwb-key__pas { background: var(--surface) !important; border: 1.5px solid var(--ink-secondary); }
+.pwb-key__tem { background: var(--brand-teal) !important; border-radius: 2px !important; transform: rotate(45deg) scale(0.86); }
+
+.pwb-frame { overflow-x: auto; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.pwb-frame:focus-visible { outline: none; box-shadow: var(--ring); }
+.pwb-mesh { display: block; width: 100%; min-width: 720px; height: auto; font-family: var(--font-sans); }
+.pwb-colhead { fill: var(--ink-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.pwb-more { fill: var(--ink-muted); font-size: 11.5px; font-weight: 600; }
+
+.pwb-edge { fill: none; stroke: var(--line-strong); stroke-width: 1; transition: stroke var(--dur-fast) ease, opacity var(--dur-fast) ease; }
+.pwb-edge[data-on] { stroke: var(--brand-blue); stroke-width: 1.6; }
+.pwb-ray { fill: none; stroke: var(--brand-blue); stroke-width: 1.6; }
+
+.pwb-node { transition: opacity var(--dur-fast) ease; }
+.pwb-node text { fill: var(--ink-secondary); font-size: 11.5px; font-weight: 600; paint-order: stroke; stroke: var(--surface-2); stroke-width: 3px; stroke-linejoin: round; }
+.pwb-hit { fill: transparent; }
+.pwb-sheet { fill: var(--brand-navy); }
+.pwb-rule { fill: none; stroke: var(--surface-2); stroke-width: 1.6; stroke-linecap: round; }
+.pwb-node[data-kind="pagina"] text { fill: var(--brand-navy); font-size: 12px; font-weight: 800; }
+.pwb-node[data-kind="seccion"] .pwb-dot { fill: var(--brand-navy); stroke: var(--surface-2); stroke-width: 2; }
+.pwb-node[data-kind="seccion"] text { fill: var(--ink); font-weight: 700; }
+.pwb-node[data-kind="pasaje"] { cursor: pointer; outline: none; }
+.pwb-node[data-kind="pasaje"] .pwb-dot { fill: var(--surface); stroke: var(--ink-secondary); stroke-width: 1.5; transition: fill var(--dur-base) ease, stroke var(--dur-base) ease; }
+.pwb-node[data-kind="pasaje"][data-idx] .pwb-dot { fill: var(--brand-navy); stroke: var(--surface-2); stroke-width: 2; }
+.pwb-codetext { fill: var(--brand-navy) !important; font-weight: 800 !important; }
+.pwb-score { fill: var(--brand-blue-strong) !important; font-weight: 700 !important; font-variant-numeric: tabular-nums; }
+.pwb-node[data-kind="tema"] .pwb-dot { fill: var(--brand-teal); stroke: var(--surface-2); stroke-width: 2; }
+.pwb-node[data-kind="tema"][data-norma] .pwb-dot { fill: var(--surface); stroke: var(--brand-teal); }
+.pwb-shared { fill: var(--ink-muted) !important; font-size: 10.5px !important; font-weight: 500 !important; }
+.pwb-node[data-on] .pwb-dot { fill: var(--brand-blue); }
+.pwb-node[data-on] .pwb-sheet { fill: var(--brand-blue); }
+.pwb-node[data-sel] .pwb-hit { fill: var(--brand-blue-soft); }
+.pwb-node[data-kind="pasaje"]:focus-visible .pwb-hit { fill: transparent; stroke: var(--brand-blue); stroke-width: 2; }
+@media (hover: hover) and (pointer: fine) {
+  .pwb-node[data-kind="pasaje"]:not([data-sel]):hover .pwb-hit { fill: var(--surface-3); }
+}
+.pwb-mesh[data-asked] .pwb-node:not([data-on]) { opacity: 0.34; }
+.pwb-mesh[data-asked] .pwb-edge:not([data-on]) { opacity: 0.3; }
+.pwb-q rect { fill: var(--brand-blue); }
+.pwb-q text { fill: var(--surface); font-size: 11.5px; font-weight: 800; }
+
+.pwb-empty { display: grid; gap: var(--space-2); padding: var(--space-6) var(--space-5); background: var(--surface-2); border: 1px dashed var(--line-strong); border-radius: var(--radius-sm); }
+.pwb-empty p { max-width: 62ch; margin: 0; color: var(--ink-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
+.pwb-empty strong { color: var(--ink); }
+
+/* --- La consulta -------------------------------------------------------------------------- */
+
+.pwb-answer { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--line); }
+@media (max-width: 760px) { .pwb-answer { grid-template-columns: minmax(0, 1fr); } }
+.pwb-answer h4 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 0 6px; color: var(--ink-secondary); font-size: var(--text-xs); font-weight: 700; }
+.pwb-answer > div { display: grid; gap: var(--space-3); align-content: start; min-width: 0; }
+
+.pwb-cites { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.pwb-cites button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: baseline;
+  width: 100%;
+  padding: 8px 10px;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, transform var(--dur-press) var(--ease-out);
+}
+.pwb-cites button:active { transform: scale(0.99); }
+.pwb-cites button:focus-visible { outline: none; box-shadow: var(--ring); }
+.pwb-cites button[aria-pressed="true"] { background: var(--brand-blue-soft); border-color: transparent; }
+.pwb-cites b { color: var(--brand-navy); font-weight: 800; }
+.pwb-cites span { overflow: hidden; color: var(--ink-secondary); text-overflow: ellipsis; white-space: nowrap; }
+.pwb-cites em { color: var(--ink-muted); font-style: normal; font-variant-numeric: tabular-nums; }
+
+.pwb-others { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.pwb-others li { display: grid; gap: 1px; }
+.pwb-others strong { font-size: var(--text-sm); font-weight: 700; }
+.pwb-others small { color: var(--ink-muted); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+
+.pwb-said { display: grid; gap: var(--space-2); padding-top: var(--space-3); border-top: 1px solid var(--line); }
+.pwb-said h4 { color: var(--ink); font-size: var(--text-sm); }
+.pwb-text { max-width: 64ch; margin: 0; color: var(--ink); font-size: var(--text-base); line-height: 1.6; white-space: pre-line; }
+.pwb-tip { max-width: 52ch; margin: 0; color: var(--ink-secondary); font-size: var(--text-sm); line-height: 1.45; animation: pwb-in 0.32s var(--ease-out) both; }
+.pwb-thinking { max-width: 64ch; margin: 0; padding: var(--space-3); color: var(--ink-secondary); background: var(--surface-2); border-radius: var(--radius-xs); font-size: var(--text-sm); line-height: 1.5; }
+.pwb-thinking b { color: var(--ink); }
+@keyframes pwb-in { from { opacity: 0; transform: translateY(4px); filter: blur(2px); } }
+
+.pwb-dots { display: inline-flex; gap: 3px; }
+.pwb-dots i { width: 5px; height: 5px; background: var(--brand-blue); border-radius: var(--radius-pill); animation: pwb-dot 1s var(--ease-out) infinite; }
+.pwb-dots i:nth-child(2) { animation-delay: 0.15s; }
+.pwb-dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes pwb-dot { 0%, 100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+.pwb-passage { padding: var(--space-4); background: var(--surface-2); border-radius: var(--radius-sm); }
+.pwb-passage strong { color: var(--brand-navy); font-size: var(--text-sm); font-weight: 800; overflow-wrap: anywhere; }
+.pwb-passage p { margin: 0; color: var(--ink-secondary); font-size: var(--text-sm); line-height: 1.6; white-space: pre-line; }
+
+@media (prefers-reduced-motion: reduce) {
+  li[data-state="run"] .pwb-glyph__arc { animation-duration: 1.6s; }
+  .pwb-tip { animation: none; }
+  .pwb-dots i { animation: none; opacity: 0.7; }
+  .pwb-pages button:active:not(:disabled), .pwb-cites button:active { transform: none; }
+}

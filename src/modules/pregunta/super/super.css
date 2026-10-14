@@ -1,0 +1,191 @@
+/* =============================================================================
+   Los modos secretos de Pilo · colores, equipo y entrada.
+
+   Un modo tiñe lo que ya existe: el acento de la página (--ap-primary), la
+   barra lateral y la escena de la entrada (--ap-stage-*). No añade superficies
+   ni cambia medidas. La entrada reutiliza la escena de la bienvenida
+   (welcome.css, .apw-*); aquí solo va lo suyo (.aps-*).
+   Solo se animan transform y opacidad.
+   ========================================================================== */
+
+/* --- El color de cada modo ---------------------------------------------------------- */
+
+.ap[data-modo="pilocop"][data-tema] {
+  --sp-primary: #c2410c;
+  --sp-soft: #fdebe0;
+  --sp-text: #9a3412;
+  --sp-side: #0b1220;
+  --sp-accent: #ff6a00;
+  --sp-light: #ff8a3d;
+  --sp-stage-1: #4a2208;
+  --sp-stage-2: #170b04;
+}
+.ap[data-modo="pilonator"][data-tema] {
+  --sp-primary: #b91c1c;
+  --sp-soft: #fde8e8;
+  --sp-text: #991b1b;
+  --sp-side: #0a0a0a;
+  --sp-accent: #ff3b30;
+  --sp-light: #ff6b61;
+  --sp-stage-1: #450d0d;
+  --sp-stage-2: #140404;
+}
+.ap[data-modo="sayayin"][data-tema] {
+  --sp-primary: #a16207;
+  --sp-soft: #fdf3c8;
+  --sp-text: #854d0e;
+  --sp-side: #1c1500;
+  --sp-accent: #ffd21f;
+  --sp-light: #ffd21f;
+  --sp-stage-1: #4d3d05;
+  --sp-stage-2: #171200;
+}
+.ap[data-modo][data-tema] {
+  --ap-primary: var(--sp-primary);
+  --ap-primary-ink: #ffffff;
+  --ap-primary-soft: var(--sp-soft);
+  --ap-primary-text: var(--sp-text);
+  --ap-side: var(--sp-side);
+  --ap-side-ink: #ffffff;
+  --ap-side-muted: #b9c0cc;
+  --ap-side-line: rgba(255, 255, 255, 0.14);
+  --ap-side-active: color-mix(in srgb, var(--sp-accent) 22%, transparent);
+  --ap-accent: var(--sp-accent);
+  --ap-accent-ink: #000000;
+  --ap-ring: 0 0 0 3px color-mix(in srgb, var(--sp-accent) 35%, transparent);
+}
+/* En negro el acento tiene que ser claro para leerse. */
+.ap[data-modo][data-tema="negro"] {
+  --ap-primary: var(--sp-light);
+  --ap-primary-ink: #000000;
+  --ap-primary-soft: color-mix(in srgb, var(--sp-light) 16%, transparent);
+  --ap-primary-text: var(--sp-light);
+}
+
+/* El modo se dice con palabras en la barra, no solo con color. */
+.ap-modo {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ap-primary);
+  color: var(--ap-primary-ink);
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* --- El equipo ---------------------------------------------------------------------- */
+
+.sp-defs {
+  position: absolute;
+}
+
+.sp-scan {
+  animation: sp-scan 0.75s ease-in-out infinite alternate;
+}
+.sp-blink {
+  animation: sp-blink 1s steps(1) infinite;
+}
+.sp-flame path {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: sp-flame 0.09s steps(2) infinite alternate;
+}
+.sp-aura {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sp-aura 0.11s steps(2) infinite alternate;
+}
+.sp-ring {
+  animation: sp-ring 1.2s linear infinite;
+}
+@keyframes sp-scan {
+  to { transform: translateX(202px); }
+}
+@keyframes sp-blink {
+  50% { opacity: 0.25; }
+}
+@keyframes sp-flame {
+  to { transform: scaleY(0.7); }
+}
+@keyframes sp-aura {
+  to { transform: scale(1.03, 1.05); }
+}
+@keyframes sp-ring {
+  to { stroke-dashoffset: -120; }
+}
+
+/* --- La entrada --------------------------------------------------------------------- */
+
+/* La escena trae sus propios colores: así es la misma en la página (.ap) y en la app (.pa),
+   sin depender de las variables de quien la aloja. */
+.aps[data-modo="pilocop"] {
+  --ap-accent: #ff6a00;
+  --ap-stage-1: #4a2208;
+  --ap-stage-2: #170b04;
+}
+.aps[data-modo="pilonator"] {
+  --ap-accent: #ff3b30;
+  --ap-stage-1: #450d0d;
+  --ap-stage-2: #140404;
+}
+.aps[data-modo="sayayin"] {
+  --ap-accent: #ffd21f;
+  --ap-stage-1: #4d3d05;
+  --ap-stage-2: #171200;
+}
+.aps {
+  z-index: 110;
+  --ap-stage-3: #020202;
+  --ap-stage-glow: color-mix(in srgb, var(--ap-accent) 26%, transparent);
+  --ap-stage-ink: #ffffff;
+  --ap-stage-muted: #d6d6d6;
+  --ap-stage-line: rgba(255, 255, 255, 0.14);
+  --ap-stage-chip: rgba(255, 255, 255, 0.08);
+  color: var(--ap-stage-ink);
+  font-family: var(--ap-sans, inherit);
+}
+.aps .apw-title {
+  font: 700 clamp(2rem, 3.4vw + 1rem, 3.4rem) / 1.04 var(--ap-serif, var(--font-display, Georgia, serif));
+}
+.aps .apw-sbtn {
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  background: none;
+  cursor: pointer;
+}
+.aps .apw-brand {
+  margin-right: auto;
+}
+.aps-fly {
+  height: clamp(220px, 46vh, 420px);
+  aspect-ratio: 1300 / 1800;
+}
+.aps-fly svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.aps-flash {
+  position: absolute;
+  inset: 0;
+  background: var(--ap-accent);
+  opacity: 0;
+  pointer-events: none;
+}
+.aps .apw-bubble {
+  min-height: 1.5em;
+  color: var(--ap-stage-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-scan,
+  .sp-blink,
+  .sp-flame path,
+  .sp-aura,
+  .sp-ring {
+    animation: none;
+  }
+}

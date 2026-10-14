@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="Pilo, la inteligencia artificial de la Universidad de Santander."
+    />
+    <meta name="theme-color" content="#f4f7fb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b1017" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pilo AI | Universidad de Santander" />
+    <meta
+      property="og:description"
+      content="Pregúntele a Pilo sobre la UDES."
+    />
+    <meta property="og:image" content="/og-card.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href="/logo-udes.svg" />
+
+    <!-- Las fuentes se piden desde el HTML, no con @import dentro del CSS:
+         un @import obliga al navegador a descargar la hoja de estilos antes
+         de descubrir siquiera la petición de la fuente. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wdth,wght@0,75..100,300..800;1,75..100,300..800&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wdth,wght@0,75..100,300..800;1,75..100,300..800&display=swap"
+    />
+
+    <title>Pilo AI | Universidad de Santander</title>
+
+    <!-- La app móvil de Mr. Pilo (/app) es instalable. Su manifiesto, sus metas
+         de iPhone y el aviso de instalación se ponen solo bajo /app: el resto
+         del portal no es una app ni debe ofrecerse como tal. Va aquí, y no en
+         el código de la app, porque el navegador los lee al cargar la página
+         y el aviso de instalación puede llegar antes que la app. -->
+    <script>
+      (function () {
+        var path = location.pathname;
+        if (path !== "/app" && path.indexOf("/app/") !== 0) return;
+        var head = document.head;
+        var add = function (tag, attrs) {
+          var el = document.createElement(tag);
+          for (var key in attrs) el.setAttribute(key, attrs[key]);
+          head.appendChild(el);
+        };
+        // Los márgenes seguros (env(safe-area-inset-*)) solo existen si la página ocupa toda la pantalla.
+        var viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) viewport.setAttribute("content", "width=device-width, initial-scale=1.0, viewport-fit=cover");
+        add("link", { rel: "manifest", href: "/manifest.webmanifest" });
+        add("link", { rel: "apple-touch-icon", href: "/pilo-app/apple-touch-icon.png" });
+        add("meta", { name: "mobile-web-app-capable", content: "yes" });
+        add("meta", { name: "apple-mobile-web-app-capable", content: "yes" });
+        add("meta", { name: "apple-mobile-web-app-title", content: "Mr. Pilo" });
+        add("meta", { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" });
+        add("meta", { name: "application-name", content: "Mr. Pilo" });
+        // El aviso de instalación se guarda para que la app lo ofrezca con su propio botón («Instalar a Pilo»).
+        window.addEventListener("beforeinstallprompt", function (event) {
+          event.preventDefault();
+          window.__piloInstall = event;
+          window.dispatchEvent(new Event("pilo-install"));
+        });
+      })();
+    </script>
+
+    <!-- El tema se aplica antes del primer pintado. Sin esto, quien tiene el
+         tema oscuro guardado ve un destello blanco en cada carga. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("pdi-theme");
+          if (stored === "light" || stored === "dark") {
+            document.documentElement.setAttribute("data-theme", stored);
+          }
+        } catch (error) {
+          /* almacenamiento bloqueado: manda prefers-color-scheme */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

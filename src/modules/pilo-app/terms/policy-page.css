@@ -1,0 +1,374 @@
+/* =============================================================================
+   Mr. Pilo · la política de uso completa (/pilo-politica).
+
+   Una página del sitio, no de la app: usa los tokens del portal (tokens.css) y
+   sigue su tema claro u oscuro. Aquí no hay ningún color escrito a mano.
+
+   Desde 861 px: índice lateral pegado y el texto a su derecha, a 70ch. Por
+   debajo: el índice es una franja horizontal pegada arriba, que se desplaza
+   dentro de sí misma; la página nunca se desplaza hacia los lados.
+
+   Es un documento: sin animaciones de adorno. Solo ceden al pulsarlos los
+   enlaces de volver.
+   ========================================================================== */
+
+.pp {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--space-5) var(--gutter) var(--space-10);
+  background: var(--page);
+  color: var(--ink);
+  font: 500 var(--text-base) / 1.6 var(--font-sans);
+}
+
+.pp *,
+.pp *::before,
+.pp *::after {
+  box-sizing: border-box;
+}
+
+.pp :where(h1, h2, p, ul, ol, dl, dd) {
+  margin: 0;
+}
+
+.pp :focus-visible {
+  outline: 2px solid var(--brand-blue);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+.pp-in {
+  display: grid;
+  /* La columna no crece con su contenido: la franja del índice se desplaza dentro de sí misma. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+/* --- Arriba: volver a Pilo ----------------------------------------------------------------------- */
+
+.pp-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pp-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--brand-blue-strong);
+  text-decoration: none;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.pp-back:active {
+  transform: scale(0.97);
+}
+
+.pp-back svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pp-brand {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ink-secondary);
+}
+
+.pp-brand b {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* --- El documento -------------------------------------------------------------------------------- */
+
+.pp-doc {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: start;
+  padding: clamp(20px, 4vw, 48px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+}
+
+.pp-toc {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + var(--space-4));
+  display: grid;
+  gap: var(--space-3);
+}
+
+.pp-toc__label {
+  font-size: var(--text-xs);
+  font-weight: 800;
+  color: var(--ink-secondary);
+}
+
+.pp-toc ol {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--line-strong);
+}
+
+.pp-toc a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  margin-left: -1px;
+  padding: var(--space-1) var(--space-3);
+  border-left: 2px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink-secondary);
+  text-decoration: none;
+}
+
+/* La sección que se lee: el filete y la tinta, no solo el color. */
+.pp-toc a[aria-current] {
+  border-left-color: var(--brand-blue);
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.pp-text {
+  display: grid;
+  gap: var(--space-7);
+  min-width: 0;
+  max-width: 70ch;
+}
+
+.pp-text > header h1 {
+  font: 700 var(--text-2xl) / 1.1 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+.pp-text > header p {
+  margin-top: var(--space-2);
+  color: var(--ink-secondary);
+}
+
+.pp-text > header .pp-version {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pp-sec {
+  display: grid;
+  gap: var(--space-3);
+  scroll-margin-top: var(--space-5);
+}
+
+.pp-sec:focus-visible {
+  outline: none;
+}
+
+.pp-sec h2 {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  font: 700 1.3rem/1.2 var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.pp-sec h2 span {
+  flex: none;
+  font: 800 var(--text-sm) var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  color: var(--brand-blue-strong);
+}
+
+.pp-sec p,
+.pp-sec li,
+.pp-facts dd {
+  color: var(--ink-secondary);
+  overflow-wrap: break-word;
+}
+
+.pp-sec ul {
+  display: grid;
+  gap: var(--space-2);
+  padding-left: var(--space-5);
+  list-style: disc;
+}
+
+.pp-sec strong {
+  color: var(--ink);
+}
+
+/* Lo que el dueño aún no ha definido: dicho tal cual, sin adorno y sin inventarlo. */
+.pp-pending {
+  font-style: italic;
+}
+
+.pp-facts {
+  margin-top: var(--space-1);
+  border-top: 1px solid var(--line);
+}
+
+.pp-facts > div {
+  display: grid;
+  grid-template-columns: minmax(0, 170px) minmax(0, 1fr);
+  gap: 0 var(--space-4);
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.pp-facts dt {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.pp-foot {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+/* --- Teléfono: el índice es una franja pegada arriba ------------------------------------------- */
+
+@media (max-width: 860px) {
+  /* En bloque: así la franja acompaña todo el documento y no solo su fila. */
+  .pp-doc {
+    display: block;
+  }
+
+  .pp-toc {
+    top: 0;
+    z-index: 2;
+    display: block;
+    margin: 0 calc(-1 * clamp(20px, 4vw, 48px)) var(--space-5);
+    padding: env(safe-area-inset-top, 0px) clamp(20px, 4vw, 48px) 0;
+    border-bottom: 1px solid var(--line-strong);
+    background: var(--surface);
+  }
+
+  .pp-toc__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .pp-toc ol {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: var(--space-1);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    border-left: 0;
+  }
+
+  .pp-toc ol::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pp-toc a {
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+    border-left: 0;
+    border-bottom: 2px solid transparent;
+  }
+
+  .pp-toc a[aria-current] {
+    border-bottom-color: var(--brand-blue);
+  }
+
+  .pp-sec {
+    scroll-margin-top: calc(60px + env(safe-area-inset-top, 0px));
+  }
+
+  .pp-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .pp {
+    padding-top: var(--space-2);
+  }
+
+  .pp-brand {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-back:active {
+    transform: none;
+  }
+}
+
+/* --- En papel: el documento, en tinta sobre blanco, sin índice ni enlaces de volver ------------ */
+
+@media print {
+  /* Colores del sistema en esquema claro: tinta sobre blanco también con el portal en oscuro. */
+  .pp {
+    min-height: 0;
+    padding: 0;
+    color-scheme: light;
+    background: Canvas !important;
+  }
+
+  .pp * {
+    background: none !important;
+  }
+
+  .pp,
+  .pp * {
+    color: CanvasText !important;
+    box-shadow: none !important;
+    border-color: GrayText !important;
+  }
+
+  .pp-top,
+  .pp-toc,
+  .pp-foot {
+    display: none;
+  }
+
+  .pp-doc {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .pp-text {
+    max-width: none;
+  }
+
+  .pp-sec h2 {
+    break-after: avoid;
+  }
+
+  .pp-facts > div,
+  .pp-sec li {
+    break-inside: avoid;
+  }
+}

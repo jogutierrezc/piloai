@@ -1,0 +1,63 @@
+/* Mr. Pilo · la cara oficial (PiloFace.tsx). El dibujo mide 450 × 631 y se
+   encaja entero en el cuadro que pide quien lo usa: nunca se estira. Solo se
+   animan transform y opacidad. */
+
+.pilo-face {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  aspect-ratio: 1;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+/* El dibujo, centrado y a su proporción. */
+.pilo-face__rig {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  aspect-ratio: 450 / 631;
+  translate: -50% 0;
+  transform-origin: 50% 88%;
+}
+
+.pilo-face__rig img,
+.pilo-face__gaze,
+.pilo-face__white {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Lo que se le pone encima (PiloFace `gear`): mismo encuadre, puede sobresalir. */
+.pilo-face__gear {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Las pupilas se mueven dentro del blanco del ojo y no salen de él. */
+.pilo-face__white {
+  -webkit-mask: url("/pilo-face/white.png") center / 100% 100% no-repeat;
+  mask: url("/pilo-face/white.png") center / 100% 100% no-repeat;
+}
+
+/* Las poses de una sola imagen tienen otro encuadre: caben enteras. */
+.pilo-face__pose {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  transform-origin: 50% 88%;
+}

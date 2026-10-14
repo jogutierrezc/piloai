@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Página de prueba · Pilo en otros portales</title>
+    <style>
+      body { margin: 0; font: 16px/1.6 Georgia, "Times New Roman", serif; color: #2a2a2a; background: #f3efe6; }
+      main { max-width: 640px; margin: 0 auto; padding: 48px 20px 160px; }
+      h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 16px; }
+      p { margin: 0 0 16px; }
+      code { font: 0.85em/1.5 Consolas, Menlo, monospace; background: #e6dfd0; padding: 2px 6px; border-radius: 4px; }
+      [role="tablist"] { display: flex; gap: 8px; margin: 0 0 12px; }
+      [role="tab"] { font: inherit; padding: 6px 14px; border: 1px solid #b9ae97; border-radius: 999px; background: transparent; cursor: pointer; }
+      [role="tab"][aria-selected="true"] { background: #2a2a2a; color: #f3efe6; }
+      details { margin: 0 0 16px; padding: 10px 14px; border: 1px solid #d5ccb8; border-radius: 8px; }
+      summary { cursor: pointer; font-weight: bold; }
+      details p { margin: 10px 0 0; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Página de prueba de otro portal</h1>
+      <p>Esta página no usa los estilos del portal de Planeación, a propósito: sirve para ver a Pilo alojado en un sitio ajeno. Aquí están los dos: el Pilo de Planeación en la esquina inferior derecha y Mr. Pilo en Enseñanza, la Inteligencia Artificial de la Universidad de Santander, en la inferior izquierda.</p>
+      <p>Cada uno se pega con su propia línea. El de Enseñanza lleva <code>data-pilo="ensenanza"</code>; sin ese atributo, la línea trae al Pilo de Planeación. Un Pilo que no esté abierto para quien mira la página sencillamente no aparece.</p>
+      <p>Para probar otras variantes, cambie los atributos de los <code>&lt;script&gt;</code> al final de este archivo: <code>data-tema</code> acepta blanco, soleado o negro; <code>data-esquina</code> acepta derecha o izquierda. Si van los dos en la misma página, póngalos en esquinas distintas.</p>
+      <h2>Leer la página</h2>
+      <p>Los dos Pilos llevan <code>data-leer="todo"</code>: al preguntarles, leen esta página para responder sobre lo que usted está viendo, también lo que está plegado en la pestaña y en el desplegable de abajo. Con <code>data-leer="si"</code> leerían solo lo visible. La lectura llega a «Lo que leyó en otros portales», en la memoria de ese Pilo, y la administración decide si la guarda. A esa bandeja llegan las páginas de los portales autorizados en la intranet y, del portal de Planeación, solo esta página de prueba.</p>
+      <p data-pilo-ignorar>Este párrafo lleva <code>data-pilo-ignorar</code>: Pilo no lo lee. Tampoco lee campos de formulario, menús ni diálogos.</p>
+      <h2>Para probar «leer todo»</h2>
+      <p>Sin abrir nada, pregúntele a cualquiera de los dos por el horario de la biblioteca de Cúcuta o por el código de préstamo: los dos están en la página, pero plegados. Pilo no pulsa las pestañas ni abre el desplegable: los lee como están.</p>
+      <div role="tablist" aria-label="Sedes">
+        <button type="button" role="tab" id="demo-tab-1" aria-controls="demo-panel-1" aria-selected="true">Bucaramanga</button>
+        <button type="button" role="tab" id="demo-tab-2" aria-controls="demo-panel-2" aria-selected="false">Cúcuta</button>
+      </div>
+      <div role="tabpanel" id="demo-panel-1" aria-labelledby="demo-tab-1">
+        <p>La biblioteca de prueba de Bucaramanga abre de lunes a viernes, de 7:00 a. m. a 9:00 p. m.</p>
+      </div>
+      <div role="tabpanel" id="demo-panel-2" aria-labelledby="demo-tab-2" hidden>
+        <p>La biblioteca de prueba de Cúcuta abre de lunes a sábado, de 8:00 a. m. a 6:00 p. m. (dato inventado, solo para esta prueba).</p>
+      </div>
+      <details>
+        <summary>¿Cómo se pide un libro en préstamo?</summary>
+        <p>En esta página de prueba, el préstamo se pide con el código inventado PRUEBA-2468 en el mostrador.</p>
+      </details>
+      <div id="demo-cookies" class="cookie-banner" hidden>
+        <p>Este aviso de cookies está oculto y no es contenido: Pilo no lo lee ni con «leer todo». Si le pregunta por la palabra clave «mandarina», no la sabrá.</p>
+      </div>
+      <p>Baje por la página para comprobar que los botones se quedan en su esquina.</p>
+      <p style="height: 900px"></p>
+      <p>Fin de la página de prueba.</p>
+    </main>
+    <script>
+      // Las pestañas de la prueba: una visible, la otra con `hidden`.
+      document.querySelectorAll('[role="tab"]').forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          document.querySelectorAll('[role="tab"]').forEach(function (other) {
+            other.setAttribute("aria-selected", other === tab ? "true" : "false");
+            document.getElementById(other.getAttribute("aria-controls")).hidden = other !== tab;
+          });
+        });
+      });
+    </script>
+    <script src="/pilo.js" data-tema="blanco" data-esquina="derecha" data-leer="todo" defer></script>
+    <script src="/pilo.js" data-pilo="ensenanza" data-tema="blanco" data-esquina="izquierda" data-leer="todo" defer></script>
+  </body>
+</html>

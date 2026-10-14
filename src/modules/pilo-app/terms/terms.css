@@ -1,0 +1,435 @@
+/* =============================================================================
+   Mr. Pilo · la app · la aceptación de la política («Antes de empezar»), las
+   cuatro reglas de oro y la tarjeta de autorización de Génesis y Moodle.
+
+   En el teléfono, Pilo arriba en su escenario y las reglas debajo, en una sola
+   columna que se desplaza. Desde 900 px, el escenario a la izquierda y las
+   reglas a la derecha, como en el diseño aprobado.
+
+   Los colores son los del tema (pilo-app-themes.css): aquí no hay ninguno
+   escrito a mano; los bordes salen de mezclar la tinta del tema con
+   transparente. Todo lo que se toca mide 44 px o más.
+
+   Movimiento: solo transform y opacidad, y todo lo que se pulsa cede a 0.97.
+   Ningún texto nace oculto en esta hoja: los estados ocultos los pone y los
+   quita GSAP, que al interrumpirse deja el final.
+   ========================================================================== */
+
+.pt-gate,
+.pt-card,
+.pt-rules {
+  --pt-line: color-mix(in srgb, var(--c-ink2) 42%, transparent);
+}
+
+/* --- La aceptación ----------------------------------------------------------------------------- */
+
+/* Encima de la conversación y de sus hojas; debajo de la bienvenida, que se va primero. */
+.pt-gate {
+  position: absolute;
+  inset: 0;
+  z-index: 19;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: var(--c-bg);
+  color: var(--c-ink);
+}
+
+.pt-gate:focus-visible {
+  outline: none;
+}
+
+.pt-stage {
+  position: relative;
+  flex: none;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+  min-height: 228px;
+  padding: calc(20px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 22px max(16px, env(safe-area-inset-left, 0px));
+  color: var(--s-ink);
+  text-align: center;
+  isolation: isolate;
+}
+
+.pt-stage__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 38%, var(--s1) 0%, var(--s2) 46%, var(--s3) 100%);
+}
+
+.pt-glow {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: 520px;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--s-glow), transparent);
+  pointer-events: none;
+}
+
+.pt-rings i {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1px solid var(--s-line);
+  pointer-events: none;
+}
+
+/* La cara oficial, entera y a su proporción: solo cambia el tamaño de su caja. */
+.pt-face,
+.pt-face__in {
+  width: 112px;
+  height: 112px;
+}
+
+.pt-stage h1 {
+  font: 700 1.6rem/1.1 var(--font-display);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.pt-stage h1:focus-visible {
+  outline: none;
+}
+
+.pt-stage p {
+  max-width: 32ch;
+  font-weight: 600;
+  color: var(--s-muted);
+  text-wrap: balance;
+}
+
+.pt-accept {
+  flex: 1 0 auto;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  width: 100%;
+  max-width: 600px;
+  margin-inline: auto;
+  padding: 22px max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+
+.pt-accept h2 {
+  font: 700 1.3rem/1.2 var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* --- Las cuatro reglas de oro ------------------------------------------------------------------ */
+
+.pt-i {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pt-rules {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pt-rules li {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.pt-rules__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--c-chip);
+  color: var(--c-link);
+}
+
+.pt-rules b {
+  display: block;
+  font-weight: 800;
+  color: var(--c-ink);
+}
+
+.pt-rules p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--c-ink2);
+}
+
+/* --- La casilla, los botones y las notas -------------------------------------------------------- */
+
+/* La casilla se toca entera. */
+.pt-consent {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  min-height: 48px;
+  padding: 13px 16px;
+  border: 1px solid var(--pt-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-bubble);
+  color: var(--c-ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pt-consent--plain {
+  background: none;
+}
+
+.pt-consent input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--c-link);
+}
+
+.pt-consent:has(input[aria-invalid="true"]) {
+  border-color: var(--c-bad);
+  box-shadow: inset 0 0 0 1px var(--c-bad);
+}
+
+.pt-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: center;
+}
+
+.pt-go {
+  min-width: 132px;
+  padding-inline: 22px;
+}
+
+/* Aún no deja seguir: se ve apagado, pero se puede enfocar y dice por qué. */
+.pt-go[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.pt-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  border-radius: var(--radius-xs);
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--c-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pt-hint {
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+/* Lo que falta no se dice solo con color: lleva su signo. */
+.pt-hint[data-missed] {
+  font-weight: 700;
+  color: var(--c-bad);
+}
+
+.pt-hint[data-missed]::before {
+  content: "! ";
+  font-weight: 800;
+}
+
+.pt-link,
+.pt-consent {
+  transition: transform var(--dur-press) var(--ease-out), border-color var(--dur-fast) ease;
+}
+
+.pt-link:active,
+.pt-consent:active {
+  transform: scale(0.97);
+}
+
+/* --- La autorización de Génesis o Moodle -------------------------------------------------------- */
+
+.pt-card {
+  display: grid;
+  min-width: 0;
+  max-width: 560px;
+  overflow: hidden;
+  border: 1px solid var(--pt-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-sheet);
+  color: var(--c-ink);
+}
+
+.pt-card__head {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 20px 22px;
+  background: var(--c-bar);
+  color: var(--c-bar-ink);
+}
+
+.pt-card__face {
+  width: 84px;
+  height: 84px;
+}
+
+.pt-card__head h2,
+.pt-card__head h3 {
+  margin: 0;
+  font: 700 1.3rem/1.15 var(--font-display);
+  text-wrap: balance;
+}
+
+.pt-card__head p {
+  margin: 2px 0 0;
+  font-size: 0.875rem;
+  color: var(--c-bar-muted);
+}
+
+.pt-card__body {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding: 20px 22px 24px;
+}
+
+.pt-promise {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pt-promise li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.pt-promise .pt-i {
+  margin-top: 2px;
+  color: var(--c-ok);
+}
+
+.pt-promise b {
+  display: block;
+  font-weight: 800;
+}
+
+.pt-promise span {
+  font-size: 0.875rem;
+  color: var(--c-ink2);
+}
+
+/* --- Pantallas bajas, estrechas y anchas ---------------------------------------------------------- */
+
+@media (max-height: 620px) {
+  .pt-face,
+  .pt-face__in {
+    width: 80px;
+    height: 80px;
+  }
+
+  .pt-stage {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .pt-card__head {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .pt-card__face {
+    width: 64px;
+    height: 64px;
+  }
+
+  .pt-card__body {
+    padding: 16px 16px 20px;
+  }
+}
+
+@media (min-width: 900px) {
+  .pt-gate {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    overflow: hidden;
+  }
+
+  .pt-stage {
+    gap: 14px;
+    min-height: 0;
+    padding: 36px 24px;
+  }
+
+  .pt-face,
+  .pt-face__in {
+    width: 180px;
+    height: 180px;
+  }
+
+  .pt-stage h1 {
+    font-size: 1.8rem;
+  }
+
+  .pt-accept {
+    align-content: center;
+    align-content: safe center;
+    justify-items: start;
+    max-width: none;
+    min-height: 0;
+    height: 100%;
+    margin: 0;
+    padding: 32px clamp(24px, 5vw, 64px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .pt-accept > * {
+    width: 100%;
+    max-width: 560px;
+  }
+}
+
+@media (min-width: 900px) and (max-height: 640px) {
+  .pt-face,
+  .pt-face__in {
+    width: 124px;
+    height: 124px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pt-link:active,
+  .pt-consent:active {
+    transform: none;
+  }
+}

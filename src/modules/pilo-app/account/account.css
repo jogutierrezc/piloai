@@ -1,0 +1,1299 @@
+/* =============================================================================
+   Mr. Pilo · cuentas (0120) · /app/cuenta, /app/perfil y /app/guardadas.
+
+   En el teléfono, Pilo arriba en su escenario y el formulario debajo, en una
+   sola columna que se desplaza. Desde 900 px, el escenario a la izquierda y
+   el formulario a la derecha, como en el diseño aprobado.
+
+   Los colores son los del tema (pilo-app-themes.css): aquí no hay ninguno
+   escrito a mano; los bordes y los rellenos suaves salen de mezclar la tinta
+   del tema con transparente. Todo lo que se toca mide 44 px o más y los
+   campos van a 16 px (con menos, iOS acerca la página al enfocarlos).
+
+   Movimiento: solo transform y opacidad, menos de 300 ms, y todo botón cede a
+   0.97 al pulsarlo. Ningún texto nace oculto en esta hoja: los estados
+   ocultos los pone y los quita GSAP, que al interrumpirse deja el final.
+   ========================================================================== */
+
+.pa {
+  --pc-line: color-mix(in srgb, var(--c-ink2) 42%, transparent);
+  --pc-soft: color-mix(in srgb, var(--c-ink2) 10%, transparent);
+}
+
+/* --- La puerta: escenario y formulario ------------------------------------------------------- */
+
+.pc-gate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: var(--c-bg);
+}
+
+.pc-stage {
+  position: relative;
+  flex: none;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 8px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 18px max(16px, env(safe-area-inset-left, 0px));
+  color: var(--s-ink);
+  text-align: center;
+  isolation: isolate;
+}
+
+.pc-stage-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 38%, var(--s1) 0%, var(--s2) 46%, var(--s3) 100%);
+}
+
+.pc-glow {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 520px;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--s-glow), transparent);
+  pointer-events: none;
+}
+
+.pc-rings i {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1px solid var(--s-line);
+  pointer-events: none;
+}
+
+.pc-stage-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.pc-stage-top .pa-w-brand {
+  margin-right: auto;
+}
+
+.pc-stage-top .pa-sbtn {
+  text-decoration: none;
+}
+
+.pc-stage :focus-visible {
+  outline-color: var(--s-ink);
+  border-radius: var(--radius-pill);
+}
+
+/* La cara oficial, entera y a su proporción: solo cambia el tamaño de su caja. */
+.pc-face,
+.pc-face__in {
+  width: 104px;
+  height: 104px;
+}
+
+.pc-bubble {
+  max-width: min(34ch, 100%);
+  min-height: 2.9em;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.42;
+  text-wrap: balance;
+}
+
+.pc-bubble .wd {
+  display: inline-block;
+  white-space: pre;
+}
+
+.pc-form {
+  flex: 1 0 auto;
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+  padding: 20px max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  color: var(--c-ink);
+}
+
+/* --- La barra de pasos ------------------------------------------------------------------------ */
+
+.pc-segs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pc-segs span {
+  flex: 1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--pc-line);
+}
+
+.pc-segs span i {
+  display: block;
+  height: 100%;
+  background: var(--c-link);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 280ms var(--ease-out);
+}
+
+.pc-segs span[data-on] i {
+  transform: none;
+}
+
+.pc-segs small {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Un paso ---------------------------------------------------------------------------------- */
+
+.pc-step {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  min-width: 0;
+}
+
+.pc-step h2 {
+  font: 700 1.5rem/1.14 var(--font-display);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.pc-step h2:focus-visible {
+  outline: none;
+}
+
+.pc-step > p,
+.pc-sheet__in > p {
+  color: var(--c-ink2);
+  max-width: 62ch;
+}
+
+.pc-label {
+  margin-bottom: 6px;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--c-ink);
+}
+
+.pc-hint {
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pc-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pc-field label {
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+/* 16 px: con menos, iOS acerca la página al enfocar el campo. */
+.pc-field input,
+.pc-field select,
+.pc-field textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--pc-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-bubble);
+  color: var(--c-ink);
+  font: 500 16px/1.4 var(--font-sans);
+  caret-color: var(--c-link);
+}
+
+.pc-field textarea {
+  resize: vertical;
+  min-height: 88px;
+}
+
+.pc-field input::placeholder {
+  color: var(--c-ink2);
+  opacity: 1;
+}
+
+.pc-field input:focus-visible,
+.pc-field select:focus-visible,
+.pc-field textarea:focus-visible {
+  outline: 2px solid var(--c-link);
+  outline-offset: 1px;
+  border-radius: var(--radius-sm);
+}
+
+/* Un campo con error: el borde lo marca y el mensaje, con su glifo, lo dice. */
+.pc-field [aria-invalid="true"] {
+  border-color: var(--c-bad);
+  border-width: 2px;
+}
+
+.pc-pass {
+  position: relative;
+}
+
+.pc-pass input {
+  padding-right: 96px;
+}
+
+.pc-reveal {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  bottom: 2px;
+  min-width: 84px;
+  padding: 0 12px;
+  border-radius: var(--radius-xs);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--c-link);
+}
+
+.pc-msg {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+  overflow-wrap: anywhere;
+}
+
+.pc-msg .pa-i {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+.pc-msg[data-t="bad"] {
+  color: var(--c-bad);
+}
+
+.pc-msg[data-t="ok"] {
+  color: var(--c-ok);
+}
+
+.pc-live {
+  min-height: 20px;
+}
+
+.pc-domains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-domains li {
+  max-width: 100%;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--c-chip);
+  color: var(--c-ink);
+  font: 600 0.75rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.pc-opts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.pc-opt {
+  min-height: 64px;
+  padding: 12px 14px;
+  border: 1px solid var(--pc-line);
+  border-radius: var(--radius-md);
+  background: var(--c-bubble);
+  color: var(--c-ink);
+  font-weight: 800;
+  text-align: left;
+}
+
+.pc-opt small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--c-ink2);
+}
+
+/* La elegida no se marca solo con color: lleva el borde doble. */
+.pc-opt[aria-pressed="true"] {
+  border-color: var(--c-link);
+  background: var(--c-chip);
+  box-shadow: inset 0 0 0 1px var(--c-link);
+}
+
+.pc-checks {
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+.pc-checks li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pc-checks .pa-i {
+  width: 16px;
+  height: 16px;
+}
+
+.pc-checks li[data-ok] {
+  color: var(--c-ok);
+}
+
+/* Una elección entre pocas: un selector que se desliza hasta la elegida (lo mueve Seg, en parts.tsx). */
+.pc-seg {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  max-width: 100%;
+  padding: 4px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-bubble);
+}
+
+.pc-seg__thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: 0;
+  border-radius: var(--radius-xs);
+  background: var(--c-mine);
+  pointer-events: none;
+}
+
+.pc-seg button {
+  position: relative;
+  z-index: 1;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+  transition: transform var(--dur-press) var(--ease-out), color var(--dur-fast) ease;
+}
+
+.pc-seg button[aria-checked="true"] {
+  color: var(--c-mine-ink);
+}
+
+.pc-seg button:focus-visible {
+  outline: 2px solid var(--c-link);
+  outline-offset: 2px;
+}
+
+.pc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pc-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.pc-quiet {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 44px;
+  padding: 0 4px;
+  border-radius: var(--radius-xs);
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--c-link);
+  text-decoration: none;
+}
+
+.pc-step .pa-btn,
+.pc-sheet .pa-btn,
+.pc-save .pa-btn {
+  min-width: 132px;
+  padding-inline: 20px;
+}
+
+.pc-step .pa-btn:disabled,
+.pc-save .pa-btn:disabled,
+.pc-quiet:disabled {
+  opacity: 0.55;
+}
+
+/* «Usar Pilo sin cuenta», a la vista desde el primer paso. */
+.pc-aside {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-bubble);
+}
+
+.pc-aside p {
+  flex: 1 1 200px;
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pc-aside[data-strong] {
+  border-color: var(--c-link);
+  box-shadow: inset 0 0 0 1px var(--c-link);
+}
+
+.pc-benefits ul {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-benefits li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  font-size: 0.875rem;
+}
+
+.pc-benefits .pa-i {
+  margin-top: 1px;
+  color: var(--c-ok);
+}
+
+.pc-benefits small {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+/* Los términos de la cuenta: a la vista, y una casilla que se toca entera. */
+.pc-terms {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-bubble);
+}
+
+.pc-terms .pc-label {
+  margin: 0;
+}
+
+.pc-terms ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0 0 0 18px;
+  list-style: disc;
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pc-check {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pc-check input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--c-link);
+}
+
+/* --- Filas de datos (usuario, perfil, sede) ---------------------------------------------------- */
+
+.pc-rows {
+  margin: 0;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-bubble);
+}
+
+.pc-rows > div {
+  display: grid;
+  grid-template-columns: minmax(0, 96px) minmax(0, 1fr);
+  gap: 4px 16px;
+  align-items: center;
+  padding: 12px 16px;
+  border-top: 1px solid var(--c-line);
+}
+
+.pc-rows > div:first-child {
+  border-top: 0;
+}
+
+.pc-rows dt {
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+.pc-rows dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.pc-rows code {
+  font: 600 0.9rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.pc-break {
+  overflow-wrap: anywhere;
+}
+
+.pc-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--c-chip);
+  color: var(--c-ink);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.pc-tag .pa-i {
+  width: 14px;
+  height: 14px;
+}
+
+.pc-tag[data-t="ok"] {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--c-ok);
+  color: var(--c-ok);
+}
+
+/* --- Las páginas: perfil y guardadas ----------------------------------------------------------- */
+
+.pc-page {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.pc-pane {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  min-width: 0;
+}
+
+.pc-pane__head h1 {
+  font: 700 1.45rem/1.15 var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.pc-pane__head p {
+  margin-top: 2px;
+  max-width: 64ch;
+  color: var(--c-ink2);
+}
+
+.pc-profile {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.pc-sheet {
+  display: grid;
+  min-width: 0;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.pc-sheet__in {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding: 16px;
+}
+
+.pc-sheet .pc-rows {
+  border: 0;
+  border-bottom: 1px solid var(--c-line);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: none;
+}
+
+.pc-preview {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 14px 16px;
+  border-top: 1px solid var(--c-line);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  background: var(--c-bubble);
+}
+
+.pc-preview__face {
+  width: 48px;
+  height: 48px;
+}
+
+.pc-save {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.pc-save__msg {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.pc-wait {
+  padding: 24px 0;
+  color: var(--c-ink2);
+  font-weight: 700;
+}
+
+.pc-search {
+  max-width: 440px;
+}
+
+.pc-saved {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.pc-saved > li {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-top: 1px solid var(--c-line);
+}
+
+.pc-saved > li:first-child {
+  border-top: 0;
+}
+
+.pc-saved__head strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.pc-saved__head small {
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pc-saved__text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 70ch;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  color: var(--c-ink);
+}
+
+.pc-saved__text[data-open] {
+  display: block;
+}
+
+.pc-saved__src {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pc-saved__src a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-left: 8px;
+  font-weight: 800;
+  color: var(--c-link);
+}
+
+.pc-saved__tools,
+.pc-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.pc-confirm {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.pc-confirm span {
+  flex: 1 1 180px;
+}
+
+.pc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--pc-line);
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: inherit;
+}
+
+.pc-chip .pa-i {
+  width: 16px;
+  height: 16px;
+}
+
+.pc-chip[data-strong] {
+  border-color: currentColor;
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+
+/* Todo lo que se toca cede un poco al pulsarlo. */
+.pc-opt,
+.pc-quiet,
+.pc-reveal,
+.pc-chip {
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+
+.pc-opt:active,
+.pc-seg button:active,
+.pc-quiet:active,
+.pc-reveal:active,
+.pc-chip:active {
+  transform: scale(0.97);
+}
+
+/* --- Pantallas bajas y anchas ------------------------------------------------------------------ */
+
+@media (max-height: 620px) {
+  .pc-face,
+  .pc-face__in {
+    width: 76px;
+    height: 76px;
+  }
+}
+
+@media (min-width: 900px) {
+  .pc-gate {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    overflow: hidden;
+  }
+
+  .pc-stage {
+    align-content: center;
+    gap: 14px;
+    min-height: 0;
+    padding: 24px;
+    overflow: hidden;
+  }
+
+  .pc-stage-top {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    right: 20px;
+    width: auto;
+  }
+
+  .pc-face,
+  .pc-face__in {
+    width: 190px;
+    height: 190px;
+  }
+
+  .pc-bubble {
+    min-height: 5.6em;
+    font-size: 1.08rem;
+  }
+
+  .pc-form {
+    align-content: center;
+    align-content: safe center;
+    max-width: none;
+    min-height: 0;
+    height: 100%;
+    margin: 0;
+    padding: 32px clamp(24px, 5vw, 64px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .pc-form > * {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .pc-step h2 {
+    font-size: 1.6rem;
+  }
+
+  .pc-rows--wide > div {
+    grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+  }
+
+  .pc-page {
+    padding: 28px clamp(20px, 3vw, 40px) 32px;
+  }
+
+  .pc-sheet__in {
+    padding: 20px;
+  }
+}
+
+@media (min-width: 900px) and (max-height: 640px) {
+  .pc-face,
+  .pc-face__in {
+    width: 132px;
+    height: 132px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-segs span i {
+    transition-duration: 1ms;
+  }
+
+  .pc-opt:active,
+  .pc-seg button:active,
+  .pc-quiet:active,
+  .pc-reveal:active,
+  .pc-chip:active {
+    transform: none;
+  }
+}
+
+/* --- El perfil de quien tiene cuenta --------------------------------------------------------------
+   Arriba, quién es. Después lo que se edita, con la muestra de cómo responde Pilo a la vista: justo
+   encima en el teléfono, fija al lado en el escritorio. La cuenta (lo que no se cambia aquí) y la
+   salida van al final y aparte. «Guardar» aparece cuando hay algo que guardar. */
+
+.pc-pane:has(.pc-profile--v2) {
+  max-width: 920px;
+}
+
+/* El encabezado: la cara de Pilo con sus anillos, sobre la escena del tema. */
+.pc-me {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 22px;
+  align-items: center;
+  padding: 20px clamp(16px, 4vw, 32px);
+  border-radius: var(--radius-md);
+  background: radial-gradient(120% 140% at 12% 20%, var(--s1), var(--s2) 55%, var(--s3));
+  color: var(--s-ink);
+  overflow: hidden;
+}
+
+.pc-me__orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 118px;
+  height: 118px;
+}
+
+.pc-me__rings {
+  position: absolute;
+  width: 150px;
+  max-width: none;
+  height: 150px;
+  fill: none;
+  stroke: var(--ring-1);
+  stroke-width: 1.4;
+  pointer-events: none;
+}
+
+.pc-me__rings circle:nth-child(1) {
+  opacity: 0.6;
+}
+
+.pc-me__rings circle:nth-child(2) {
+  stroke: var(--ring-2);
+  opacity: 0.44;
+}
+
+.pc-me__rings circle:nth-child(3) {
+  opacity: 0.28;
+}
+
+.pc-me__face {
+  position: relative;
+  display: block;
+  width: 100px;
+  height: 100px;
+  filter: drop-shadow(0 10px 16px var(--c-shadow));
+}
+
+.pc-me__who {
+  min-width: 0;
+}
+
+.pc-me h2 {
+  font: 700 1.5rem/1.15 var(--font-display);
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+.pc-me p {
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: var(--s-muted);
+  overflow-wrap: anywhere;
+}
+
+.pc-me__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pc-me .pc-tag {
+  min-height: 28px;
+  padding: 0 12px;
+  background: var(--s-chip);
+  color: var(--s-ink);
+}
+
+@media (max-width: 560px) {
+  .pc-me {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+    gap: 12px;
+  }
+}
+
+/* Las secciones del perfil se separan con líneas finas, no con cajas. */
+.pc-line {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pc-line > .pc-hint {
+  margin-bottom: 10px;
+}
+
+.pc-profile--v2 .pc-sheet {
+  border: 0;
+  border-top: 1px solid var(--c-line);
+  border-radius: 0;
+  background: none;
+}
+
+.pc-profile--v2 .pc-sheet__in {
+  padding: 18px 0 4px;
+}
+
+.pc-h {
+  font: 700 1.08rem/1.2 var(--font-display);
+}
+
+/* En el teléfono: la muestra, lo que se edita y la cuenta, en ese orden. */
+.pc-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.pc-aside {
+  display: contents;
+}
+
+.pc-sample {
+  order: 1;
+}
+
+.pc-edit {
+  order: 2;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pc-account {
+  order: 3;
+}
+
+.pc-sample__turn {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.pc-sample__bubble {
+  min-height: 5.2em;
+  padding: 10px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--pa-r-bubble);
+  background: var(--c-bubble);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* La respuesta cambia de una a otra: un desenfoque corto une las dos. */
+.pc-sample__bubble span {
+  display: block;
+  animation: pc-swap 320ms var(--ease-out);
+}
+
+@keyframes pc-swap {
+  from {
+    opacity: 0.35;
+    filter: blur(3px);
+  }
+}
+
+.pc-facts {
+  display: grid;
+  margin: 0;
+}
+
+.pc-facts > div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.pc-facts > div:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.pc-facts dt {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--c-ink2);
+}
+
+.pc-facts dd {
+  margin: 0;
+  min-width: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.pc-facts small {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--c-ink2);
+}
+
+.pc-out {
+  justify-self: start;
+}
+
+/* En el teléfono, la barra de guardar sube con el primer cambio y baja cuando no queda nada pendiente. */
+.pc-profile--v2 .pc-save {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 10px 0;
+  border-top: 1px solid var(--c-line);
+  background: var(--c-bg);
+  transition: transform 280ms var(--ease-out), opacity 200ms ease;
+}
+
+.pc-profile--v2 .pc-save:not([data-on]) {
+  transform: translateY(100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 200ms ease, opacity 160ms ease, visibility 0s linear 200ms;
+}
+
+@media (min-width: 960px) {
+  .pc-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  .pc-edit {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .pc-aside {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 0;
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .pc-profile--v2 .pc-save,
+  .pc-profile--v2 .pc-save:not([data-on]) {
+    position: static;
+    padding: 0;
+    border: 0;
+    background: none;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-sample__bubble span {
+    animation: none;
+  }
+
+  .pc-seg button,
+  .pa-tile__ck {
+    transition-duration: 1ms;
+  }
+
+  .pc-profile--v2 .pc-save,
+  .pc-profile--v2 .pc-save:not([data-on]) {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* --- En el teléfono: Pilo guía en una fila (su cara y su frase) y debajo va la pregunta ----------- */
+
+@media (max-width: 899px) {
+  .pc-stage {
+    grid-template-columns: 72px minmax(0, 1fr);
+    justify-items: stretch;
+    align-items: center;
+    column-gap: 12px;
+    padding-bottom: 14px;
+    text-align: left;
+  }
+
+  .pc-stage-top {
+    grid-column: 1 / -1;
+  }
+
+  .pc-face {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+    align-self: start;
+  }
+
+  .pc-face,
+  .pc-face__in {
+    width: 72px;
+    height: 72px;
+  }
+
+  .pc-bubble {
+    grid-column: 2;
+    grid-row: 2;
+    max-width: none;
+    min-height: 0;
+    font-size: 0.9375rem;
+    text-wrap: pretty;
+  }
+
+  .pc-stage > .pa-w-mood {
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: start;
+  }
+
+  /* El botón principal ocupa el ancho: lo que se hace en cada pantalla es una cosa. */
+  .pc-step .pc-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .pc-step .pc-actions .pa-btn {
+    width: 100%;
+  }
+
+  .pc-step .pc-actions .pc-quiet {
+    justify-content: center;
+    min-height: 48px;
+  }
+}

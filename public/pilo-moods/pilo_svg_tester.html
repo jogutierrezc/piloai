@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilo — tester HTML para SVG de expresiones</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;padding:24px;color:#17202a}
+.wrap{max-width:1200px;margin:auto}.card{background:#fff;border-radius:18px;padding:22px;box-shadow:0 10px 28px rgba(0,0,0,.08)}
+.controls,.exprs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px} button,select{border:0;border-radius:999px;padding:10px 16px;cursor:pointer;background:#111827;color:#fff;font-size:14px} select{background:#fff;color:#111827;border:1px solid #d0d7e2}
+.stage{display:flex;justify-content:center;align-items:center;min-height:760px;background:linear-gradient(#fbfcfe,#f5f7fb);border-radius:14px;margin-top:14px;overflow:auto} object{width:min(100%,980px);height:760px;border:0;background:transparent}
+.small{color:#586174;font-size:14px;line-height:1.45;max-width:920px;margin:12px auto 0}
+code{background:#eef2f7;padding:2px 6px;border-radius:5px}
+</style></head><body>
+<div class="wrap"><div class="card"><h1>Pilo — conexión HTML para probar expresiones del SVG</h1>
+<div class="controls">
+<label>Vista:&nbsp;<select id="svgPicker"><option value="pilo_svg_interactivo_plain.svg">1. Transparente</option><option value="pilo_svg_interactivo_sticker.svg">2. Sticker</option><option value="pilo_svg_interactivo_compare.svg">3. Comparación</option></select></label>
+</div>
+<div class="exprs">
+<button onclick="setExpr('neutral')">Neutral</button>
+<button onclick="setExpr('smile')">Sonrisa</button>
+<button onclick="setExpr('wink')">Guiño</button>
+<button onclick="setExpr('tongue')">Loco / lengua</button>
+<button onclick="setExpr('think')">Pensar</button>
+<button onclick="playCycle()">Ciclo automático</button>
+<button onclick="stopCycle()">Detener</button>
+</div>
+<div class="stage"><object id="svgFrame" type="image/svg+xml" data="pilo_svg_interactivo_plain.svg"></object></div>
+<p class="small">Este HTML está conectado a <strong>tres SVG autocontenidos</strong>, sin depender de archivos externos. Puede auditar la apariencia y probar las expresiones directamente. Los SVG son: <code>pilo_svg_interactivo_plain.svg</code>, <code>pilo_svg_interactivo_sticker.svg</code> y <code>pilo_svg_interactivo_compare.svg</code>.</p>
+</div></div>
+<script>
+const picker=document.getElementById('svgPicker'); const frame=document.getElementById('svgFrame'); let timer=null; const seq=['neutral','smile','wink','tongue','think']; let idx=0;
+picker.addEventListener('change',()=>{ stopCycle(); frame.data=picker.value; });
+function getDoc(){ return frame.contentDocument; }
+function setExpr(name){ stopCycle(); const doc=getDoc(); if(doc && doc.defaultView && typeof doc.defaultView.setExpression==='function'){ doc.defaultView.setExpression(name);} }
+function playCycle(){ stopCycle(); timer=setInterval(()=>{ const doc=getDoc(); if(doc && doc.defaultView && typeof doc.defaultView.setExpression==='function'){ doc.defaultView.setExpression(seq[idx % seq.length]); idx++; } }, 700); }
+function stopCycle(){ if(timer){ clearInterval(timer); timer=null; } }
+frame.addEventListener('load',()=>{ const doc=getDoc(); if(doc && doc.defaultView && typeof doc.defaultView.setExpression==='function'){ doc.defaultView.setExpression('neutral'); } });
+</script></body></html>

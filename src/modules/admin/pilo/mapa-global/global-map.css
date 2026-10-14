@@ -1,0 +1,164 @@
+/* =============================================================================
+   Mr. Pilo · el mapa global (GlobalMap.tsx).
+
+   Hereda el plano de la malla (mesh-view.css): nodos azul marino, relaciones en
+   línea tenue y el azul institucional para lo elegido. Lo propio:
+
+   - Una banda por Pilo, con su nombre escrito: la segmentación se lee, no se
+     adivina por el color.
+   - Los puentes entre los dos Pilos van con trazo de rayas y un rombo en el
+     carril del medio; el punto que tiene puente lleva su rombo al lado.
+   - Documentos en cuadro, cursos en cuadro de otra línea, referencias huecas:
+     la forma dice la clase, la leyenda la nombra.
+   ========================================================================== */
+
+.gmap { display: grid; gap: var(--space-3); min-width: 0; }
+
+.gmap-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.gmap-bar .msh-search { flex: 1 1 18rem; }
+
+.gmap-legend { display: flex; flex-wrap: wrap; gap: 6px var(--space-4); margin: 0; padding: 0; color: var(--ink-secondary); font-size: var(--text-xs); list-style: none; }
+.gmap-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.gmap-legend svg { flex: none; overflow: visible; }
+
+.gmap-notes { display: grid; gap: var(--space-1); }
+.gmap-notes p { margin: 0; }
+
+/* --- El plano ------------------------------------------------------------------------- */
+
+.gmap-frame { max-height: min(72vh, 780px); }
+
+.gmap-band rect { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
+.gmap-band__name { fill: var(--brand-navy); font-size: 13px; font-weight: 800; }
+.gmap-band__count { fill: var(--ink-muted); font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.gmap-band__head { fill: var(--ink-muted); font-size: 11px; font-weight: 800; }
+
+.gmap-node text { font-size: 11.5px; stroke: var(--surface); }
+.gmap-node circle { stroke: var(--surface); }
+.gmap-node[data-col="0"] text { fill: var(--brand-navy); font-size: 13px; font-weight: 800; }
+.gmap-node[data-kind="referencia"] circle.gmap-glyph { fill: var(--surface); stroke: var(--ink-secondary); stroke-width: 1.5; }
+.gmap-node[data-kind="referencia"][data-on] circle.gmap-glyph { fill: var(--brand-blue-soft); stroke: var(--brand-blue); }
+.gmap-node rect.gmap-glyph { fill: var(--od-line-1); stroke: var(--surface); stroke-width: 2; transition: fill var(--dur-fast) ease; }
+.gmap-node[data-kind="curso"] rect.gmap-glyph { fill: var(--od-line-3); }
+.gmap-node[data-on] rect.gmap-glyph, .gmap-node[data-sel] rect.gmap-glyph { fill: var(--brand-blue); }
+.gmap-node[data-sel] .msh-node__hit { fill: var(--brand-blue-soft); }
+
+/* El rombo: este punto tiene puente con el otro Pilo. */
+.gmap-mark { fill: var(--surface); stroke: var(--brand-navy); stroke-width: 1.5; }
+.gmap-node[data-on] .gmap-mark, .gmap-bridge[data-on] .gmap-mark { fill: var(--brand-blue); stroke: var(--brand-blue); }
+
+/* Abrir y plegar lo que un punto contiene. */
+.gmap-toggle { cursor: pointer; }
+.gmap-toggle rect { fill: var(--surface-3); stroke: var(--line-strong); stroke-width: 1; }
+.gmap-node .gmap-toggle text { fill: var(--ink-secondary); font-size: 10.5px; font-weight: 800; font-variant-numeric: tabular-nums; stroke: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gmap-toggle:hover rect { fill: var(--brand-blue-soft); stroke: var(--brand-blue); }
+  .gmap-toggle:hover text { fill: var(--brand-blue-strong); }
+}
+
+.gmap-edges path[data-kind="enlace"] { stroke-dasharray: 0.02 0.02; }
+
+/* Los puentes: rayas, nunca solo color. */
+.gmap-bridge path { fill: none; stroke: var(--brand-navy); stroke-width: 1.2; stroke-dasharray: 5 4; transition: opacity var(--dur-fast) ease, stroke var(--dur-fast) ease; }
+.gmap-bridge[data-on] path { stroke: var(--brand-blue); stroke-width: 1.8; }
+.msh-svg[data-focus] .gmap-bridge:not([data-on]) { opacity: 0.12; }
+
+/* --- El panel --------------------------------------------------------------------------- */
+
+.gmap-hint { display: grid; justify-items: start; gap: var(--space-3); padding: var(--space-5); color: var(--ink-secondary); }
+.gmap-hint p { margin: 0; font-size: var(--text-sm); line-height: var(--leading-normal); }
+.gmap-hint strong { color: var(--ink); }
+
+.gmap-owner { display: inline-flex; align-items: center; gap: 6px; padding: 2px var(--space-2); color: var(--brand-navy); background: var(--surface-3); border-radius: var(--radius-pill); font-size: var(--text-xs); font-weight: 800; }
+.gmap-owner svg { flex: none; }
+
+.gmap-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.gmap-chips em { color: var(--ink-muted); font-size: var(--text-xs); font-style: normal; }
+
+.gmap-chip {
+  min-height: 28px;
+  max-width: 100%;
+  padding: 0 var(--space-3);
+  color: var(--brand-navy);
+  background: var(--brand-blue-soft);
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.gmap-chip:active { transform: scale(0.97); }
+.gmap-chip:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 1px; }
+.gmap-chip[aria-pressed="true"] { color: var(--ink-on-accent); background: var(--brand-blue); }
+
+.gmap-bridges { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.gmap-bridges li { display: grid; gap: 2px; padding: var(--space-2) var(--space-3); border: 1px dashed var(--brand-navy); border-radius: var(--radius-xs); }
+.gmap-bridges button { display: inline-flex; align-items: baseline; gap: 6px; padding: 0; color: var(--brand-blue); text-align: left; background: none; border: 0; font: inherit; font-size: var(--text-sm); font-weight: 700; cursor: pointer; }
+.gmap-bridges button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.gmap-bridges button:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; border-radius: var(--radius-xs); }
+.gmap-bridges small { color: var(--ink-muted); font-size: var(--text-xs); }
+
+.gmap-fold { justify-self: start; }
+
+/* --- Los puentes guardados: su estado (0122) ------------------------------------------------
+   Aprobado: rayas, como siempre. Por revisar: puntos y tinta tenue, porque Pilo
+   aún no lo sigue. La diferencia va en el trazo y, en el detalle, en palabras. */
+.gmap-bridge[data-status="propuesta"] path { stroke: var(--ink-muted); stroke-width: 1.4; stroke-dasharray: 1 4; stroke-linecap: round; }
+.gmap-bridge[data-status="propuesta"] .gmap-mark { stroke: var(--ink-muted); stroke-dasharray: 2 2; }
+.gmap-bridge[data-status="propuesta"][data-on] path { stroke: var(--brand-blue); }
+
+.gmap-bridges li[data-status="propuesta"] { border-style: dotted; border-color: var(--ink-muted); }
+.gmap-bridge-state { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-secondary); font-weight: 700; }
+.gmap-bridge-state svg { flex: none; }
+
+/* --- La bandeja «Puentes por revisar» ------------------------------------------------------ */
+
+.gmap-inbox { display: grid; gap: var(--space-3); min-width: 0; padding: var(--space-4); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.gmap-inbox__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); }
+.gmap-inbox__head h4 { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); margin: 0; color: var(--ink); font-size: var(--text-md, 1rem); font-weight: 800; }
+.gmap-inbox__head h4 small { color: var(--ink-muted); font-size: var(--text-xs); font-weight: 700; }
+.gmap-inbox p { margin: 0; }
+
+.gmap-inbox__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.gmap-inbox__list > li { display: grid; gap: var(--space-2); align-content: start; min-width: 0; padding: var(--space-3); background: var(--surface-2); border: 1px dotted var(--ink-muted); border-radius: var(--radius-xs); }
+.gmap-inbox__ends { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); min-width: 0; }
+.gmap-inbox__end { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 6px; min-width: 0; color: var(--ink); font-size: var(--text-sm); font-weight: 700; overflow-wrap: anywhere; }
+.gmap-inbox__end .pis-link { padding: 0; text-align: left; overflow-wrap: anywhere; }
+.gmap-inbox__link { display: inline-flex; flex: none; }
+.gmap-inbox__link path { fill: var(--surface); stroke: var(--ink-muted); stroke-width: 1.4; stroke-dasharray: 1 4; stroke-linecap: round; }
+.gmap-inbox__link path + path { stroke-dasharray: none; }
+.gmap-inbox__why { color: var(--ink-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); overflow-wrap: anywhere; }
+.gmap-inbox__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.gmap-inbox__foot small { color: var(--ink-muted); font-size: var(--text-xs); font-weight: 700; }
+.gmap-inbox__foot .button-primary, .gmap-inbox__foot .button-secondary { min-height: 36px; padding: 0 var(--space-3); font-size: var(--text-xs); transition: transform var(--dur-press) var(--ease-out); }
+.gmap-inbox__foot .button-primary:active, .gmap-inbox__foot .button-secondary:active { transform: scale(0.97); }
+
+.gmap-inbox__decided summary { color: var(--ink-secondary); font-size: var(--text-sm); font-weight: 700; cursor: pointer; }
+.gmap-inbox__decided summary:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; border-radius: var(--radius-xs); }
+.gmap-inbox__decided ul { display: grid; gap: 0; margin: var(--space-2) 0 0; padding: 0; list-style: none; }
+.gmap-inbox__decided li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-1) var(--space-3); padding: var(--space-2) 0; border-top: 1px solid var(--line); font-size: var(--text-sm); }
+.gmap-inbox__decided li > span { display: grid; gap: 2px; min-width: 0; flex: 1 1 16rem; overflow-wrap: anywhere; }
+.gmap-inbox__decided li small { color: var(--ink-muted); font-size: var(--text-xs); }
+
+@media (max-width: 1100px) {
+  .gmap .msh-panel { position: static; max-height: none; }
+}
+
+@media (max-width: 640px) {
+  .gmap-inbox { padding: var(--space-3); }
+  .gmap-inbox__head .pis-actions { width: 100%; }
+  .gmap-inbox__head .pis-actions > button { flex: 1 1 auto; }
+  .gmap-inbox__foot .pis-actions { width: 100%; }
+  .gmap-inbox__foot .pis-actions > button { flex: 1 1 0; justify-content: center; min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gmap-inbox__foot .button-primary:active, .gmap-inbox__foot .button-secondary:active { transform: none; }
+  .gmap-chip:active { transform: none; }
+  .gmap-bridge path, .gmap-node rect.gmap-glyph { transition-duration: 0ms; }
+}

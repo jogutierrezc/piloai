@@ -1,0 +1,41 @@
+# Configuración de Supabase CLI para Pilo AI.
+# Es el MISMO proyecto de Supabase que usa Planeación: aquí solo viven las funciones de Pilo.
+project_id = "pdi-udes"
+[functions.pilo-ia]
+# Mr. Pilo con IA también atiende a visitantes sin sesión cuando un portal está
+# en «Público»: la función identifica a quien pregunta y aplica la audiencia de
+# cada portal por su cuenta.
+verify_jwt = false
+
+[functions.pilo-cuentas]
+# Registro e ingreso de los Usuarios de Pilo: quien llama aún no tiene sesión.
+# La función valida por su cuenta cada acción y limita los intentos.
+verify_jwt = false
+
+[functions.pilo-clases]
+# «Mis clases» (beta): la función comprueba por su cuenta que quien llama tenga
+# una cuenta de Pilo activa de estudiante o de profesor. No guarda nada de Moodle.
+verify_jwt = false
+
+[functions.pilo-carnet]
+# El carnet digital: la función comprueba por su cuenta que quien llama tenga una cuenta de Pilo
+# activa (y, para verificar el carnet de otra persona, que sea profesor). Nada del carnet se guarda aquí.
+verify_jwt = false
+
+[functions.pilo-genesis]
+# «Mis notas» (beta): la función comprueba por su cuenta que quien llama tenga
+# una cuenta de Pilo activa de estudiante. No guarda nada de Génesis.
+verify_jwt = false
+
+[functions.pilo-alertas]
+# La capa de emergencias de Pilo. La llaman Aluna (webhook firmado con x-aluna-firma),
+# pg_cron (encabezado x-pilo-cron) y la intranet (sesión de la administración):
+# la función comprueba por su cuenta cada camino.
+verify_jwt = false
+
+
+[functions.pilo-staff]
+# El personal administrativo de Pilo (pilo_0146): invitar y quitar personas. La
+# función verifica el JWT por su cuenta y exige que quien llama sea administrador
+# de Pilo (pilo_staff_role() = 'admin'); usa la clave de servicio para crear la cuenta.
+verify_jwt = false

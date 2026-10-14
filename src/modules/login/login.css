@@ -1,0 +1,488 @@
+/* =============================================================================
+   Administración de Pilo · acceso.
+   Dos mitades: la escena de Mr. Pilo (marino profundo, sus anillos cian) y el
+   formulario sobre papel. Solo tokens --pa-*; claro y oscuro reales.
+   ========================================================================== */
+
+.lg {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  color: var(--pa-ink);
+  background: var(--pa-bg);
+  font-family: var(--pa-font-body);
+}
+
+.lg h1,
+.lg p {
+  margin: 0;
+}
+
+.lg :focus-visible {
+  outline: 2px solid var(--pa-focus);
+  outline-offset: 2px;
+}
+
+/* --- La escena ------------------------------------------------------------ */
+
+.lg-stage {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: center;
+  justify-items: center;
+  gap: 28px;
+  padding: 48px 32px;
+  overflow: hidden;
+  color: var(--pa-stage-ink);
+  background: var(--pa-stage);
+}
+
+/* Anillos: el aura de Pilo. Decorativos, quietos. */
+.lg-stage::before,
+.lg-stage::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  border: 1px solid var(--pa-stage-line);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.lg-stage::before {
+  width: 380px;
+  height: 380px;
+}
+.lg-stage::after {
+  width: 600px;
+  height: 600px;
+  border-color: color-mix(in srgb, var(--pa-pilo-cyan) 18%, transparent);
+}
+
+.lg-stage__pilo {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.28));
+}
+
+.lg-bubble {
+  position: relative;
+  z-index: 1;
+  max-width: 21rem;
+  min-height: 4.4rem;
+  display: grid;
+  align-items: center;
+  padding: 14px 18px;
+  color: #0a2d63;
+  background: #ffffff;
+  border-radius: 18px 18px 18px 6px;
+  font-size: 0.97rem;
+  font-weight: 600;
+  line-height: 1.4;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.lg-bubble__text {
+  animation: lg-say 200ms var(--pa-ease) both;
+}
+
+@keyframes lg-say {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* Estados de Pilo: el borde de la burbuja dice lo que pasa además de la cara y el texto. */
+.lg[data-phase="error"] .lg-bubble {
+  box-shadow: 0 0 0 3px var(--pa-signal), 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+.lg[data-phase="exito"] .lg-bubble {
+  box-shadow: 0 0 0 3px var(--pa-pilo-cyan), 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+/* --- El formulario -------------------------------------------------------- */
+
+.lg-main {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  gap: 24px;
+  padding: 24px clamp(16px, 5vw, 56px) 32px;
+}
+
+.lg-top {
+  width: 100%;
+  max-width: 26rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lg-logo {
+  display: block;
+  height: auto;
+  max-width: 132px;
+}
+
+.lg-theme {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--pa-ink-2);
+  background: transparent;
+  border: 1px solid var(--pa-line);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform var(--pa-dur-press) var(--pa-ease), background-color var(--pa-dur-fast) ease;
+}
+.lg-theme:active {
+  transform: scale(0.95);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lg-theme:hover {
+    background: var(--pa-surface-3);
+  }
+}
+
+.lg-card {
+  align-self: center;
+  width: 100%;
+  max-width: 26rem;
+  padding: 36px 32px 28px;
+  background: var(--pa-surface);
+  border: 1px solid var(--pa-line);
+  border-radius: var(--pa-radius-lg);
+  box-shadow: var(--pa-shadow-md);
+}
+
+.lg-head {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.lg-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--pa-accent-text);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lg h1 {
+  color: var(--pa-ink);
+  font-family: var(--pa-font-display);
+  font-size: clamp(1.65rem, 1.2vw + 1.3rem, 2.05rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+.lg-lede {
+  color: var(--pa-ink-2);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+
+.lg form {
+  display: grid;
+  gap: 18px;
+}
+
+.lg-field {
+  display: grid;
+  gap: 6px;
+}
+
+.lg-field label {
+  color: var(--pa-ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.lg-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 4px 0 14px;
+  color: var(--pa-ink-muted);
+  background: var(--pa-surface-2);
+  border: 1px solid var(--pa-line-strong);
+  border-radius: var(--pa-radius);
+  transition: border-color var(--pa-dur-fast) ease, box-shadow var(--pa-dur-fast) ease, background-color var(--pa-dur-fast) ease;
+}
+
+.lg-input:focus-within {
+  border-color: var(--pa-focus);
+  box-shadow: var(--pa-focus-ring);
+  background: var(--pa-surface);
+}
+
+.lg-input input {
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0;
+  color: var(--pa-ink);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  font-size: 1rem; /* 16px: iOS no hace zoom al enfocar */
+}
+
+.lg-input input::placeholder {
+  color: var(--pa-ink-muted);
+  opacity: 0.85;
+}
+
+.lg-input input[aria-invalid="true"] {
+  color: var(--pa-ink);
+}
+.lg-input:has(input[aria-invalid="true"]) {
+  border-color: var(--pa-fail);
+}
+
+.lg-reveal {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--pa-accent-text);
+  background: transparent;
+  border: 0;
+  border-radius: var(--pa-radius-sm);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lg-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-top: -6px;
+}
+
+.lg-hint {
+  color: var(--pa-ink-muted);
+  font-size: 0.78rem;
+}
+
+.lg-link {
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--pa-accent-text);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.lg-link[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.lg-alert,
+.lg-ok {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--pa-radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.lg-alert svg,
+.lg-ok svg {
+  flex: none;
+  margin-top: 2px;
+}
+.lg-alert {
+  color: var(--pa-fail);
+  background: var(--pa-fail-soft);
+  border: 1px solid color-mix(in srgb, var(--pa-fail) 40%, transparent);
+}
+.lg-ok {
+  color: var(--pa-ok);
+  background: var(--pa-ok-soft);
+  border: 1px solid color-mix(in srgb, var(--pa-ok) 40%, transparent);
+}
+.lg-card > section > .lg-alert {
+  margin-bottom: 16px;
+}
+
+.lg-rules {
+  display: grid;
+  gap: 6px;
+  margin: -4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+}
+.lg-rules li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pa-ink-muted);
+  transition: color var(--pa-dur-fast) ease;
+}
+.lg-rules li[data-met="true"] {
+  color: var(--pa-ok);
+  font-weight: 600;
+}
+
+.lg-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 20px;
+  color: var(--pa-accent-ink);
+  background: var(--pa-accent);
+  border: 0;
+  border-radius: var(--pa-radius);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform var(--pa-dur-press) var(--pa-ease), background-color var(--pa-dur-fast) ease;
+}
+.lg-submit:active {
+  transform: scale(0.97);
+}
+.lg-submit[aria-disabled="true"] {
+  cursor: progress;
+}
+@media (hover: hover) and (pointer: fine) {
+  .lg-submit:hover {
+    background: var(--pa-accent-hover);
+  }
+}
+.lg-submit:focus-visible {
+  outline-offset: 3px;
+}
+
+.lg-spin {
+  width: 16px;
+  height: 16px;
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: lg-spin 700ms linear infinite;
+}
+@keyframes lg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lg-restricted {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 20px !important;
+  color: var(--pa-ink-muted);
+  font-size: 0.78rem;
+}
+
+.lg-noaccess {
+  display: grid;
+  gap: 14px;
+}
+.lg-noaccess .lg-submit {
+  margin-top: 6px;
+}
+
+.lg-back a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--pa-ink-2);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .lg-back a:hover {
+    color: var(--pa-ink);
+    text-decoration: underline;
+  }
+}
+
+/* --- Móvil: Pilo pasa a una franja superior ------------------------------ */
+
+@media (max-width: 899px) {
+  .lg {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+
+  .lg-stage {
+    grid-template-rows: none;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 14px;
+    padding: max(16px, env(safe-area-inset-top)) 16px 20px;
+  }
+  .lg-stage::before,
+  .lg-stage::after {
+    display: none;
+  }
+  .lg-bubble {
+    max-width: none;
+    min-height: 0;
+    font-size: 0.9rem;
+    border-radius: 16px 16px 16px 6px;
+  }
+
+  .lg-main {
+    padding-top: 16px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+  .lg-card {
+    padding: 28px 20px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-bubble__text {
+    animation-name: lg-fade;
+  }
+  .lg-submit:active,
+  .lg-theme:active {
+    transform: none;
+  }
+  .lg-spin {
+    animation-duration: 1.6s;
+  }
+}
+@keyframes lg-fade {
+  from {
+    opacity: 0;
+  }
+}

@@ -1,0 +1,143 @@
+/* Mr. Pilo · Mis límites. Solo variables del tema (pilo-app-themes.css). */
+
+.lm-card {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  scroll-margin-top: 12px;
+}
+
+.lm-space {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.lm-row {
+  display: grid;
+  gap: 6px;
+  padding: 8px 0;
+}
+
+.lm-row + .lm-row {
+  border-top: 1px solid var(--c-line);
+}
+
+.lm-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 28px;
+}
+
+.lm-line small {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.lm-line b {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.lm-row[data-off] .lm-line b {
+  color: var(--c-ink2);
+}
+
+.lm-line b .pa-i {
+  width: 14px;
+  height: 14px;
+}
+
+.lm-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--c-chip);
+  overflow: hidden;
+}
+
+.lm-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--c-link);
+}
+
+.lm-meter[data-warn] .lm-bar {
+  outline: 2px solid var(--c-warn);
+  outline-offset: 1px;
+}
+
+.lm-meter[data-warn] .lm-bar i {
+  background: var(--c-warn);
+}
+
+.lm-count {
+  margin-top: 4px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.lm-warn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--c-warn);
+}
+
+/* El aviso del chat */
+
+.lm-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--c-line);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.lm-banner span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lm-banner a,
+.lm-banner button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding-inline: 4px;
+  color: var(--c-link);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: transform var(--dur-press, 120ms) var(--ease-out, ease-out);
+}
+
+.lm-banner a:active,
+.lm-banner button:active {
+  transform: scale(0.97);
+}
+
+.lm-banner a:focus-visible,
+.lm-banner button:focus-visible {
+  outline: 2px solid var(--c-link);
+  outline-offset: 2px;
+}

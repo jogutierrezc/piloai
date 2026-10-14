@@ -1,0 +1,170 @@
+/* =============================================================================
+   Administración de Pilo · tokens del portal (prefijo --pa-).
+
+   Identidad: la de Mr. Pilo, no la de PDI. Un azul marino profundo (la escena
+   de Pilo) y su cian de marca como acento de acción; el ámbar de señal solo
+   para lo que pide atención. El papel es azulado, frío y limpio; en oscuro, la
+   noche de la escena de Pilo.
+
+   Tema: igual que tokens.css. Claro en :root; oscuro cuando el sistema lo pide
+   y la persona no eligió claro (@media + :not([data-theme="light"])) o cuando
+   eligió oscuro (:root[data-theme="dark"]). Cada token se redefine por tema;
+   ninguno depende de un volteo automático.
+
+   Contraste (medido): texto --pa-ink / --pa-ink-2 / --pa-ink-muted sobre
+   --pa-bg, --pa-surface y --pa-surface-2 >= 4.5:1 en los dos temas;
+   --pa-accent-ink sobre --pa-accent >= 4.5:1; --pa-ok/warn/fail como texto
+   sobre --pa-surface >= 4.5:1. El estado NUNCA va solo en color: siempre con
+   ícono y etiqueta (los tonos --pa-*-soft son fondo de apoyo, no el mensaje).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- Planos --------------------------------------------------------------- */
+  --pa-bg: #eef2f8;
+  --pa-surface: #ffffff;
+  --pa-surface-2: #f6f8fc;
+  --pa-surface-3: #e8edf5;
+  /* La escena de Pilo: marino profundo en los dos temas. */
+  --pa-stage: #0a2d63;
+  --pa-stage-2: #06204a;
+  --pa-stage-ink: #ffffff;
+  --pa-stage-muted: #c3d5f2;
+  --pa-stage-line: rgba(255, 255, 255, 0.16);
+
+  /* --- Tinta ---------------------------------------------------------------- */
+  --pa-ink: #0c1a2e;
+  --pa-ink-2: #3d4f68;
+  --pa-ink-muted: #56677f;
+  --pa-line: rgba(13, 40, 84, 0.13);
+  --pa-line-strong: rgba(13, 40, 84, 0.26);
+
+  /* --- Acento (cian de Pilo, oscurecido para sostener texto blanco) --------- */
+  --pa-accent: #0a6b82;
+  --pa-accent-hover: #085a6e;
+  --pa-accent-ink: #ffffff;
+  --pa-accent-soft: #dff3f6;
+  --pa-accent-text: #0a6b82;
+  /* El cian vivo de Pilo, para detalles sobre la escena marina. */
+  --pa-pilo-cyan: #7fe7f0;
+  --pa-signal: #f6b93f;
+
+  /* --- Estado (siempre con ícono + etiqueta) -------------------------------- */
+  --pa-ok: #17713a;
+  --pa-ok-soft: #e3f4e9;
+  --pa-warn: #8a5600;
+  --pa-warn-soft: #fbf0d9;
+  --pa-fail: #b3261e;
+  --pa-fail-soft: #fce8e6;
+
+  /* --- Foco ----------------------------------------------------------------- */
+  --pa-focus: #0a6b82;
+  --pa-focus-ring: 0 0 0 3px rgba(10, 107, 130, 0.3);
+
+  /* --- Forma y elevación ---------------------------------------------------- */
+  --pa-radius: 14px;
+  --pa-radius-sm: 10px;
+  --pa-radius-lg: 22px;
+  --pa-shadow-sm: 0 1px 2px rgba(10, 34, 73, 0.06), 0 2px 6px rgba(10, 34, 73, 0.04);
+  --pa-shadow-md: 0 2px 4px rgba(10, 34, 73, 0.05), 0 12px 28px rgba(10, 34, 73, 0.09);
+  --pa-shadow-lg: 0 4px 8px rgba(10, 34, 73, 0.06), 0 28px 56px rgba(10, 34, 73, 0.14);
+
+  /* --- Tipografía ----------------------------------------------------------- */
+  --pa-font-display: "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --pa-font-body: "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --pa-font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, monospace;
+
+  /* --- Movimiento ----------------------------------------------------------- */
+  --pa-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --pa-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --pa-dur-press: 140ms;
+  --pa-dur-fast: 180ms;
+  --pa-dur-base: 240ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --pa-bg: #0a111b;
+    --pa-surface: #131c29;
+    --pa-surface-2: #19232f;
+    --pa-surface-3: #212d3b;
+    --pa-stage: #071a38;
+    --pa-stage-2: #04112a;
+    --pa-stage-ink: #f1f6ff;
+    --pa-stage-muted: #a9bddf;
+    --pa-stage-line: rgba(255, 255, 255, 0.12);
+
+    --pa-ink: #eef3f9;
+    --pa-ink-2: #b8c5d6;
+    --pa-ink-muted: #94a4ba;
+    --pa-line: rgba(148, 176, 214, 0.17);
+    --pa-line-strong: rgba(148, 176, 214, 0.32);
+
+    --pa-accent: #7fe7f0;
+    --pa-accent-hover: #a2f0f7;
+    --pa-accent-ink: #06142b;
+    --pa-accent-soft: rgba(127, 231, 240, 0.13);
+    --pa-accent-text: #7fe7f0;
+    --pa-pilo-cyan: #7fe7f0;
+    --pa-signal: #f6b93f;
+
+    --pa-ok: #5fd08a;
+    --pa-ok-soft: rgba(95, 208, 138, 0.14);
+    --pa-warn: #f0b94a;
+    --pa-warn-soft: rgba(240, 185, 74, 0.14);
+    --pa-fail: #ff8f88;
+    --pa-fail-soft: rgba(255, 143, 136, 0.14);
+
+    --pa-focus: #7fe7f0;
+    --pa-focus-ring: 0 0 0 3px rgba(127, 231, 240, 0.4);
+
+    --pa-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
+    --pa-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.45), 0 12px 28px rgba(0, 0, 0, 0.4);
+    --pa-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.5), 0 28px 56px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --pa-bg: #0a111b;
+  --pa-surface: #131c29;
+  --pa-surface-2: #19232f;
+  --pa-surface-3: #212d3b;
+  --pa-stage: #071a38;
+  --pa-stage-2: #04112a;
+  --pa-stage-ink: #f1f6ff;
+  --pa-stage-muted: #a9bddf;
+  --pa-stage-line: rgba(255, 255, 255, 0.12);
+
+  --pa-ink: #eef3f9;
+  --pa-ink-2: #b8c5d6;
+  --pa-ink-muted: #94a4ba;
+  --pa-line: rgba(148, 176, 214, 0.17);
+  --pa-line-strong: rgba(148, 176, 214, 0.32);
+
+  --pa-accent: #7fe7f0;
+  --pa-accent-hover: #a2f0f7;
+  --pa-accent-ink: #06142b;
+  --pa-accent-soft: rgba(127, 231, 240, 0.13);
+  --pa-accent-text: #7fe7f0;
+  --pa-pilo-cyan: #7fe7f0;
+  --pa-signal: #f6b93f;
+
+  --pa-ok: #5fd08a;
+  --pa-ok-soft: rgba(95, 208, 138, 0.14);
+  --pa-warn: #f0b94a;
+  --pa-warn-soft: rgba(240, 185, 74, 0.14);
+  --pa-fail: #ff8f88;
+  --pa-fail-soft: rgba(255, 143, 136, 0.14);
+
+  --pa-focus: #7fe7f0;
+  --pa-focus-ring: 0 0 0 3px rgba(127, 231, 240, 0.4);
+
+  --pa-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --pa-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.45), 0 12px 28px rgba(0, 0, 0, 0.4);
+  --pa-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.5), 0 28px 56px rgba(0, 0, 0, 0.5);
+}

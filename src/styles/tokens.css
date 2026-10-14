@@ -1,0 +1,670 @@
+/* =============================================================================
+   PDI · Sistema de diseño — tokens
+   Una sola fuente de verdad para color, tipografía, espacio, forma y movimiento.
+   Los tokens de color se declaran completos en :root (tema claro) y se
+   redefinen — solo los que cambian — para el tema oscuro.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- Marca -------------------------------------------------------------- */
+  --brand-navy: #0a2d63;
+  --brand-navy-deep: #061e46;
+  --brand-blue: #2166d6;
+  --brand-blue-strong: #1b52ad;
+  --brand-blue-soft: #eaf1fd;
+  --brand-teal: #0096a5;
+  /* Mr. Pilo Bot: la escena de la guía, marino en los dos temas. */
+  --pilo-stage: #0a2d63;
+  --pilo-stage-ink: #ffffff;
+  --pilo-stage-muted: #c3d5f2;
+  --pilo-stage-line: rgba(255, 255, 255, 0.14);
+  --pilo-accent: #7fe7f0;
+  --pilo-accent-ink: #0a2d63;
+
+  /* --- Planos ------------------------------------------------------------- */
+  --page: #f4f7fb;
+  --page-alt: #eaeff7;
+  --surface: #ffffff;
+  --surface-2: #f8fafd;
+  --surface-3: #eef3fa;
+  --surface-glass: rgba(255, 255, 255, 0.72);
+  /* El logotipo está dibujado para fondo claro: sus trazos son azul #014898 y
+     lleva blancos. Sobre la placa azul marino que tenía antes, el azul del
+     logo se perdía contra el azul del fondo. En tema claro no necesita placa;
+     en oscuro sí, y blanca, para conservar el fondo que su diseño supone. */
+  --logo-plate: transparent;
+  --logo-plate-pad: 0px;
+
+  /* --- Tinta -------------------------------------------------------------- */
+  --ink: #0d1c31;
+  --ink-secondary: #45566d;
+  --ink-muted: #6b7c93;
+  --ink-faint: #93a2b6;
+  --ink-on-accent: #ffffff;
+
+  /* --- Líneas y separación ------------------------------------------------ */
+  --line: rgba(13, 40, 84, 0.11);
+  --line-strong: rgba(13, 40, 84, 0.2);
+  --line-faint: rgba(13, 40, 84, 0.06);
+
+  /* --- Acentos de pilar (paleta categórica validada: all-pairs CVD) --------
+     Verificada con el validador de dataviz sobre superficie clara:
+     banda de luminosidad OK · croma OK · CVD dE 10.1 · visión normal dE 16.5
+     · contraste >= 3:1. El nombre y el ícono del pilar acompañan siempre al
+     color: la identidad nunca depende solo del tono.                        */
+  --pillar-1: #2166d6; /* Personalización        · azul institucional */
+  --pillar-2: #0096a5; /* Ambiente tecnológico   · cian */
+  --pillar-3: #a67e00; /* Entorno emprendedor    · ámbar */
+  --pillar-4: #78398c; /* Gobernanza             · púrpura */
+  --pillar-5: #2e6b0b; /* Sostenibilidad         · verde */
+  --pillar-6: #bc4861; /* Apropiación social     · rosa */
+
+  /* --- Estado (reservado; nunca se reutiliza como serie) ------------------
+     Los colores de estado siempre viajan con ícono + etiqueta.              */
+  --status-done: #12833a;
+  --status-active: #2f6fd0;
+  --status-pending: #b07d00;
+  --status-risk: #d03b3b;
+  --status-done-soft: #e6f4ea;
+  --status-active-soft: #e8f0fd;
+  --status-pending-soft: #fbf2e0;
+  --status-risk-soft: #fceaea;
+
+  /* --- Escala de cumplimiento (5 bandas) ----------------------------------
+     Naranja → verde es justo el par que no separa el daltonismo, así que las
+     bandas se distinguen además por luminosidad: bajan de L 0.74 a L 0.46 de
+     forma monótona, con saltos de 0.07. Verificado con el validador ordinal:
+     monótona, salto suficiente entre bandas y contraste del extremo claro OK.
+     Cada uso lleva siempre la etiqueta de la banda, nunca solo el color.    */
+  --band-1: #fd8453; /* Bajo          */
+  --band-2: #d77b00; /* Medio bajo    */
+  --band-3: #9f7a00; /* Medio         */
+  --band-4: #667500; /* Medio alto    */
+  --band-5: #006b27; /* Satisfactorio */
+
+  /* --- Datos: rejilla y pistas -------------------------------------------- */
+  --track: rgba(13, 40, 84, 0.09);
+  --gridline: rgba(13, 40, 84, 0.07);
+
+  /* --- Tipografía --------------------------------------------------------- */
+  --font-display: "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md: 1.0625rem;
+  --text-lg: clamp(1.15rem, 0.4vw + 1.05rem, 1.3rem);
+  --text-xl: clamp(1.35rem, 0.8vw + 1.15rem, 1.65rem);
+  --text-2xl: clamp(1.7rem, 1.4vw + 1.35rem, 2.3rem);
+  --text-3xl: clamp(2.1rem, 2.6vw + 1.5rem, 3.1rem);
+  --text-4xl: clamp(2.6rem, 4.6vw + 1.4rem, 4.6rem);
+
+  --leading-tight: 1.08;
+  --leading-snug: 1.28;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  --tracking-display: -0.028em;
+  --tracking-tight: -0.012em;
+  --tracking-wide: 0.08em;
+  --tracking-caps: 0.14em;
+
+  /* --- Espacio (base 4px) -------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 104px;
+
+  --gutter: clamp(16px, 4vw, 40px);
+  --measure: 68ch;
+  --content-max: 1220px;
+  --header-h: 72px;
+
+  /* --- Forma -------------------------------------------------------------- */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-2xl: 32px;
+  --radius-pill: 999px;
+
+  /* --- Elevación (sombras en capas, no un solo desenfoque) ---------------- */
+  --shadow-xs: 0 1px 2px rgba(10, 34, 73, 0.06);
+  --shadow-sm: 0 1px 2px rgba(10, 34, 73, 0.05), 0 2px 6px rgba(10, 34, 73, 0.04);
+  --shadow-md: 0 1px 2px rgba(10, 34, 73, 0.05), 0 6px 16px rgba(10, 34, 73, 0.06);
+  --shadow-lg: 0 2px 4px rgba(10, 34, 73, 0.05), 0 12px 28px rgba(10, 34, 73, 0.08);
+  --shadow-xl: 0 4px 8px rgba(10, 34, 73, 0.06), 0 24px 48px rgba(10, 34, 73, 0.11);
+  --shadow-accent: 0 8px 20px rgba(33, 102, 214, 0.24);
+  --ring: 0 0 0 3px rgba(33, 102, 214, 0.32);
+
+  /* --- Movimiento ---------------------------------------------------------
+     Curvas fuertes: las nativas de CSS son demasiado tibias.                */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --dur-press: 140ms;
+  --dur-fast: 180ms;
+  --dur-base: 220ms;
+  --dur-slow: 300ms;
+  --dur-bar: 900ms;
+
+  /* --- Datos Abiertos · tablero de paletas --------------------------------
+     El tablero sigue el tema: en claro, paletas blancas con tinta azul marino
+     sobre papel; en oscuro, azul noche con tinta blanca. Ámbar = lo que acaba
+     de llegar, lo activo y la acción principal; cian = el corte anterior.
+     Los colores de texto (--od-signal-text, --od-previous) tienen su propio
+     valor por tema: el ámbar de relleno no llega a 4.5:1 sobre blanco.     */
+  --od-board: #ffffff;
+  --od-board-raised: #f1f5fa;
+  --od-board-line: rgba(13, 40, 84, 0.11);
+  --od-board-line-strong: rgba(13, 40, 84, 0.22);
+  --od-flap: #f6f8fc;
+  --od-flap-low: #e8eef6;
+  --od-flap-hinge: #b7c3d6;
+  --od-flap-ink: #0a2d63;
+  --od-flap-shadow: 0 0 0 1px rgba(13, 40, 84, 0.1), 0 1px 2px rgba(13, 40, 84, 0.12);
+  --od-board-ink: #0d1c31;
+  --od-board-muted: #4e5f77;
+  --od-signal: #f6b93f;
+  --od-signal-strong: #ffcc66;
+  --od-signal-ink: #1d1402;
+  --od-signal-text: #8a5700;
+  --od-previous: #0a6f7c;
+
+  /* Medallero (0056): tres metales y nada más. La cuarta categoría en adelante
+     no es un metal —se dibuja como anillo sin relleno—, porque inventar un
+     cuarto color obligaría a separarlo de la plata y no hay sitio. Medidos
+     contra el piso del sistema: tinta >= 4.5:1, disco >= 3:1 sobre la
+     superficie y ΔE >= 15.8 con el ámbar de señal, que no es una medalla. */
+  --od-medal-1: #8f660e;
+  --od-medal-1-ink: #ffffff;
+  --od-medal-2: #657183;
+  --od-medal-2-ink: #ffffff;
+  --od-medal-3: #a2542a;
+  --od-medal-3-ink: #ffffff;
+  --od-scrim: rgba(255, 255, 255, 0.9);
+  --od-hero-ink: #0a2d63;
+  --od-shadow-panel: 0 2px 4px rgba(10, 34, 73, 0.05), 0 18px 40px rgba(10, 34, 73, 0.1);
+
+  /* Boleto de origen: papel claro en los dos temas, como el objeto real. */
+  --od-ticket-stock: #eef2f8;
+  --od-ticket-ink: #0d1c31;
+  --od-ticket-muted: #4a5b73;
+  --od-ticket-perforation: #b7c3d6;
+
+  /* Franjas de línea: una por informe, con tinta blanca >= 4.5:1. Identifican
+     junto al código de dos letras, nunca solas. */
+  --od-line-1: #1f5fbf;
+  --od-line-2: #0b7481;
+  --od-line-3: #a4471f;
+  --od-line-4: #6b3fa0;
+  --od-line-5: #7f6200;
+  --od-line-6: #ad2f58;
+  --od-line-7: #43536b;
+  --od-line-8: #2e6b2f;
+  --od-line-9: #8a3b8f;
+  --od-line-10: #1a6b5a;
+  --od-line-11: #7a4a2b;
+
+  /* Lectura fuera del tablero. */
+  --od-page: #eef2f8;
+  --od-surface: #ffffff;
+  --od-bar: #132b52;
+  --od-bar-soft: #b9c6da;
+  --od-bar-previous: #0b7a88;
+  --od-bar-empty: rgba(13, 40, 84, 0.22);
+
+  /* Series por sede. Validadas todas contra todas (CVD y visión normal) sobre
+     #ffffff: Bucaramanga, Cúcuta, Valledupar. Siempre con leyenda y etiqueta. */
+  --od-series-1: #1f5fbf;
+  --od-series-2: #c2571a;
+  --od-series-3: #0f8a6e;
+  --od-series-total: #0d1c31;
+
+  /* Categorías de las circulares, orden fijo, validadas por pares adyacentes.
+     Sobre blanco 3 tonos quedan por debajo de 3:1: la leyenda con cifra y
+     porcentaje es obligatoria. */
+  --od-cat-1: #2a78d6;
+  --od-cat-2: #eb6834;
+  --od-cat-3: #1baf7a;
+  --od-cat-4: #7a5bd0;
+  --od-cat-5: #e87ba4;
+  --od-cat-6: #008300;
+
+  /* Escala azul secuencial (mapa de calor y mapa): claro = poco, oscuro = mucho. */
+  --od-seq-0: #eef3fa;
+  --od-seq-1: #cde2fb;
+  --od-seq-2: #9ec5f4;
+  --od-seq-3: #6da7ec;
+  --od-seq-4: #3987e5;
+  --od-seq-5: #256abf;
+  --od-seq-6: #184f95;
+  --od-seq-7: #0d366b;
+  --od-seq-ink-light: #0d1c31;
+  --od-seq-ink-dark: #ffffff;
+  /* Escala divergente (Saber PRO): terracota bajo el umbral, azul sobre él;
+     cuanto más lejos del centro, más contraste con la superficie. Cada paso
+     trae la tinta de su rótulo. */
+  --od-div-neg-3: #7c2f0d;
+  --od-div-neg-2: #b9541f;
+  --od-div-neg-1: #e79c69;
+  --od-div-mid: #e9edf3;
+  --od-div-pos-1: #6fa4e8;
+  --od-div-pos-2: #2a63b8;
+  --od-div-neg-3-ink: #ffffff;
+  --od-div-neg-2-ink: #ffffff;
+  --od-div-neg-1-ink: #0d1c31;
+  --od-div-mid-ink: #0d1c31;
+  --od-div-pos-1-ink: #0d1c31;
+  --od-div-pos-2-ink: #ffffff;
+  --od-flow: #d98200;
+  /* Segunda ruta del mapa de movilidad: salientes, frente al ámbar de entrantes. */
+  --od-flow-out: #c0306f;
+  --od-flow-out-head: #ff5c9a;
+
+  /* Tablero de diversidad: dos familias étnicas, los seis estratos (del más
+     bajo, el más oscuro) con su tinta, y los pares de género y zona. */
+  --od-dei-indigena: #6b3fa0;
+  --od-dei-negra: #a4471f;
+  --od-dei-e1: #0d366b;
+  --od-dei-e2: #184f95;
+  --od-dei-e3: #256abf;
+  --od-dei-e4: #6da7ec;
+  --od-dei-e5: #9ec5f4;
+  --od-dei-e6: #cde2fb;
+  --od-dei-e-ink-deep: #ffffff;
+  --od-dei-e-ink-pale: #0d1c31;
+  --od-dei-f: #7a5bd0;
+  --od-dei-m: #0f8a6e;
+  --od-dei-urbano: #1f5fbf;
+  --od-dei-rural: #2e6b2f;
+  --od-dei-hatch: rgba(13, 40, 84, 0.28);
+  --od-dei-tile-ink: #ffffff;
+  /* Doce tonos para los pueblos y comunidades del mosaico. Todos sostienen
+     tinta blanca por encima de 4,5:1, así que valen igual en los dos temas. */
+  --od-etnia-1: #7b3fb0;
+  --od-etnia-2: #b4461c;
+  --od-etnia-3: #0a7a86;
+  --od-etnia-4: #2f7a2f;
+  --od-etnia-5: #b42d5e;
+  --od-etnia-6: #2462c6;
+  --od-etnia-7: #8a6100;
+  --od-etnia-8: #9a3a9f;
+  --od-etnia-9: #c0392b;
+  --od-etnia-10: #1f6f5c;
+  --od-etnia-11: #4f46a8;
+  --od-etnia-12: #7d4a26;
+  /* Paleta institucional pastel para composiciones de pocas partes: azules,
+     naranja, cobre y dorado, con su tinta. Van siempre con leyenda. */
+  --od-inst-1: #7fa7d9;
+  --od-inst-2: #f0a868;
+  --od-inst-3: #c08457;
+  --od-inst-4: #d9b44a;
+  --od-inst-5: #3f6fae;
+  --od-inst-6: #b9cde6;
+  --od-dei-tile-shade: #06142b;
+
+  --font-sign: "Open Sans", "Arial Narrow", "Roboto Condensed", sans-serif;
+  /* Los rótulos del tablero van en Open Sans condensada: el eje de ancho de la variable (75 a 100). */
+  --sign-stretch: 75%;
+  --text-sign-hero: clamp(2.7rem, 7.2vw, 6rem);
+  --ease-flap-fall: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-flap-settle: cubic-bezier(0.2, 1.6, 0.45, 1);
+  --dur-image-flap: 720ms;
+
+  /* --- Intranet · muro de módulos (lanzador /admin) ------------------------
+     Un campo plano por módulo, los mismos tonos de las franjas de informe:
+     todos sostienen tinta blanca por encima de 5,4:1. Solo tema claro.      */
+  --wall-planeacion: var(--od-line-6);
+  --wall-pdi: var(--brand-navy);
+  --wall-cifras: var(--od-line-2);
+  --wall-observatorio: var(--od-line-8);
+  --wall-impacto: var(--od-line-4);
+  --wall-tableros: var(--od-line-7);
+  --wall-reportes: var(--od-line-3);
+  --wall-rankings: var(--od-line-1);
+  --wall-sistema: var(--od-line-5);
+  --wall-internacionalizacion: var(--od-line-10);
+  --wall-ink: #ffffff;
+  --wall-numeral: rgba(255, 255, 255, 0.16);
+  --wall-veil: rgba(255, 255, 255, 0.14);
+  --wall-veil-strong: rgba(255, 255, 255, 0.26);
+  --wall-rule: rgba(255, 255, 255, 0.32);
+  --wall-rule-strong: rgba(255, 255, 255, 0.6);
+  --radius-tile: 6px;
+
+  /* --- Capas -------------------------------------------------------------- */
+  --z-sticky: 20;
+  --z-header: 50;
+  --z-overlay: 80;
+  --z-modal: 90;
+}
+
+/* ---------------------------------------------------------------------------
+   Tema oscuro. Se aplica cuando el sistema lo pide y el usuario no eligió
+   claro, o cuando el usuario eligió oscuro explícitamente.
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --brand-navy: #9dc0f5;
+    --brand-navy-deep: #7fabee;
+    --brand-blue: #5c9bf2;
+    --brand-blue-strong: #7fb0f6;
+    --brand-blue-soft: rgba(92, 155, 242, 0.14);
+    --brand-teal: #37b6c4;
+    --pilo-stage: #071a38;
+    --pilo-stage-ink: #f1f6ff;
+    --pilo-stage-muted: #a9bddf;
+    --pilo-stage-line: rgba(255, 255, 255, 0.12);
+    --pilo-accent: #7fe7f0;
+    --pilo-accent-ink: #06142b;
+
+    --page: #0b1017;
+    --page-alt: #0e141d;
+    --surface: #151d28;
+    --surface-2: #1a232f;
+    --surface-3: #202c3a;
+    --surface-glass: rgba(21, 29, 40, 0.78);
+    --logo-plate: #ffffff;
+    --logo-plate-pad: 5px;
+
+    --ink: #eef3f9;
+    --ink-secondary: #b3c1d2;
+    --ink-muted: #8b9bb0;
+    --ink-faint: #6d7d92;
+    --ink-on-accent: #08111d;
+
+    --line: rgba(148, 176, 214, 0.16);
+    --line-strong: rgba(148, 176, 214, 0.28);
+    --line-faint: rgba(148, 176, 214, 0.09);
+
+    /* Paleta oscura re-derivada, no un volteo automático.
+       banda OK · croma OK · CVD dE 7.7 (banda de piso: exige el ícono y la
+       etiqueta que ya acompañan a cada pilar) · visión normal dE 15.6 ·
+       contraste >= 3:1 sobre la superficie oscura.                          */
+    --pillar-1: #2e5fca;
+    --pillar-2: #0ca3b7;
+    --pillar-3: #a58c0d;
+    --pillar-4: #b271ed;
+    --pillar-5: #327f3a;
+    --pillar-6: #db516a;
+
+    --status-done: #3fb267;
+    --status-active: #5c9bf2;
+    --status-pending: #d9a221;
+    --status-risk: #ec6a6a;
+    --status-done-soft: rgba(63, 178, 103, 0.16);
+    --status-active-soft: rgba(92, 155, 242, 0.16);
+    --status-pending-soft: rgba(217, 162, 33, 0.16);
+    --status-risk-soft: rgba(236, 106, 106, 0.16);
+
+    /* Escala de cumplimiento en oscuro: la convención se invierte, más
+       luminosidad es más presencia. Monótona y con todas las bandas por encima
+       de 3:1 sobre la superficie oscura. */
+    --band-1: #b74506;
+    --band-2: #bd6c01;
+    --band-3: #bc9200;
+    --band-4: #a6bb2d;
+    --band-5: #73e087;
+
+    --track: rgba(148, 176, 214, 0.16);
+    --gridline: rgba(148, 176, 214, 0.09);
+
+    --od-board: #06142b;
+    --od-board-raised: #0b1f3f;
+    --od-board-line: rgba(147, 170, 206, 0.16);
+    --od-board-line-strong: rgba(147, 170, 206, 0.3);
+    --od-flap: #132b52;
+    --od-flap-low: #0f2446;
+    --od-flap-hinge: #020a18;
+    --od-flap-ink: #f3f6fb;
+    --od-flap-shadow: 0 0.05em 0.12em rgba(0, 0, 0, 0.45);
+    --od-board-ink: #e8eef7;
+    --od-board-muted: #9aaecb;
+    --od-signal-text: #f6b93f;
+    --od-previous: #6fd3de;
+  --od-medal-1: #caa33c;
+  --od-medal-1-ink: #201704;
+  --od-medal-2: #b3bfcd;
+  --od-medal-2-ink: #151d29;
+  --od-medal-3: #c97b45;
+  --od-medal-3-ink: #2a1608;
+    --od-medal-1: #caa33c;
+    --od-medal-1-ink: #201704;
+    --od-medal-2: #b3bfcd;
+    --od-medal-2-ink: #151d29;
+    --od-medal-3: #c97b45;
+    --od-medal-3-ink: #2a1608;
+    --od-scrim: rgba(6, 20, 43, 0.94);
+    --od-hero-ink: #f3f6fb;
+    --od-shadow-panel: 0 24px 48px rgba(0, 0, 0, 0.35);
+    --od-ticket-perforation: #6b7c93;
+    --od-page: #07142a;
+    --od-surface: #0e2141;
+    --od-bar: #e3eaf5;
+    --od-bar-soft: #3a5178;
+    --od-bar-previous: #6fd3de;
+    --od-bar-empty: rgba(148, 176, 214, 0.34);
+    --od-series-1: #4a86e0;
+    --od-series-2: #d9733a;
+    --od-series-3: #2fa58a;
+    --od-series-total: #e8eef7;
+    --od-cat-1: #3987e5;
+    --od-cat-2: #d95926;
+    --od-cat-3: #199e70;
+    --od-cat-4: #9085e9;
+    --od-cat-5: #d55181;
+    --od-cat-6: #008300;
+    --od-seq-0: #0c1d38;
+    --od-seq-1: #10325e;
+    --od-seq-2: #184f95;
+    --od-seq-3: #1c5cab;
+    --od-seq-4: #2a78d6;
+    --od-seq-5: #5598e7;
+    --od-seq-6: #86b6ef;
+    --od-seq-7: #cde2fb;
+    --od-seq-ink-light: #ffffff;
+    --od-seq-ink-dark: #06142b;
+    --od-div-neg-3: #eea06c;
+    --od-div-neg-2: #cf6a33;
+    --od-div-neg-1: #86340e;
+    --od-div-mid: #1a2d4d;
+    --od-div-pos-1: #2c62ad;
+    --od-div-pos-2: #72aaf0;
+    --od-div-neg-3-ink: #06142b;
+    --od-div-neg-2-ink: #06142b;
+    --od-div-neg-1-ink: #ffffff;
+    --od-div-mid-ink: #e8eef7;
+    --od-div-pos-1-ink: #ffffff;
+    --od-div-pos-2-ink: #06142b;
+    --od-flow: #f6b93f;
+    --od-flow-out: #ff6fa3;
+    --od-flow-out-head: #ffc2d8;
+  --od-dei-indigena: #8a62c9;
+  --od-dei-negra: #b8582c;
+  --od-dei-e1: #cde2fb;
+  --od-dei-e2: #86b6ef;
+  --od-dei-e3: #5598e7;
+  --od-dei-e4: #1c5cab;
+  --od-dei-e5: #184f95;
+  --od-dei-e6: #10325e;
+  --od-dei-e-ink-deep: #06142b;
+  --od-dei-e-ink-pale: #ffffff;
+  --od-dei-f: #9085e9;
+  --od-dei-m: #2fa58a;
+  --od-dei-urbano: #4a86e0;
+  --od-dei-rural: #5fa35c;
+  --od-dei-hatch: rgba(148, 176, 214, 0.4);
+    --od-dei-indigena: #8a62c9;
+    --od-dei-negra: #b8582c;
+    --od-dei-e1: #cde2fb;
+    --od-dei-e2: #86b6ef;
+    --od-dei-e3: #5598e7;
+    --od-dei-e4: #1c5cab;
+    --od-dei-e5: #184f95;
+    --od-dei-e6: #10325e;
+    --od-dei-e-ink-deep: #06142b;
+    --od-dei-e-ink-pale: #ffffff;
+    --od-dei-f: #9085e9;
+    --od-dei-m: #2fa58a;
+    --od-dei-urbano: #4a86e0;
+    --od-dei-rural: #5fa35c;
+    --od-dei-hatch: rgba(148, 176, 214, 0.4);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.45), 0 6px 16px rgba(0, 0, 0, 0.34);
+    --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.45), 0 12px 28px rgba(0, 0, 0, 0.42);
+    --shadow-xl: 0 4px 8px rgba(0, 0, 0, 0.5), 0 24px 48px rgba(0, 0, 0, 0.5);
+    --shadow-accent: 0 8px 20px rgba(33, 84, 168, 0.5);
+    --ring: 0 0 0 3px rgba(92, 155, 242, 0.42);
+  }
+}
+
+/* La elección explícita del usuario gana en ambos sentidos. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --brand-navy: #9dc0f5;
+  --brand-navy-deep: #7fabee;
+  --brand-blue: #5c9bf2;
+  --brand-blue-strong: #7fb0f6;
+  --brand-blue-soft: rgba(92, 155, 242, 0.14);
+  --brand-teal: #37b6c4;
+  --pilo-stage: #071a38;
+  --pilo-stage-ink: #f1f6ff;
+  --pilo-stage-muted: #a9bddf;
+  --pilo-stage-line: rgba(255, 255, 255, 0.12);
+  --pilo-accent: #7fe7f0;
+  --pilo-accent-ink: #06142b;
+
+  --page: #0b1017;
+  --page-alt: #0e141d;
+  --surface: #151d28;
+  --surface-2: #1a232f;
+  --surface-3: #202c3a;
+  --surface-glass: rgba(21, 29, 40, 0.78);
+  --logo-plate: #ffffff;
+  --logo-plate-pad: 5px;
+
+  --ink: #eef3f9;
+  --ink-secondary: #b3c1d2;
+  --ink-muted: #8b9bb0;
+  --ink-faint: #6d7d92;
+  --ink-on-accent: #08111d;
+
+  --line: rgba(148, 176, 214, 0.16);
+  --line-strong: rgba(148, 176, 214, 0.28);
+  --line-faint: rgba(148, 176, 214, 0.09);
+
+  --pillar-1: #2e5fca;
+  --pillar-2: #0ca3b7;
+  --pillar-3: #a58c0d;
+  --pillar-4: #b271ed;
+  --pillar-5: #327f3a;
+  --pillar-6: #db516a;
+
+  --status-done: #3fb267;
+  --status-active: #5c9bf2;
+  --status-pending: #d9a221;
+  --status-risk: #ec6a6a;
+  --status-done-soft: rgba(63, 178, 103, 0.16);
+  --status-active-soft: rgba(92, 155, 242, 0.16);
+  --status-pending-soft: rgba(217, 162, 33, 0.16);
+  --status-risk-soft: rgba(236, 106, 106, 0.16);
+
+  /* Escala de cumplimiento en oscuro: la convención se invierte, más
+     luminosidad es más presencia. Monótona y con todas las bandas por encima
+     de 3:1 sobre la superficie oscura. */
+  --band-1: #b74506;
+  --band-2: #bd6c01;
+  --band-3: #bc9200;
+  --band-4: #a6bb2d;
+  --band-5: #73e087;
+
+  --track: rgba(148, 176, 214, 0.16);
+  --gridline: rgba(148, 176, 214, 0.09);
+
+  --od-board: #06142b;
+  --od-board-raised: #0b1f3f;
+  --od-board-line: rgba(147, 170, 206, 0.16);
+  --od-board-line-strong: rgba(147, 170, 206, 0.3);
+  --od-flap: #132b52;
+  --od-flap-low: #0f2446;
+  --od-flap-hinge: #020a18;
+  --od-flap-ink: #f3f6fb;
+  --od-flap-shadow: 0 0.05em 0.12em rgba(0, 0, 0, 0.45);
+  --od-board-ink: #e8eef7;
+  --od-board-muted: #9aaecb;
+  --od-signal-text: #f6b93f;
+  --od-previous: #6fd3de;
+  --od-scrim: rgba(6, 20, 43, 0.94);
+  --od-hero-ink: #f3f6fb;
+  --od-shadow-panel: 0 24px 48px rgba(0, 0, 0, 0.35);
+  --od-ticket-perforation: #6b7c93;
+  --od-page: #07142a;
+  --od-surface: #0e2141;
+  --od-bar: #e3eaf5;
+  --od-bar-soft: #3a5178;
+  --od-bar-previous: #6fd3de;
+  --od-bar-empty: rgba(148, 176, 214, 0.34);
+  --od-series-1: #4a86e0;
+  --od-series-2: #d9733a;
+  --od-series-3: #2fa58a;
+  --od-series-total: #e8eef7;
+  --od-cat-1: #3987e5;
+  --od-cat-2: #d95926;
+  --od-cat-3: #199e70;
+  --od-cat-4: #9085e9;
+  --od-cat-5: #d55181;
+  --od-cat-6: #008300;
+  --od-seq-0: #0c1d38;
+  --od-seq-1: #10325e;
+  --od-seq-2: #184f95;
+  --od-seq-3: #1c5cab;
+  --od-seq-4: #2a78d6;
+  --od-seq-5: #5598e7;
+  --od-seq-6: #86b6ef;
+  --od-seq-7: #cde2fb;
+  --od-seq-ink-light: #ffffff;
+  --od-seq-ink-dark: #06142b;
+  --od-div-neg-3: #eea06c;
+  --od-div-neg-2: #cf6a33;
+  --od-div-neg-1: #86340e;
+  --od-div-mid: #1a2d4d;
+  --od-div-pos-1: #2c62ad;
+  --od-div-pos-2: #72aaf0;
+  --od-div-neg-3-ink: #06142b;
+  --od-div-neg-2-ink: #06142b;
+  --od-div-neg-1-ink: #ffffff;
+  --od-div-mid-ink: #e8eef7;
+  --od-div-pos-1-ink: #ffffff;
+  --od-div-pos-2-ink: #06142b;
+  --od-flow: #f6b93f;
+  --od-flow-out: #ff6fa3;
+  --od-flow-out-head: #ffc2d8;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.45), 0 6px 16px rgba(0, 0, 0, 0.34);
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.45), 0 12px 28px rgba(0, 0, 0, 0.42);
+  --shadow-xl: 0 4px 8px rgba(0, 0, 0, 0.5), 0 24px 48px rgba(0, 0, 0, 0.5);
+  --shadow-accent: 0 8px 20px rgba(33, 84, 168, 0.5);
+  --ring: 0 0 0 3px rgba(92, 155, 242, 0.42);
+}

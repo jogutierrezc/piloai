@@ -1,0 +1,551 @@
+/* =============================================================================
+   Mr. Pilo · la app móvil · los doce temas.
+
+   Esta es la única hoja de la app que escribe colores: es la excepción
+   acordada a «ningún color a mano». Todo lo demás (pilo-app.css, account.css)
+   usa estas variables. Cada tema redefine las mismas:
+
+     --s-*    la escena de la bienvenida y la cabecera del perfil (fondo en tres
+              pasos --s1..--s3, tinta, luz)
+     --acc    el color puro del tema (acento) y --acc-ink, su tinta
+     --ring-* los dos anillos que salen de Pilo al cambiar de tema
+     --c-*    la conversación, el menú, las hojas y las pantallas de la cuenta
+              (--c-ok y --c-bad: lo que sirve y lo que falta en un campo,
+              siempre con su glifo y su palabra; --c-s1 y --c-s2: las dos
+              series de la gráfica de Mis notas, que además se distinguen
+              por el trazo)
+     --w-*    las tarjetas de muestra de la bienvenida (papel claro en todos)
+
+   Cómo se deriva cada tema (los valores están calculados; la app no calcula
+   colores al ejecutarse). Del color puro salen: el PROFUNDO (barra, botón y
+   mensaje propio; al menos 7,5:1 con blanco), el TEXTO (al menos 4,6:1 sobre
+   blanco y sobre su tono suave: enlaces y estados) y el SUAVE (el puro al 12 %
+   sobre blanco: lo seleccionado y las etiquetas). El puro queda solo como
+   acento, porque varios (Azul Salud, Verde Bio, Magenta, Naranja Social,
+   Púrpura, Ámbar, Turquesa, Dorado) no llegan a 4,5:1 con letra blanca.
+
+   El contraste del texto se mide en themes.test.ts contra el fondo real de
+   cada uno: 4.5:1 como mínimo en los doce. Un valor nuevo que no llegue,
+   rompe la prueba.
+
+   La muestra de cada tema en el selector (.pa-swatch) lleva su propio
+   data-tema: así se pinta con los colores de ese tema y no con los del que
+   está puesto.
+   ========================================================================== */
+
+/* Azul UDES (por defecto): el azul institucional con acento dorado. */
+.pa,
+.pa[data-tema="udes"],
+.pa-swatch[data-tema="udes"] {
+  --s1: #014c97;
+  --s2: #014c97;
+  --s3: #012a53;
+  --s-ink: #ffffff;
+  --s-muted: #c7d8e8;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(1, 76, 151, 0.2);
+  --acc: #014c97;
+  --acc-ink: #ffffff;
+  --ring-1: #80a6cb;
+  --ring-2: #cea284;
+  --c-bg: #f4f7fa;
+  --c-bubble: #ffffff;
+  --c-ink: #0c1f37;
+  --c-ink2: #556273;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #014c97;
+  --c-mine-ink: #ffffff;
+  --c-bar: #014c97;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #c7d8e8;
+  --c-link: #014c97;
+  --c-sheet: #ffffff;
+  --c-chip: #e1eaf3;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(1, 42, 83, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Dorado UDES: cálido; el dorado, profundizado hasta llevar blanco encima. */
+.pa[data-tema="dorado"],
+.pa-swatch[data-tema="dorado"] {
+  --s1: #856855;
+  --s2: #654f41;
+  --s3: #382b24;
+  --s-ink: #ffffff;
+  --s-muted: #f4f3f2;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(206, 162, 132, 0.2);
+  --acc: #cea284;
+  --acc-ink: #0d1c31;
+  --ring-1: #cea284;
+  --ring-2: #dfc3af;
+  --c-bg: #fdfbf9;
+  --c-bubble: #ffffff;
+  --c-ink: #192436;
+  --c-ink2: #5e6672;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #654f41;
+  --c-mine-ink: #ffffff;
+  --c-bar: #654f41;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #f4f3f2;
+  --c-link: #866956;
+  --c-sheet: #ffffff;
+  --c-chip: #f9f4f0;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(56, 43, 36, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Gris claro: barra blanca y fondo neutro; el azul institucional solo como acento. */
+.pa[data-tema="gris"],
+.pa-swatch[data-tema="gris"] {
+  --s1: #ffffff;
+  --s2: #eef3fa;
+  --s3: #e1eaf3;
+  --s-ink: #0d1c31;
+  --s-muted: #45566d;
+  --s-line: rgba(13, 40, 84, 0.16);
+  --s-chip: rgba(13, 40, 84, 0.06);
+  --s-glow: rgba(1, 76, 151, 0.12);
+  --acc: #014c97;
+  --acc-ink: #ffffff;
+  --ring-1: #014c97;
+  --ring-2: #a9784f;
+  --c-bg: #f5f5f5;
+  --c-bubble: #ffffff;
+  --c-ink: #0d1c31;
+  --c-ink2: #45566d;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #014c97;
+  --c-mine-ink: #ffffff;
+  --c-bar: #ffffff;
+  --c-bar-ink: #0d1c31;
+  --c-bar-muted: #45566d;
+  --c-link: #014c97;
+  --c-sheet: #ffffff;
+  --c-chip: #e1eaf3;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(6, 30, 70, 0.2);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Noche: el oscuro, con el azul salud como luz. */
+.pa[data-tema="noche"],
+.pa-swatch[data-tema="noche"] {
+  --s1: #0b3a73;
+  --s2: #07254f;
+  --s3: #04101f;
+  --s-ink: #ffffff;
+  --s-muted: #a9b8d0;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(57, 181, 224, 0.2);
+  --acc: #39b5e0;
+  --acc-ink: #07142b;
+  --ring-1: #39b5e0;
+  --ring-2: #cea284;
+  --c-bg: #07142b;
+  --c-bubble: #0c1d3a;
+  --c-ink: #e8eefb;
+  --c-ink2: #a9b8d0;
+  --c-line: rgba(255, 255, 255, 0.14);
+  --c-mine: #014c97;
+  --c-mine-ink: #ffffff;
+  --c-bar: #04101f;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #a9b8d0;
+  --c-link: #39b5e0;
+  --c-sheet: #0c1d3a;
+  --c-chip: #14305c;
+  --c-mark: #3a3115;
+  --c-warn: #f0c46a;
+  --c-warn-bg: #2a2110;
+  --c-ok: #5fd38a;
+  --c-bad: #ff9a92;
+  --c-s1: #7fb2ff;
+  --c-s2: #ffab6b;
+  --c-scrim: rgba(0, 0, 0, 0.66);
+  --c-shadow: rgba(0, 0, 0, 0.7);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: dark;
+}
+
+/* Salud: Ciencias Médicas y de la Salud. */
+.pa[data-tema="salud"],
+.pa-swatch[data-tema="salud"] {
+  --s1: #257592;
+  --s2: #1c5a70;
+  --s3: #0f323e;
+  --s-ink: #ffffff;
+  --s-muted: #eef3f4;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(57, 181, 224, 0.2);
+  --acc: #39b5e0;
+  --acc-ink: #0d1c31;
+  --ring-1: #39b5e0;
+  --ring-2: #7ecfeb;
+  --c-bg: #f6fcfe;
+  --c-bubble: #ffffff;
+  --c-ink: #10253b;
+  --c-ink2: #586676;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #1c5a70;
+  --c-mine-ink: #ffffff;
+  --c-bar: #1c5a70;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #eef3f4;
+  --c-link: #257692;
+  --c-sheet: #ffffff;
+  --c-chip: #e7f6fb;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(15, 50, 62, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Bio: Ciencias Agrícolas y Veterinarias. */
+.pa[data-tema="bio"],
+.pa-swatch[data-tema="bio"] {
+  --s1: #307a44;
+  --s2: #255f35;
+  --s3: #14341d;
+  --s-ink: #ffffff;
+  --s-muted: #edf2ee;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(67, 172, 96, 0.2);
+  --acc: #43ac60;
+  --acc-ink: #0d1c31;
+  --ring-1: #5fb878;
+  --ring-2: #85c998;
+  --c-bg: #f7fbf8;
+  --c-bubble: #ffffff;
+  --c-ink: #102534;
+  --c-ink2: #586671;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #255f35;
+  --c-mine-ink: #ffffff;
+  --c-bar: #255f35;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #edf2ee;
+  --c-link: #307a44;
+  --c-sheet: #ffffff;
+  --c-chip: #e8f5ec;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(20, 52, 29, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Magenta: Ingenierías y Tecnologías. */
+.pa[data-tema="magenta"],
+.pa-swatch[data-tema="magenta"] {
+  --s1: #ae3171;
+  --s2: #942a60;
+  --s3: #511735;
+  --s-ink: #ffffff;
+  --s-muted: #eddde6;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(221, 62, 144, 0.2);
+  --acc: #dd3e90;
+  --acc-ink: #08111d;
+  --ring-1: #e982b7;
+  --ring-2: #e982b7;
+  --c-bg: #fdf6fa;
+  --c-bubble: #ffffff;
+  --c-ink: #191e37;
+  --c-ink2: #5e6273;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #942a60;
+  --c-mine-ink: #ffffff;
+  --c-bar: #942a60;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #eddde6;
+  --c-link: #ba3479;
+  --c-sheet: #ffffff;
+  --c-chip: #fbe8f2;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(81, 23, 53, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Social: Ciencias Sociales. */
+.pa[data-tema="social"],
+.pa-swatch[data-tema="social"] {
+  --s1: #ad4d38;
+  --s2: #883c2c;
+  --s3: #4b2118;
+  --s-ink: #ffffff;
+  --s-muted: #f4edeb;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(242, 108, 79, 0.2);
+  --acc: #f26c4f;
+  --acc-ink: #0d1c31;
+  --ring-1: #f48269;
+  --ring-2: #f79f8d;
+  --c-bg: #fef8f7;
+  --c-bubble: #ffffff;
+  --c-ink: #1b2133;
+  --c-ink2: #5f6470;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #883c2c;
+  --c-mine-ink: #ffffff;
+  --c-bar: #883c2c;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #f4edeb;
+  --c-link: #ae4e39;
+  --c-sheet: #ffffff;
+  --c-chip: #fdedea;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(75, 33, 24, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Tecnológico: UDESTEC. */
+.pa[data-tema="purpura"],
+.pa-swatch[data-tema="purpura"] {
+  --s1: #705a8a;
+  --s2: #5e4c74;
+  --s3: #342a40;
+  --s-ink: #ffffff;
+  --s-muted: #e6e3e9;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(144, 117, 178, 0.2);
+  --acc: #9075b2;
+  --acc-ink: #0a1627;
+  --ring-1: #b19ec9;
+  --ring-2: #b7a5cd;
+  --c-bg: #faf9fc;
+  --c-bubble: #ffffff;
+  --c-ink: #152139;
+  --c-ink2: #5b6474;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #5e4c74;
+  --c-mine-ink: #ffffff;
+  --c-bar: #5e4c74;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #e6e3e9;
+  --c-link: #786194;
+  --c-sheet: #ffffff;
+  --c-chip: #f2eef6;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(52, 42, 64, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Ámbar (propuesto). */
+.pa[data-tema="ambar"],
+.pa-swatch[data-tema="ambar"] {
+  --s1: #8c671e;
+  --s2: #6a4e17;
+  --s3: #3a2b0d;
+  --s-ink: #ffffff;
+  --s-muted: #f4f3ef;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(242, 177, 52, 0.2);
+  --acc: #f2b134;
+  --acc-ink: #0d1c31;
+  --ring-1: #f2b134;
+  --ring-2: #f7cc7b;
+  --c-bg: #fefbf6;
+  --c-bubble: #ffffff;
+  --c-ink: #1b2531;
+  --c-ink2: #5f666f;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #6a4e17;
+  --c-mine-ink: #ffffff;
+  --c-bar: #6a4e17;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #f4f3ef;
+  --c-link: #8f681f;
+  --c-sheet: #ffffff;
+  --c-chip: #fdf6e7;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(58, 43, 13, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Turquesa (propuesto). */
+.pa[data-tema="turquesa"],
+.pa-swatch[data-tema="turquesa"] {
+  --s1: #17766f;
+  --s2: #125d58;
+  --s3: #0a3330;
+  --s-ink: #ffffff;
+  --s-muted: #e6eeed;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(31, 163, 154, 0.2);
+  --acc: #1fa39a;
+  --acc-ink: #0d1c31;
+  --ring-1: #4cb5ae;
+  --ring-2: #6dc3bd;
+  --c-bg: #f5fbfa;
+  --c-bubble: #ffffff;
+  --c-ink: #0e2437;
+  --c-ink2: #566673;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #125d58;
+  --c-mine-ink: #ffffff;
+  --c-bar: #125d58;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #e6eeed;
+  --c-link: #177972;
+  --c-sheet: #ffffff;
+  --c-chip: #e4f4f3;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(10, 51, 48, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}
+
+/* Granate (propuesto). */
+.pa[data-tema="granate"],
+.pa-swatch[data-tema="granate"] {
+  --s1: #9e344a;
+  --s2: #943145;
+  --s3: #511b26;
+  --s-ink: #ffffff;
+  --s-muted: #e7d2d6;
+  --s-line: rgba(255, 255, 255, 0.17);
+  --s-chip: rgba(255, 255, 255, 0.1);
+  --s-glow: rgba(176, 58, 82, 0.2);
+  --acc: #b03a52;
+  --acc-ink: #ffffff;
+  --ring-1: #d493a0;
+  --ring-2: #d492a0;
+  --c-bg: #fbf6f7;
+  --c-bubble: #ffffff;
+  --c-ink: #171e33;
+  --c-ink2: #5d6270;
+  --c-line: rgba(13, 28, 49, 0.12);
+  --c-mine: #943145;
+  --c-mine-ink: #ffffff;
+  --c-bar: #943145;
+  --c-bar-ink: #ffffff;
+  --c-bar-muted: #e7d2d6;
+  --c-link: #b03a52;
+  --c-sheet: #ffffff;
+  --c-chip: #f6e7ea;
+  --c-mark: #fff0b8;
+  --c-warn: #8a5700;
+  --c-warn-bg: #fbf2e0;
+  --c-ok: #0d6a2d;
+  --c-bad: #b3261e;
+  --c-s1: #1f5fbf;
+  --c-s2: #bd5318;
+  --c-scrim: rgba(2, 8, 20, 0.55);
+  --c-shadow: rgba(81, 27, 38, 0.26);
+  --w-card: #ffffff;
+  --w-card-ink: #0d1c31;
+  --w-card-ok: #0d6a2d;
+  color-scheme: light;
+}

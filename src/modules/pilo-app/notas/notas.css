@@ -1,0 +1,1373 @@
+/* =============================================================================
+   Mr. Pilo · Mis notas (beta) · /app/notas.
+
+   Todo con el prefijo «pnt-». Dos pantallas: la guía de Pilo (Pilo y lo que
+   dice a un lado, la tarea al otro) y las notas (las metas siempre a la
+   vista, y las pestañas). La autorización es la de terms/ y los avisos y
+   chips, los de la cuenta y Mis clases (account.css, clases.css).
+
+   Teléfono y computador: la disposición depende del ancho de ESTA pantalla
+   (una consulta de contenedor sobre .pnt), no del ancho de un teléfono. Desde
+   760 px la guía va en dos columnas y las notas llevan las metas en una
+   columna fija a la izquierda y el contenido en dos columnas donde quepa.
+
+   Los colores son los del tema (pilo-app-themes.css): aquí no hay ninguno
+   escrito a mano. La escena de la guía usa los de la bienvenida (--s-*, --acc);
+   las dos series de las gráficas son --c-s1 y --c-s2 y además se distinguen
+   sin color: una es continua con puntos y la otra, punteada. Los textos de
+   las gráficas van en tinta, nunca del color de la serie. El estado de una
+   materia o de un área lleva siempre su glifo y su palabra.
+
+   Todo lo que se toca mide 44 px o más. Nada se desplaza a lo ancho a
+   escondidas: el selector de periodo queda fijo arriba y los periodos, cuando
+   se ven todos, se acomodan en varias filas.
+
+   Movimiento: solo transform y opacidad (y un desenfoque leve que pone GSAP),
+   y lo que se toca cede a 0.97. Ningún texto nace oculto en esta hoja: el
+   estado oculto de cada entrada lo pone y lo quita GSAP.
+   ========================================================================== */
+
+.pnt {
+  --pnt-grid: color-mix(in srgb, var(--c-ink2) 24%, transparent);
+  container-type: inline-size;
+  container-name: pnt;
+}
+
+/* Las notas necesitan más ancho que un formulario: en computador usan el que haya. */
+.pc-pane:has(> .pnt) {
+  max-width: 1120px;
+}
+
+.pnt-card {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+  color: var(--c-ink);
+}
+
+.pnt-card h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.pnt-muted {
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pnt-center {
+  text-align: center;
+}
+
+.pnt-origin {
+  font-size: 0.75rem;
+  color: var(--c-ink2);
+}
+
+.pnt-link {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-link);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.pnt-link--mid {
+  justify-self: center;
+}
+
+/* Los botones pequeños sobre la escena y la barra: el sonido, actualizar, desconectar. */
+.pnt-chipbtn {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--s-chip);
+  color: var(--s-ink);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform var(--dur-press, 140ms) var(--ease-out, ease-out);
+}
+
+.pnt-chipbtn:active {
+  transform: scale(0.97);
+}
+
+.pnt-chipbtn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* Apagado se dice con la palabra («Sin sonido») y con el glifo tachado; el tono solo acompaña. */
+.pnt-chipbtn[aria-pressed="false"] {
+  color: var(--s-muted);
+}
+
+.pnt-chipbtn svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pnt-dots {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.pnt-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-link);
+  animation: pnt-dot 1s var(--ease-out, ease-out) infinite;
+}
+
+.pnt-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.pnt-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes pnt-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.pnt-reading {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+/* --- La guía: Pilo a un lado, la tarea al otro -------------------------------------------------- */
+
+.pnt-guide {
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg, 20px);
+  background: var(--c-bg);
+}
+
+.pnt-scene {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px 18px 14px;
+  overflow: hidden;
+  background: linear-gradient(150deg, var(--s1), var(--s2) 55%, var(--s3));
+  color: var(--s-ink);
+}
+
+.pnt-scene__row {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+/* La cara oficial, entera y a su proporción: solo cambia el tamaño de su caja. */
+.pnt-pilo {
+  flex: none;
+  width: 76px;
+  height: 76px;
+}
+
+.pnt-say {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  align-content: center;
+  min-width: 0;
+  min-height: 76px;
+}
+
+.pnt-say strong {
+  font: 600 1.25rem/1.15 var(--font-display);
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+.pnt-say strong:focus-visible {
+  outline: none;
+}
+
+.pnt-caption {
+  font-size: 0.94rem;
+  line-height: 1.45;
+  color: var(--s-ink);
+}
+
+.pnt-scene__foot {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* El avance: cuatro rayas, y la del paso en que va, más larga. */
+.pnt-progress {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.pnt-progress i {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--s-line);
+}
+
+.pnt-progress i[data-on] {
+  background: var(--acc);
+}
+
+.pnt-progress i[data-now] {
+  width: 34px;
+}
+
+/* Las estelas del vuelo: quietas y transparentes hasta que GSAP las hace pasar. */
+.pnt-streaks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pnt-streaks i {
+  position: absolute;
+  left: -30%;
+  width: 30%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--acc));
+  opacity: 0;
+}
+
+.pnt-streaks i:nth-child(1) {
+  top: 22%;
+}
+
+.pnt-streaks i:nth-child(2) {
+  top: 48%;
+}
+
+.pnt-streaks i:nth-child(3) {
+  top: 71%;
+}
+
+.pnt-task {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  padding: 18px;
+}
+
+.pnt-step {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 480px;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.pnt-step > h2 {
+  margin: 0;
+  font: 700 1.2rem/1.2 var(--font-display);
+  letter-spacing: -0.015em;
+}
+
+.pnt-step .pa-btn {
+  width: 100%;
+}
+
+.pnt-step .pa-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.pnt-step .pcl-consent {
+  max-width: none;
+}
+
+/* Los cuatro pasos de la bienvenida, numerados. */
+.pnt-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: pnt-paso;
+}
+
+.pnt-list li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  font-size: 0.9rem;
+  counter-increment: pnt-paso;
+}
+
+.pnt-list li::before {
+  content: counter(pnt-paso);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--c-chip);
+  color: var(--c-ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Un control de meta. */
+.pnt-goal {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.pnt-goal__top {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.pnt-goal__top label {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.pnt-goal__top output {
+  font: 700 1.6rem/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.pnt-goal input {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  accent-color: var(--c-link);
+  cursor: pointer;
+}
+
+/* --- Las notas: la barra ------------------------------------------------------------------------- */
+
+.pnt-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--s2);
+  color: var(--s-ink);
+}
+
+.pnt-bar__pilo {
+  position: relative;
+  z-index: 4;
+  flex: none;
+  width: 48px;
+  height: 48px;
+}
+
+.pnt-bar__who {
+  display: grid;
+  flex: 1 1 180px;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.pnt-bar__who strong {
+  font: 600 1.1rem/1.2 var(--font-display);
+  overflow-wrap: anywhere;
+}
+
+.pnt-bar__who span {
+  font-size: 0.78rem;
+  color: var(--s-muted);
+  overflow-wrap: anywhere;
+}
+
+.pnt-bar__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* --- Las notas: las metas a la vista y el contenido ---------------------------------------------- */
+
+.pnt-body {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pnt-rail,
+.pnt-main {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+}
+
+.pnt-metas__head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pnt-meter {
+  display: grid;
+  gap: 6px;
+}
+
+.pnt-meter__top {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+.pnt-meter__top b {
+  font: 700 1.25rem/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink);
+}
+
+/* Dónde va (la barra) y la meta (una raya con su palabra), en un eje de 3,0 a 5,0. */
+.pnt-meter__track {
+  position: relative;
+  height: 8px;
+  margin-top: 12px;
+  border-radius: 4px;
+  background: var(--c-chip);
+}
+
+.pnt-meter__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 4px;
+  background: var(--c-s1);
+}
+
+.pnt-meter__track u {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--c-ink);
+  text-decoration: none;
+}
+
+.pnt-meter__track u::after {
+  content: "meta";
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--c-ink2);
+  font: 800 0.62rem/1 var(--font-sans);
+}
+
+.pnt-meter p {
+  font-size: 0.8125rem;
+  color: var(--c-ink);
+}
+
+.pnt-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.pnt-totals div {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.pnt-totals dd {
+  order: -1;
+  margin: 0;
+  font: 700 1.3rem/1.1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink);
+}
+
+.pnt-totals dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+/* --- Las pestañas -------------------------------------------------------------------------------- */
+
+.pnt-tabs {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  padding: 4px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-sheet);
+}
+
+.pnt-tabs button {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: calc(var(--radius-md) - 4px);
+  background: none;
+  color: var(--c-ink2);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform var(--dur-press, 140ms) var(--ease-out, ease-out), background-color 160ms ease, color 160ms ease;
+}
+
+.pnt-tabs button:active {
+  transform: scale(0.97);
+}
+
+.pnt-tabs button[aria-selected="true"] {
+  background: var(--c-bar);
+  color: var(--c-bar-ink);
+}
+
+.pnt-panel {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  min-width: 0;
+}
+
+.pnt-panel:focus-visible {
+  outline: none;
+}
+
+/* --- Mi histórico -------------------------------------------------------------------------------- */
+
+/* El selector de periodo: pegado arriba al desplazarse, siempre al alcance. */
+.pnt-picker {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin-block: -6px;
+  padding-block: 6px;
+  background: var(--c-bg);
+}
+
+.pnt-stepper {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: 8px;
+  align-items: center;
+}
+
+.pnt-stepper button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-sheet);
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: transform var(--dur-press, 140ms) var(--ease-out, ease-out);
+}
+
+.pnt-stepper button:active {
+  transform: scale(0.97);
+}
+
+.pnt-stepper button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pnt-stepper svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pnt-stepper select {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-sheet);
+  color: var(--c-ink);
+  font: 700 16px var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Todos los periodos, en las filas que hagan falta: solo donde caben (ver la consulta de contenedor). */
+.pnt-periods {
+  display: none;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pnt-periods button {
+  flex: none;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  background: var(--c-sheet);
+  color: var(--c-ink2);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: transform var(--dur-press, 140ms) var(--ease-out, ease-out), background-color 160ms ease, color 160ms ease;
+}
+
+.pnt-periods button:active {
+  transform: scale(0.97);
+}
+
+.pnt-periods button[aria-pressed="true"] {
+  border-color: var(--c-bar);
+  background: var(--c-bar);
+  color: var(--c-bar-ink);
+}
+
+.pnt-period-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.pnt-period-head h2 {
+  font: 700 1.15rem/1.2 var(--font-display);
+}
+
+.pnt-courses {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pnt-courses li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.pnt-courses li:first-child {
+  padding-top: 2px;
+  border-top: 0;
+}
+
+.pnt-courses li:last-child {
+  padding-bottom: 2px;
+}
+
+.pnt-course__name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.pnt-course__def {
+  grid-row: span 2;
+  align-self: center;
+  font: 700 1.3rem/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.pnt-course__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--c-ink2);
+}
+
+/* El estado: su glifo y su palabra; el color solo acompaña. */
+.pnt-state {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-weight: 800;
+}
+
+.pnt-state svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pnt-state[data-s="aprobada"] {
+  color: var(--c-ok);
+}
+
+.pnt-state[data-s="reprobada"] {
+  color: var(--c-bad);
+}
+
+.pnt-pdf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.pnt-pdf .pc-chip svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --- Mi evolución: la gráfica ------------------------------------------------------------------ */
+
+.pnt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+.pnt-legend li {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.pnt-legend svg {
+  flex: none;
+}
+
+.pnt-chart {
+  position: relative;
+  max-width: 720px;
+}
+
+.pnt-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.pnt-chart text {
+  font: 600 11px var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  fill: var(--c-ink2);
+}
+
+.pnt-grid {
+  stroke: var(--pnt-grid);
+  stroke-width: 1;
+}
+
+.pnt-grid[data-pass] {
+  stroke: var(--c-ink2);
+  stroke-dasharray: 2 3;
+}
+
+.pnt-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pnt-line--avg,
+.pnt-key--avg {
+  stroke: var(--c-s1);
+}
+
+.pnt-line--acc,
+.pnt-key--acc {
+  stroke: var(--c-s2);
+  stroke-dasharray: 5 4;
+}
+
+/* La meta de acumulado: una raya fina en tinta, con su nombre escrito encima. */
+.pnt-goal-line line,
+.pnt-goal-key {
+  fill: none;
+  stroke: var(--c-ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 3;
+  stroke-linecap: round;
+}
+
+.pnt-chart .pnt-goal-line text {
+  font-weight: 800;
+  fill: var(--c-ink);
+}
+
+.pnt-dot {
+  fill: var(--c-s1);
+  stroke: var(--c-sheet);
+  stroke-width: 2;
+}
+
+.pnt-key-dot {
+  fill: var(--c-s1);
+}
+
+.pnt-cross {
+  stroke: var(--c-ink2);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+.pnt-hit {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+.pnt-tip {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: var(--c-bar);
+  color: var(--c-bar-ink);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -8px);
+}
+
+.pnt-tip b {
+  display: block;
+  font-weight: 800;
+}
+
+.pnt-scroll {
+  overflow-x: auto;
+}
+
+.pnt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pnt-table caption {
+  padding-bottom: 6px;
+  color: var(--c-ink2);
+  font-weight: 700;
+  text-align: left;
+}
+
+.pnt-table th,
+.pnt-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--c-line);
+  text-align: right;
+}
+
+.pnt-table th:first-child,
+.pnt-table td:first-child {
+  text-align: left;
+}
+
+.pnt-table thead th {
+  font-weight: 800;
+  color: var(--c-ink2);
+}
+
+.pnt-table tbody th {
+  font-weight: 700;
+}
+
+.pnt-finds {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pnt-finds li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.pnt-finds svg {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  fill: none;
+  stroke: var(--c-link);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --- Mi evolución: lo que le recomiendo ------------------------------------------------------------ */
+
+.pnt-card .pcl-tools .pa-btn {
+  width: 100%;
+}
+
+.pnt-think {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.pnt-think ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+.pnt-think li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+  color: var(--c-ink2);
+}
+
+.pnt-think li[data-s="ahora"] {
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+.pnt-think li[data-s="hecho"] .pa-i {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: var(--c-ok);
+}
+
+.pnt-recs h3 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.pnt-recs {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: pnt-rec;
+}
+
+.pnt-recs > li {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 12px 0 12px 30px;
+  border-top: 1px solid var(--c-line);
+  counter-increment: pnt-rec;
+  font-size: 0.875rem;
+}
+
+.pnt-recs > li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.pnt-recs > li::before {
+  content: counter(pnt-rec);
+  position: absolute;
+  top: 11px;
+  left: 0;
+  color: var(--c-ink2);
+  font: 700 1.1rem/1.2 var(--font-display);
+}
+
+.pnt-recs > li:first-child::before {
+  top: -1px;
+}
+
+.pnt-recs p {
+  max-width: 70ch;
+  color: var(--c-ink);
+  overflow-wrap: anywhere;
+}
+
+.pnt-rec__src {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  font-size: 0.8125rem;
+}
+
+.pnt-rec__src > span:first-child {
+  font-weight: 800;
+  color: var(--c-ink2);
+}
+
+.pnt-rec__src a {
+  color: var(--c-link);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+/* Sin documento que la respalde: se dice con glifo y palabras. */
+.pnt-rec__general {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+.pnt-areas ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pnt-areas li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: baseline;
+}
+
+.pnt-area__name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* El valor, escrito junto a su barra y en tinta: nunca del color de la serie. */
+.pnt-area__val {
+  font: 700 1rem/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink);
+}
+
+/* La barra: delgada, de extremos redondos, sobre un eje de 0 a 5 con la guía en 3,0 (al 60 %). */
+.pnt-area__track {
+  position: relative;
+  grid-column: 1 / -1;
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--pnt-grid);
+}
+
+.pnt-area__track::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 60%;
+  width: 1px;
+  height: 14px;
+  background: var(--c-ink2);
+}
+
+.pnt-area__fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--c-s2);
+}
+
+.pnt-area__fill[data-strong] {
+  background: var(--c-s1);
+}
+
+.pnt-area__state {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+.pnt-area__state svg,
+.pnt-rec__general svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --- Mi semestre: en construcción -------------------------------------------------------------- */
+
+.pnt-soon {
+  justify-items: start;
+}
+
+.pnt-badge {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.pnt-badge svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pnt-cuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.pnt-cuts div {
+  display: grid;
+  gap: 6px;
+  padding: 12px 10px;
+  border: 1.5px dashed var(--c-line);
+  border-radius: var(--radius-md);
+}
+
+.pnt-cuts b {
+  font-size: 0.8125rem;
+}
+
+.pnt-cuts i {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--c-chip);
+}
+
+.pnt-cuts i:last-child {
+  width: 60%;
+}
+
+/* --- En computador (o donde haya ancho): dos columnas ------------------------------------------- */
+
+@container pnt (min-width: 760px) {
+  /* La guía: Pilo a la izquierda, la tarea a la derecha. */
+  .pnt-guide {
+    grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+    min-height: 520px;
+  }
+
+  .pnt-scene {
+    gap: 20px;
+    align-content: center;
+    padding: 36px 32px;
+  }
+
+  .pnt-scene__row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .pnt-pilo {
+    width: 132px;
+    height: 132px;
+  }
+
+  .pnt-say {
+    min-height: 0;
+  }
+
+  .pnt-say strong {
+    font-size: 1.7rem;
+  }
+
+  .pnt-caption {
+    font-size: 1.04rem;
+  }
+
+  .pnt-task {
+    align-content: center;
+    padding: 36px 32px;
+  }
+
+  /* Las notas: las metas en una columna fija a la izquierda. */
+  .pnt-body {
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .pnt-rail {
+    position: sticky;
+    top: 8px;
+  }
+
+  .pnt-totals {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pnt-tabs {
+    max-width: 460px;
+  }
+
+  .pnt-stepper {
+    max-width: 320px;
+  }
+
+  .pnt-periods {
+    display: flex;
+  }
+}
+
+/* El contenido en dos columnas, donde quepa junto a las metas. */
+@container pnt (min-width: 980px) {
+  .pnt-panel--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pnt-panel--two .pnt-span {
+    grid-column: 1 / -1;
+  }
+}
+
+/* --- Pantallas muy estrechas, y quien pide menos movimiento ------------------------------------- */
+
+@container pnt (max-width: 380px) {
+  .pnt-tabs button {
+    font-size: 0.8125rem;
+  }
+
+  .pnt-totals dd {
+    font-size: 1.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pnt-dots i {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  .pnt-tabs button,
+  .pnt-periods button,
+  .pnt-stepper button,
+  .pnt-chipbtn {
+    transition: none;
+  }
+}

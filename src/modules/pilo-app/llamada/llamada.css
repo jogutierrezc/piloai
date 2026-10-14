@@ -1,0 +1,693 @@
+/* =============================================================================
+   Mr. Pilo · la app · la llamada.
+
+   Dos piezas: el aviso previo (.pc-preview, una hoja de las de siempre) y la
+   pantalla de la llamada (.pc). Ningún color a mano: todo sale de las
+   variables de los cinco temas (pilo-app-themes.css). La llamada usa las de la
+   escena de la bienvenida (--s-*, --acc), que son oscuras en los cinco, para
+   que se sienta un lugar aparte y no una pantalla más del chat.
+   ========================================================================== */
+
+/* --- El aviso previo ------------------------------------------------------------------------ */
+
+.pc-preview {
+  gap: 16px;
+}
+
+.pc-lead {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--c-ink2);
+  text-wrap: pretty;
+}
+
+.pc-lang {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.pc-lang button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--c-ink);
+  font-weight: 700;
+  text-align: left;
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+
+.pc-lang button:active {
+  transform: scale(0.97);
+}
+
+.pc-lang b {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--c-line);
+  border-radius: 50%;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--c-ink2);
+  transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+
+/* Elegido: el contorno se hace trazo grueso y el círculo se llena (no solo cambia de color). */
+.pc-lang button[aria-checked="true"] {
+  border: 2px solid var(--c-link);
+  padding: 7px 11px;
+  background: var(--c-chip);
+}
+
+.pc-lang button[aria-checked="true"] b {
+  border-color: var(--c-link);
+  background: var(--c-link);
+  color: var(--c-bg);
+}
+
+.pc-feat,
+.pc-know {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pa-sheet .pc-feat li {
+  display: grid;
+  gap: 2px;
+  padding: 12px 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.pc-feat strong {
+  font-weight: 800;
+}
+
+.pc-feat span {
+  max-width: 56ch;
+  color: var(--c-ink2);
+  font-size: 0.875rem;
+  text-wrap: pretty;
+}
+
+.pc-know {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pa-sheet .pc-know li {
+  position: relative;
+  padding: 0 0 0 16px;
+  border-top: 0;
+  max-width: 60ch;
+  color: var(--c-ink2);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.pc-know li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-ink2);
+}
+
+.pc-problem {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.pc-actions {
+  position: sticky;
+  bottom: calc(-22px - env(safe-area-inset-bottom, 0px));
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  margin: 4px -4px -4px;
+  padding: 12px 4px calc(4px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to bottom, transparent, var(--c-sheet) 14px);
+}
+
+.pc-actions .pa-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- La llamada ----------------------------------------------------------------------------- */
+
+.pc {
+  --pc-bar: 112px;
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  background: radial-gradient(120% 78% at 50% 30%, var(--s1), var(--s2) 58%, var(--s3));
+  color: var(--s-ink);
+  outline: none;
+}
+
+.pc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) var(--pa-side-r) 0 var(--pa-side);
+}
+
+.pc-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--s-muted);
+}
+
+.pc-live i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--s-muted);
+  transition: background-color var(--dur-base) ease;
+}
+
+.pc[data-phase="escucha"] .pc-live i,
+.pc[data-phase="habla"] .pc-live i {
+  background: var(--acc);
+}
+
+.pc-live time {
+  font-variant-numeric: tabular-nums;
+  color: var(--s-ink);
+}
+
+.pc-langs {
+  display: inline-flex;
+  border: 1px solid var(--s-line);
+  border-radius: var(--radius-pill);
+  background: var(--s-chip);
+}
+
+.pc-langs button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  color: var(--s-ink);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+
+.pc-langs button:active {
+  transform: scale(0.97);
+}
+
+.pc-langs button[aria-checked="true"] {
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+
+.pc-stage {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  min-height: 0;
+  padding: 8px 20px;
+  text-align: center;
+}
+
+.pc-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(70vw, 320px, 42dvh);
+  aspect-ratio: 1;
+  margin-bottom: clamp(28px, 7dvh, 48px);
+  border-radius: 50%;
+  cursor: default;
+}
+
+.pc-orb:not(:disabled) {
+  cursor: pointer;
+}
+
+.pc-orb:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 10px;
+}
+
+.pc-rings {
+  position: absolute;
+  inset: -20%;
+  width: 140%;
+  height: 140%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--acc);
+  stroke-width: 1.4;
+  max-width: none;
+  pointer-events: none;
+}
+
+.pc-ring {
+  opacity: 0.4;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pc-ring--think {
+  stroke-dasharray: 2 9;
+  stroke-linecap: round;
+  stroke-width: 2.4;
+  opacity: 0;
+}
+
+.pc-face {
+  position: relative;
+  display: block;
+  width: 84%;
+  aspect-ratio: 1;
+  /* La mascota no es redonda: se apoya sobre la escena con una luz detrás, no dentro de un círculo. */
+  filter: drop-shadow(0 14px 22px var(--c-shadow));
+}
+
+.pc-face::before {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--s-glow), transparent);
+}
+
+.pc-state {
+  margin: 0;
+  font: 700 clamp(1.5rem, 1.1rem + 2vw, 2.125rem) / 1.1 var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.pc-hint {
+  margin: -4px 0 0;
+  min-height: 1.2em;
+  font-size: 0.8125rem;
+  color: var(--s-muted);
+  opacity: 0;
+  transition: opacity var(--dur-base) ease;
+}
+
+.pc-hint[data-on] {
+  opacity: 1;
+}
+
+.pc-caption {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  width: min(100%, 52ch);
+  height: 8.5em;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0) 32%);
+  mask-image: linear-gradient(to bottom, transparent, rgb(0 0 0) 32%);
+}
+
+.pc-caption p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.pc-heard {
+  color: var(--s-muted);
+  font-size: 0.9375rem;
+}
+
+.pc-said {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.pc-heard[data-empty],
+.pc-said[data-empty] {
+  display: none;
+}
+
+.pc-fail {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  width: min(100%, 44ch);
+}
+
+.pc-fail p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.pc-fail div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pc-btn {
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+
+.pc-btn--line {
+  background: transparent;
+  color: var(--s-ink);
+  border: 1px solid var(--s-line);
+}
+
+.pc-log {
+  position: absolute;
+  inset: 16% 0 var(--pc-bar) 0;
+  z-index: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px max(20px, var(--pa-side-r)) 12px max(20px, var(--pa-side));
+  border-radius: var(--pa-r-sheet);
+  background: var(--s3);
+  border: 1px solid var(--s-line);
+  border-bottom: 0;
+  animation: pc-up 260ms var(--ease-out);
+}
+
+.pc-log[hidden] {
+  display: none;
+}
+
+.pc-log ol {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 60ch);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-log li {
+  display: grid;
+  gap: 2px;
+}
+
+.pc-log b {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--s-muted);
+}
+
+.pc-log li[data-who="pilo"] span {
+  font-weight: 600;
+}
+
+.pc-log__empty {
+  margin: 0;
+  text-align: center;
+  color: var(--s-muted);
+}
+
+@keyframes pc-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+
+.pc-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 14px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+}
+
+.pc-ctl {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--s-line);
+  border-radius: 50%;
+  background: var(--s-chip);
+  color: var(--s-ink);
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+
+.pc-ctl .pa-i {
+  width: 24px;
+  height: 24px;
+}
+
+.pc-ctl:active {
+  transform: scale(0.97);
+}
+
+.pc-ctl:disabled {
+  opacity: 0.4;
+}
+
+/* Apagado (micrófono en pausa, conversación a la vista): se llena, no solo cambia de color. */
+.pc-ctl[aria-pressed="true"] {
+  background: var(--s-ink);
+  color: var(--s2);
+}
+
+.pc-ctl--end {
+  width: 76px;
+  height: 76px;
+  border-color: transparent;
+  background: var(--c-bad);
+  color: var(--s-ink);
+}
+
+.pc-ctl--end .pa-i {
+  width: 30px;
+  height: 30px;
+}
+
+.pc-ctl:focus-visible,
+.pc-langs button:focus-visible,
+.pc-btn:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pc-langs button:not([aria-checked="true"]):hover,
+  .pc-ctl:not(:disabled):not([aria-pressed="true"]):hover {
+    background: var(--s-line);
+  }
+
+  .pc-lang button[aria-checked="false"]:hover {
+    border-color: var(--c-ink2);
+  }
+}
+
+/* Teléfono apaisado o ventana baja: la cara se achica y el aviso de tocar se va. */
+@media (max-height: 560px) {
+  .pc-orb {
+    width: min(40dvh, 200px);
+    margin-bottom: 8px;
+  }
+
+  .pc-hint {
+    display: none;
+  }
+
+  .pc-caption {
+    height: 5.5em;
+  }
+
+  .pc-ctl {
+    width: 52px;
+    height: 52px;
+  }
+
+  .pc-ctl--end {
+    width: 64px;
+    height: 64px;
+  }
+
+  .pc {
+    --pc-bar: 92px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-log {
+    animation: none;
+  }
+
+  .pc-ctl,
+  .pc-langs button,
+  .pc-lang button {
+    transition-property: background-color, color, border-color;
+  }
+
+  .pc-ctl:active,
+  .pc-langs button:active,
+  .pc-lang button:active {
+    transform: none;
+  }
+}
+
+/* --- El anuncio de lanzamiento --------------------------------------------------------------- */
+
+.pn-in {
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.pn-hero {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 136px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: radial-gradient(120% 120% at 50% 40%, var(--s1), var(--s2) 60%, var(--s3));
+}
+
+.pn-rings {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  max-width: none;
+  fill: none;
+  stroke: var(--acc);
+  stroke-width: 1.4;
+}
+
+.pn-ring {
+  opacity: 0.4;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pn-face {
+  position: relative;
+  display: block;
+  width: 104px;
+  height: 104px;
+  filter: drop-shadow(0 10px 16px var(--c-shadow));
+}
+
+.pn-in h2 {
+  font-size: 1.45rem;
+  text-wrap: balance;
+}
+
+.pn-how {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: pn;
+}
+
+.pa-sheet .pn-how li {
+  counter-increment: pn;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 1px 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--c-line);
+}
+
+/* Es una secuencia de verdad: el número dice el orden en que se hace. */
+.pn-how li::before {
+  content: counter(pn);
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid var(--c-link);
+  border-radius: 50%;
+  color: var(--c-link);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.pn-how strong {
+  font-size: 0.92rem;
+}
+
+.pa-sheet .pn-how span {
+  color: var(--c-ink2);
+  font-size: 0.8125rem;
+  text-wrap: pretty;
+}
+
+.pa-sheet .pn-langs {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+/* Tras cerrar el anuncio, el botón del teléfono late dos veces para mostrar dónde está. */
+.pa-bar .pa-icon[data-hint] {
+  position: relative;
+}
+
+.pa-bar .pa-icon[data-hint]::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border: 2px solid var(--acc);
+  border-radius: 50%;
+  opacity: 0;
+  animation: pn-ping 1.8s var(--ease-out) 2;
+  pointer-events: none;
+}
+
+@keyframes pn-ping {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-bar .pa-icon[data-hint]::after {
+    animation: none;
+  }
+}

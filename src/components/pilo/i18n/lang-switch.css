@@ -1,0 +1,65 @@
+/* El selector de idioma de Pilo: hereda el color del lugar donde se pone. */
+.pilo-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 32%, transparent);
+  font-family: inherit;
+}
+.pilo-lang button {
+  min-width: 34px;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: 800 12px/1 inherit;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  opacity: 0.74;
+  transition: opacity 120ms ease-out, background-color 120ms ease-out;
+}
+.pilo-lang button[aria-pressed="true"] {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+.pilo-lang button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .pilo-lang button:hover {
+    opacity: 1;
+  }
+}
+
+/* Según dónde se pone. */
+.apw-lang,
+.pa-lang {
+  margin-inline-end: 8px;
+}
+.pe-lang {
+  margin-inline-end: 2px;
+}
+.pe-lang button {
+  min-width: 28px;
+  min-height: 26px;
+  padding: 0 6px;
+  font-size: 11px;
+}
+.ap-lang {
+  margin-inline-start: 4px;
+}
+@media (max-width: 520px) {
+  .pilo-lang button {
+    min-width: 30px;
+    padding: 0 6px;
+  }
+}
+.apw-lang {
+  margin-inline-start: 14px;
+}

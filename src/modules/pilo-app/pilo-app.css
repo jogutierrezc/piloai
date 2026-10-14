@@ -1,0 +1,2387 @@
+/* =============================================================================
+   Mr. Pilo · la app móvil (/app).
+
+   Una pantalla de teléfono: cabecera, conversación y caja de escribir. Ocupa
+   el alto que de verdad se ve (100dvh, y el de visualViewport cuando sale el
+   teclado), respeta los márgenes seguros y nunca se desplaza hacia los lados.
+   Todo lo que se toca mide 44 px o más.
+
+   Los colores son los del tema (pilo-app-themes.css): aquí no hay ninguno
+   escrito a mano. El texto de las respuestas lo pinta AnswerText con las
+   reglas de ask-pilo.css, que leen --ap-*: más abajo se enlazan al tema.
+
+   Movimiento: solo transform y opacidad (más clip-path al cerrar la escena de
+   bienvenida, que lo pone GSAP). Lo de la interfaz dura menos de 300 ms y sale
+   más rápido de lo que entra; todo botón cede a 0.97 al pulsarlo. Lo que se
+   abre con el teclado no se anima ([data-quick]). Con movimiento reducido
+   quedan los fundidos. Ningún texto nace oculto en esta hoja: los estados
+   ocultos los pone y los quita GSAP, que al interrumpirse deja el final.
+   ========================================================================== */
+
+.pa {
+  /* Medidas propias de la app. */
+  --pa-gap: 12px;
+  --pa-side: max(12px, env(safe-area-inset-left, 0px));
+  --pa-side-r: max(12px, env(safe-area-inset-right, 0px));
+  --pa-col: 720px;
+  --pa-r-bubble: 18px 18px 18px 6px;
+  --pa-r-mine: 18px 18px 6px 18px;
+  --pa-r-sheet: 24px 24px 0 0;
+  --pa-enter: 280ms;
+  --pa-leave: 200ms;
+
+  /* Las reglas de AnswerText y RolePicker (ask-pilo.css), con los colores del tema. */
+  --ap-page: var(--c-bg);
+  --ap-surface: var(--c-bubble);
+  --ap-soft: var(--c-bg);
+  --ap-soft-2: var(--c-chip);
+  --ap-ink: var(--c-ink);
+  --ap-ink-2: var(--c-ink2);
+  --ap-ink-3: var(--c-ink2);
+  --ap-line: var(--c-line);
+  --ap-line-2: var(--c-line);
+  --ap-primary: var(--c-link);
+  --ap-primary-ink: var(--c-bg);
+  --ap-primary-soft: var(--c-chip);
+  --ap-primary-text: var(--c-link);
+  --ap-accent: var(--acc);
+  --ap-accent-ink: var(--acc-ink);
+  --ap-mark: var(--c-mark);
+  --ap-warn: var(--c-warn);
+  --ap-warn-soft: var(--c-warn-bg);
+  --ap-mem: var(--c-link);
+  --ap-mem-soft: var(--c-chip);
+  --ap-ease: var(--ease-out);
+  --ap-sans: var(--font-sans);
+  --ap-serif: var(--font-display);
+
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--pa-top, 0px);
+  z-index: 10;
+  height: 100vh;
+  height: var(--pa-h, 100dvh);
+  overflow: hidden;
+  overscroll-behavior: none;
+  isolation: isolate;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font: 500 0.9375rem/1.5 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* La conversación: cabecera, mensajes y caja de escribir. La bienvenida va encima, en su propia capa. */
+.pa-frame {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-width: 0;
+}
+
+.pa *,
+.pa *::before,
+.pa *::after {
+  box-sizing: border-box;
+}
+
+/* Los puntos de partida no pesan nada (:where): no le ganan a las reglas del texto de las respuestas. */
+:where(.pa) :where(h1, h2, h3, p, ul, ol) {
+  margin: 0;
+}
+
+.pa :where(h1, h2, h3) {
+  color: inherit;
+}
+
+:where(.pa) :where(button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.pa) :where(button:disabled) {
+  cursor: default;
+}
+
+.pa :focus-visible {
+  outline: 2px solid var(--c-link);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+.pa ::selection {
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+
+.pa-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.pa-i {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Todo botón cede un poco al pulsarlo. */
+.pa-icon,
+.pa-btn,
+.pa-sbtn,
+.pa-sug,
+.pa-mi,
+.pa-two button,
+.pa-act,
+.pa-src,
+.pa-choose button,
+.pa-w-next,
+.pa .ap-rolp__b {
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+
+.pa-tile {
+  transition: transform var(--dur-press) var(--ease-out), border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+
+.pa-icon:active,
+.pa-btn:active,
+.pa-sbtn:active,
+.pa-sug:active,
+.pa-mi:active,
+.pa-tile:active,
+.pa-two button:active,
+.pa-act:active,
+.pa-src:active,
+.pa-choose button:active,
+.pa-w-next:active,
+.pa-send:active,
+.pa .ap-rolp__b:active {
+  transform: scale(0.97);
+}
+
+/* --- Cabecera ---------------------------------------------------------------------------- */
+
+.pa-bar {
+  background: var(--c-bar);
+  color: var(--c-bar-ink);
+  border-bottom: 1px solid var(--c-line);
+  padding: calc(8px + env(safe-area-inset-top, 0px)) calc(var(--pa-side-r) - 4px) 8px calc(var(--pa-side) - 4px);
+}
+
+.pa-bar__in {
+  display: grid;
+  grid-template-columns: 44px 56px minmax(0, 1fr) 44px 44px;
+  gap: 6px;
+  align-items: center;
+  max-width: var(--pa-col);
+  margin-inline: auto;
+  min-height: 56px;
+}
+
+.pa-bar-face {
+  width: 56px;
+  height: 56px;
+}
+
+.pa-bar-id {
+  min-width: 0;
+}
+
+.pa-bar-id strong {
+  display: block;
+  font: 700 1.02rem/1.15 var(--font-display);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pa-bar-id span {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--c-bar-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pa-icon {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.pa-bar .pa-icon:focus-visible {
+  outline-color: var(--c-bar-ink);
+  border-radius: 50%;
+}
+
+/* --- Conversación ------------------------------------------------------------------------ */
+
+.pa-msgs {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 16px var(--pa-side-r) 12px var(--pa-side);
+}
+
+.pa-msgs::-webkit-scrollbar {
+  display: none;
+}
+
+.pa-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pa-gap);
+  max-width: var(--pa-col);
+  margin-inline: auto;
+}
+
+/* Pilo junto a cada respuesta: su cara entera, a su proporción, y la burbuja al lado. */
+.pa-msg {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 6px;
+  align-items: start;
+  max-width: 100%;
+}
+
+/* En una respuesta larga, la cara se queda a la vista mientras se lee. */
+.pa-msg__face {
+  width: 48px;
+  height: 48px;
+  position: sticky;
+  top: 0;
+}
+
+.pa-msg__body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  justify-items: start;
+}
+
+/* Las respuestas de Pilo no llevan burbuja: su cara a la izquierda y el texto a la derecha, sobre el fondo. */
+.pa-bubble {
+  max-width: 100%;
+  min-width: 0;
+  padding: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.pa-bubble > p {
+  font-weight: 600;
+}
+
+.pa-me {
+  align-self: flex-end;
+  max-width: 84%;
+  padding: 10px 14px;
+  border-radius: var(--pa-r-mine);
+  background: var(--c-mine);
+  color: var(--c-mine-ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.pa-hint {
+  font-size: 0.75rem;
+  color: var(--c-ink2);
+}
+
+/* El paso actual del pensamiento, en palabras. */
+.pa-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+.pa-steps > span:first-of-type {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.pa-after {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+  max-width: 100%;
+}
+
+.pa-src__t {
+  min-width: 0;
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pa-src__n {
+  color: var(--c-ink2);
+}
+
+/* Sin fuente de la UDES: se dice, con palabras y con su marca. */
+.pa-gen {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  margin-right: 4px;
+  padding: 0 12px;
+  border: 1px dashed var(--c-ink2);
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+.pa-src {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-right: 4px;
+  padding: 0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--c-link);
+}
+
+.pa-act {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--c-ink2);
+}
+
+.pa-act[aria-pressed="true"] {
+  background: var(--c-chip);
+  color: var(--c-link);
+}
+
+.pa-note {
+  font-size: 0.78rem;
+  color: var(--c-ink2);
+}
+
+.pa-warn {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  max-width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--c-warn-bg);
+  color: var(--c-warn);
+  font-size: 0.84rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.pa-warn button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+/* Las citas [n] del texto: el dibujo es pequeño, la zona que se toca no. */
+.pa .ap-cite {
+  position: relative;
+}
+
+.pa .ap-cite::after {
+  content: "";
+  position: absolute;
+  inset: -13px -10px;
+}
+
+.pa .ap-a__text {
+  max-width: none;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+/* Un aviso de Pilo (sin conexión, cerrado, pide sesión): su cara y el texto. */
+.pa-card {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-block: 8px;
+  padding: 20px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-bubble);
+  text-align: center;
+}
+
+.pa-card__face {
+  width: 112px;
+  height: 112px;
+}
+
+.pa-card h2 {
+  font: 700 1.2rem/1.2 var(--font-display);
+  text-wrap: balance;
+}
+
+.pa-card p {
+  max-width: 34ch;
+  font-size: 0.875rem;
+  color: var(--c-ink2);
+}
+
+/* --- Sugerencias y caja de escribir ------------------------------------------------------ */
+
+.pa-dock {
+  min-width: 0;
+  background: var(--c-bg);
+}
+
+.pa-dock__in {
+  max-width: var(--pa-col);
+  margin-inline: auto;
+}
+
+/* La fila se desplaza dentro de sí misma; la página, nunca. */
+.pa-sugs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding: 2px var(--pa-side-r) 10px var(--pa-side);
+}
+
+.pa-sugs::-webkit-scrollbar {
+  display: none;
+}
+
+.pa-sug {
+  flex: none;
+  max-width: 78vw;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-bubble);
+  color: var(--c-ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.pa-compose {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  gap: 8px;
+  align-items: end;
+  padding: 8px var(--pa-side-r) calc(10px + env(safe-area-inset-bottom, 0px)) var(--pa-side);
+  border-top: 1px solid var(--c-line);
+}
+
+/* Con la barra de pestañas puesta, ella ya cubre el borde inferior seguro: aquí no se repite. */
+.pa[data-tabs="true"] .pa-compose {
+  padding-bottom: 10px;
+}
+
+/* 16 px: con menos, iOS acerca la página al enfocar el campo. */
+.pa-compose textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  max-height: 132px;
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-xl);
+  background: var(--c-bubble);
+  color: var(--c-ink);
+  font: 500 16px/1.4 var(--font-sans);
+  caret-color: var(--c-link);
+  resize: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.pa-compose textarea::placeholder {
+  color: var(--c-ink2);
+  opacity: 1;
+}
+
+.pa-compose textarea:focus-visible {
+  outline: 2px solid var(--c-link);
+  outline-offset: 1px;
+  border-radius: var(--radius-xl);
+}
+
+.pa-compose textarea:disabled {
+  opacity: 1;
+  color: var(--c-ink2);
+}
+
+.pa-send {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--c-mine);
+  color: var(--c-mine-ink);
+  transition: transform var(--dur-press) var(--ease-out), opacity var(--dur-fast) ease;
+}
+
+/* El micrófono: el mismo círculo, en el color de acento en vez del de «mi mensaje». */
+.pa-send[data-mic] {
+  background: var(--c-chip);
+  color: var(--c-link);
+}
+
+.pa-send:disabled {
+  opacity: 0.4;
+}
+
+.pa-send:focus-visible {
+  border-radius: 50%;
+}
+
+/* --- Botones ----------------------------------------------------------------------------- */
+
+.pa-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.pa-btn--main {
+  background: var(--c-mine);
+  color: var(--c-mine-ink);
+}
+
+.pa-btn--line {
+  border: 1px solid var(--c-line);
+  color: var(--c-ink);
+}
+
+/* --- Menú y hojas ------------------------------------------------------------------------ */
+
+.pa-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  background: var(--c-scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--pa-leave) ease;
+}
+
+.pa-scrim[data-open] {
+  opacity: 1;
+  pointer-events: auto;
+  transition-duration: var(--dur-base);
+}
+
+.pa-menu,
+.pa-sheet {
+  position: absolute;
+  z-index: 8;
+  background: var(--c-sheet);
+  color: var(--c-ink);
+  /* Cerrado: fuera de la pantalla, sin foco ni lectura. Sale más rápido de lo que entra. */
+  visibility: hidden;
+  transition: transform var(--pa-leave) var(--ease-out), visibility 0s linear var(--pa-leave);
+}
+
+.pa-menu[data-open],
+.pa-sheet[data-open] {
+  transform: none;
+  visibility: visible;
+  transition: transform var(--pa-enter) var(--ease-drawer);
+}
+
+.pa-menu {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(86%, 340px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  transform: translateX(-102%);
+  box-shadow: 0 0 40px var(--c-shadow);
+}
+
+.pa-menu-head {
+  display: grid;
+  gap: 12px;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) 18px 12px max(18px, env(safe-area-inset-left, 0px));
+}
+
+.pa-menu-head__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pa-menu h2,
+.pa-sheet h2 {
+  font: 700 1.2rem/1.2 var(--font-display);
+}
+
+.pa-menu-body {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: 0 18px 12px max(18px, env(safe-area-inset-left, 0px));
+}
+
+.pa-label {
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--c-ink2);
+}
+
+.pa-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: center;
+  border-top: 1px solid var(--c-line);
+}
+
+.pa-row[aria-current="true"] .pa-mi strong {
+  color: var(--c-link);
+}
+
+.pa-mi {
+  display: grid;
+  gap: 1px;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 8px 0;
+  text-align: left;
+}
+
+.pa-mi strong {
+  font-size: 0.9rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pa-mi small {
+  font-size: 0.75rem;
+  color: var(--c-ink2);
+}
+
+.pa-mi--line {
+  border-top: 1px solid var(--c-line);
+}
+
+.pa-empty {
+  padding: 10px 0;
+  border-top: 1px solid var(--c-line);
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pa-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background: var(--c-bubble);
+}
+
+.pa-two button {
+  min-height: 44px;
+  border-radius: var(--radius-xs);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--c-ink2);
+}
+
+.pa-two button[aria-pressed="true"] {
+  background: var(--c-mine);
+  color: var(--c-mine-ink);
+}
+
+/* El selector de temas: tres grupos de mini-escenas (barra, burbujas y acento). Cada escena lleva su
+   propio data-tema, así se pinta con los colores de ese tema y no con los del que está puesto. */
+.pa-groups {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.pa-grp__t {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--c-ink2);
+}
+
+.pa-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 10px;
+}
+
+.pa-tile {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 8px 10px;
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background: var(--c-bubble);
+  color: var(--c-ink);
+  text-align: left;
+}
+
+.pa-tile:focus-visible {
+  outline: 2px solid var(--c-link);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pa-tile:hover {
+    border-color: var(--c-ink2);
+  }
+}
+
+/* El elegido no se marca solo con color: borde grueso y una marca de verificación. */
+.pa-tile[aria-checked="true"] {
+  border-color: var(--c-link);
+  box-shadow: 0 0 0 2px var(--c-link);
+}
+
+.pa-swatch {
+  position: relative;
+  display: block;
+  height: 62px;
+  overflow: hidden;
+  border: 1px solid var(--c-line);
+  border-radius: 9px;
+  background: var(--c-bg);
+}
+
+.pa-swatch i {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 15px;
+  background: var(--c-bar);
+}
+
+.pa-swatch i::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 5px;
+  width: 18px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--c-bar-ink);
+  opacity: 0.85;
+}
+
+.pa-swatch b {
+  position: absolute;
+  left: 8px;
+  top: 23px;
+  width: 54%;
+  height: 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 7px 7px 7px 2px;
+  background: var(--c-bubble);
+}
+
+.pa-swatch u {
+  position: absolute;
+  right: 8px;
+  top: 40px;
+  width: 44%;
+  height: 12px;
+  border-radius: 7px 7px 2px 7px;
+  background: var(--c-mine);
+}
+
+.pa-swatch em {
+  position: absolute;
+  right: 8px;
+  top: 21px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--acc);
+}
+
+.pa-tile__nm {
+  display: block;
+  min-width: 0;
+  padding-right: 22px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.pa-tile__nm small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--c-ink2);
+}
+
+.pa-tile__ck {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--c-link);
+  color: var(--c-bg);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 160ms ease, transform 200ms var(--ease-out);
+}
+
+.pa-tile__ck .pa-i {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.4;
+}
+
+.pa-tile[aria-checked="true"] .pa-tile__ck {
+  opacity: 1;
+  transform: none;
+}
+
+.pa-account {
+  display: grid;
+  gap: 8px;
+  padding: 14px 18px calc(18px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px));
+  border-top: 1px solid var(--c-line);
+  background: var(--c-bubble);
+}
+
+.pa-account p {
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pa-sheet {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9;
+  display: grid;
+  gap: 12px;
+  max-height: 86%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--pa-r-sheet);
+  padding: 10px max(20px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
+  transform: translateY(102%);
+  box-shadow: 0 -12px 40px var(--c-shadow);
+}
+
+.pa-sheet__in {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  max-width: var(--pa-col);
+  margin-inline: auto;
+}
+
+.pa-sheet__grip {
+  justify-self: center;
+  width: 40px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--c-line);
+}
+
+.pa-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pa-sheet ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pa-sheet li {
+  padding: 11px 0;
+  border-top: 1px solid var(--c-line);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.pa-sheet li small {
+  display: block;
+  color: var(--c-ink2);
+}
+
+.pa-sheet li a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 800;
+  color: var(--c-link);
+}
+
+.pa-sheet p {
+  font-size: 0.875rem;
+  color: var(--c-ink2);
+}
+
+.pa-excerpt {
+  margin-top: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pa-src-li[data-on] strong {
+  color: var(--c-link);
+}
+
+/* Abierto con el teclado: aparece en su sitio, sin recorrido. */
+.pa-menu[data-quick],
+.pa-sheet[data-quick],
+.pa-scrim[data-quick] {
+  transition-duration: 0s;
+  transition-delay: 0s;
+}
+
+/* --- «Instalar a Pilo» ------------------------------------------------------------------- */
+
+.pa-install {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 44px;
+  align-items: center;
+  gap: 8px;
+  margin: 0 var(--pa-side-r) 8px var(--pa-side);
+  padding: 6px 4px 6px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-bubble);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.pa-install .pa-btn {
+  min-height: 44px;
+  padding-block: 6px;
+  font-size: 0.8125rem;
+}
+
+.pa-steps-list {
+  counter-reset: paso;
+}
+
+.pa-steps-list li {
+  counter-increment: paso;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.pa-steps-list li::before {
+  content: counter(paso);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--c-chip);
+  color: var(--c-link);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Quién pregunta (RolePicker), con los colores del tema -------------------------------- */
+
+.pa .ap-rolp__q {
+  color: var(--c-ink2);
+}
+
+.pa .ap-rolp__b {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  background: var(--c-bubble);
+  color: var(--c-ink);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.pa .ap-rolp__b[data-quiet] {
+  background: none;
+  color: var(--c-ink2);
+}
+
+.pa .ap-rolp__b[aria-pressed="true"] {
+  border-color: var(--c-link);
+  background: var(--c-chip);
+  color: var(--c-link);
+}
+
+.pa .pa-w .ap-rolp__opts {
+  justify-content: center;
+}
+
+.pa .pa-w .ap-rolp__b {
+  min-height: 50px;
+  padding: 0 22px;
+  border-color: transparent;
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+
+.pa .pa-w .ap-rolp__b[data-quiet] {
+  border-color: var(--s-line);
+  background: none;
+  color: var(--s-ink);
+}
+
+.pa .pa-w .ap-rolp__b:focus-visible,
+.pa-w :focus-visible {
+  outline-color: var(--s-ink);
+}
+
+/* --- Bienvenida -------------------------------------------------------------------------- */
+
+.pa-w {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  color: var(--s-ink);
+}
+
+/* El fondo va en su propia capa: se cierra en círculo sin recortar a Pilo mientras vuela. */
+.pa-w-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 34%, var(--s1) 0%, var(--s2) 46%, var(--s3) 100%);
+}
+
+.pa-w-glow {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 520px;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--s-glow), transparent);
+  pointer-events: none;
+}
+
+.pa-w-rings i {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1px solid var(--s-line);
+  pointer-events: none;
+}
+
+.pa-w-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px));
+}
+
+.pa-w-brand {
+  min-width: 0;
+  margin-right: auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--s-muted);
+}
+
+.pa-w-brand b {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--s-ink);
+}
+
+.pa-sbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--s-line);
+  border-radius: var(--radius-pill);
+  color: var(--s-ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.pa-sbtn--icon {
+  width: 44px;
+  padding: 0;
+}
+
+.pa-sbtn[aria-pressed="true"] {
+  background: var(--s-chip);
+  border-color: var(--acc);
+}
+
+.pa-sbtn:focus-visible {
+  border-radius: var(--radius-pill);
+}
+
+/* `safe center`: si en una pantalla baja no cabe, sobra hacia abajo y no tapa a Pilo. */
+.pa-w-center {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  align-content: safe center;
+  gap: 12px;
+  min-height: 0;
+  min-width: 0;
+  padding: 0 18px;
+  text-align: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  touch-action: pan-y;
+}
+
+.pa-w-slot,
+.pa-w-fly {
+  width: 176px;
+  height: 176px;
+}
+
+.pa-w-title {
+  font: 700 1.9rem/1.05 var(--font-display);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.pa-w-word {
+  display: inline-block;
+  white-space: nowrap;
+  margin: 0 0.1em;
+}
+
+.pa-w-title .ch {
+  display: inline-block;
+}
+
+.pa-w-mood {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  max-width: 100%;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--s-chip);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--s-muted);
+}
+
+.pa-w-mood i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--acc);
+}
+
+.pa-w-bubble {
+  max-width: min(30ch, 100%);
+  min-height: 4.4em;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.42;
+}
+
+.pa-w-bubble .wd {
+  display: inline-block;
+  white-space: pre;
+}
+
+.pa-w-exhibit {
+  display: grid;
+  width: 100%;
+  max-width: 420px;
+  min-height: 108px;
+  align-items: center;
+}
+
+.pa-w-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-content: center;
+  min-width: 0;
+}
+
+.pa-know {
+  padding: 6px 12px;
+  border: 1px solid var(--s-line);
+  border-radius: var(--radius-sm);
+  background: var(--s-chip);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.pa-qchip,
+.pa-ticket {
+  background: var(--w-card);
+  color: var(--w-card-ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 10px 22px -8px var(--c-shadow);
+}
+
+.pa-qchip {
+  min-height: 48px;
+  padding: 8px 14px;
+  border-radius: 16px 16px 16px 4px;
+  text-align: left;
+  line-height: 1.3;
+  transition: transform var(--dur-press) var(--ease-out), box-shadow var(--dur-fast) ease;
+}
+
+.pa-qchip:active {
+  transform: scale(0.97);
+}
+
+/* Elegida: el anillo y la marca lo dicen, no solo el color. */
+.pa-qchip[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--acc), 0 10px 22px -8px var(--c-shadow);
+}
+
+.pa-qchip[aria-pressed="true"]::before {
+  content: "\2713\00a0";
+  font-weight: 800;
+}
+
+.pa-qchip:focus-visible {
+  border-radius: 16px 16px 16px 4px;
+}
+
+/* La respuesta de ejemplo: marcada como ejemplo, con su fuente. */
+.pa-w-exhibit {
+  align-content: center;
+  gap: 10px;
+}
+
+.pa-ex {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--w-card);
+  color: var(--w-card-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: left;
+  box-shadow: 0 10px 22px -8px var(--c-shadow);
+}
+
+.pa-ex .wd {
+  display: inline-block;
+  white-space: pre;
+}
+
+.pa-ex-tag {
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--acc);
+  color: var(--acc-ink);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pa-srcchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  color: var(--w-card-ok);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.pa-srcchip .pa-i {
+  width: 16px;
+  height: 16px;
+}
+
+.pa-ticket-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.pa-ticket-row em {
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  color: var(--w-card-ink);
+  opacity: 0.8;
+}
+
+.pa-choose button[aria-pressed="true"] {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 2px var(--acc);
+}
+
+/* Después del saludo la guía deja el título y achica a Pilo, para que quepan el ejemplo y la elección. */
+.pa-w[data-momento]:not([data-momento="hola"]) .pa-w-title {
+  display: none;
+}
+
+@media (max-height: 820px) {
+  .pa-w[data-momento="preguntar"] .pa-w-slot,
+  .pa-w[data-momento="preguntar"] .pa-w-fly {
+    width: 104px;
+    height: 104px;
+  }
+}
+
+.pa-ticket {
+  display: grid;
+  gap: 2px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+}
+
+.pa-ticket em {
+  font-style: normal;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--w-card-ok);
+}
+
+.pa-choose {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.pa-choose button {
+  min-height: 76px;
+  padding: 12px 8px;
+  border: 1px solid var(--s-line);
+  border-radius: var(--radius-lg);
+  background: var(--s-chip);
+  color: var(--s-ink);
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.pa-choose button small {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--s-muted);
+}
+
+.pa-choose button:focus-visible {
+  border-radius: var(--radius-lg);
+}
+
+.pa-w-foot {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  max-width: 456px;
+  margin-inline: auto;
+  padding: 6px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+}
+
+.pa-segs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pa-segs span {
+  flex: 1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--s-line);
+}
+
+.pa-segs span i {
+  display: block;
+  height: 100%;
+  background: var(--acc);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.pa-segs small {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--s-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-w-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  min-height: 48px;
+}
+
+.pa-w-actions:has(.pa-w-back:only-child) {
+  justify-content: flex-start;
+  flex-direction: row;
+}
+
+.pa-w-back {
+  min-height: 48px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  color: var(--s-muted);
+  font-weight: 800;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.pa-w-back:active {
+  transform: scale(0.97);
+}
+
+.pa-w-next {
+  min-height: 46px;
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  background: var(--acc);
+  color: var(--acc-ink);
+  font-weight: 800;
+}
+
+.pa-w-next:focus-visible {
+  border-radius: var(--radius-pill);
+}
+
+/* --- Pantallas bajas y anchas -------------------------------------------------------------- */
+
+@media (max-height: 700px) {
+  .pa-w-slot,
+  .pa-w-fly {
+    width: 132px;
+    height: 132px;
+  }
+  .pa-w-exhibit {
+    min-height: 72px;
+  }
+  .pa-w-title {
+    font-size: 1.6rem;
+  }
+  .pa-w-bubble {
+    font-size: 1rem;
+  }
+}
+
+@media (max-height: 610px) {
+  .pa-w-slot,
+  .pa-w-fly {
+    width: 100px;
+    height: 100px;
+  }
+  .pa-w-center {
+    gap: 8px;
+  }
+  .pa-w-bubble {
+    min-height: 0;
+  }
+}
+
+/* Teléfono acostado: Pilo se achica (entero, a su proporción) para caber con el texto. */
+@media (max-height: 520px) {
+  .pa-w-slot,
+  .pa-w-fly {
+    width: 84px;
+    height: 84px;
+  }
+  .pa-w-mood {
+    display: none;
+  }
+  .pa-w-bubble {
+    min-height: 0;
+  }
+  .pa-w-exhibit {
+    min-height: 0;
+  }
+  .pa-w-center {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 340px) {
+  .pa-choose {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pa-choose button {
+    min-height: 56px;
+  }
+}
+
+@media (min-width: 760px) {
+  .pa-sheet {
+    left: 50%;
+    right: auto;
+    width: min(560px, 100%);
+    translate: -50% 0;
+  }
+}
+
+/* --- La bienvenida en la app de escritorio (desktop.ts) --------------------------------------
+   La misma escena, a la medida de una ventana de computador: Pilo y el texto
+   más grandes, y la frase en una línea más larga. Solo si la ventana da para ello. */
+
+@media (min-width: 760px) and (min-height: 720px) {
+  .pa-w[data-escritorio] .pa-w-center {
+    gap: 16px;
+  }
+
+  .pa-w[data-escritorio] .pa-w-slot,
+  .pa-w[data-escritorio] .pa-w-fly {
+    width: 232px;
+    height: 232px;
+  }
+
+  .pa-w[data-escritorio] .pa-w-title {
+    font-size: 2.6rem;
+  }
+
+  .pa-w[data-escritorio] .pa-w-bubble {
+    max-width: min(44ch, 100%);
+    min-height: 3em;
+    font-size: 1.2rem;
+  }
+
+  .pa-w[data-escritorio] .pa-w-exhibit {
+    max-width: 520px;
+  }
+
+  .pa-w[data-escritorio] .pa-choose button {
+    min-height: 88px;
+    font-size: 1rem;
+  }
+
+  .pa-w[data-escritorio] .pa-choose button small {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Mientras la app de escritorio lee la sesión: la ventana con su fondo, sin nada que usar. */
+.pa-wait {
+  grid-row: 1 / -1;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  font-weight: 600;
+}
+
+/* --- Movimiento reducido -------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-menu,
+  .pa-sheet,
+  .pa-scrim {
+    transition-duration: 1ms;
+    transition-delay: 0s;
+  }
+
+  .pa-icon:active,
+  .pa-btn:active,
+  .pa-sbtn:active,
+  .pa-sug:active,
+  .pa-mi:active,
+  .pa-tile:active,
+  .pa-two button:active,
+  .pa-act:active,
+  .pa-src:active,
+  .pa-choose button:active,
+  .pa-w-next:active,
+  .pa-send:active,
+  .pa .ap-rolp__b:active {
+    transform: none;
+  }
+}
+
+/* Funciones ampliadas (0119): con permiso para adjuntar, el clip va a la izquierda del campo. */
+.pa-compose[data-clip] {
+  grid-template-columns: 44px minmax(0, 1fr) 48px;
+}
+
+.pa .px-tray {
+  padding: 0 var(--pa-side-r) 6px var(--pa-side);
+}
+
+.pa-bubble {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* --- Cuentas de Pilo (0120): «Guardar», la persona y las páginas ------------------------------ */
+
+/* «Guardar» junto a la respuesta: guardada lleva otro glifo y otra palabra, no solo otro color. */
+.pa-keep[aria-pressed="true"] {
+  border-color: var(--c-ok);
+  color: var(--c-ok);
+}
+
+.pa-keep:disabled {
+  opacity: 0.6;
+}
+
+.pa-keep .pa-i {
+  width: 16px;
+  height: 16px;
+}
+
+.pa-card__alt {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--c-link);
+}
+
+/* Con más filas de las que caben, el menú se desplaza: ninguna fila se encoge para hacerle sitio a otra. */
+.pa-menu-body {
+  grid-auto-rows: max-content;
+}
+
+.pa-mi--go {
+  text-decoration: none;
+  color: inherit;
+}
+
+.pa-mi--go em {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--c-chip);
+  font-style: normal;
+  font-size: 0.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* La persona: con cuenta, su nombre, su perfil y su usuario; sin ella, «Crear cuenta / Entrar». */
+.pa-who {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+  transition: transform var(--dur-press) var(--ease-out), border-color var(--dur-fast) ease;
+}
+
+.pa-who b,
+.pa-who small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pa-who b {
+  font-size: 0.9rem;
+}
+
+.pa-who small {
+  font-size: 0.75rem;
+  color: var(--c-ink2);
+}
+
+.pa-who[aria-current="page"] {
+  border-color: currentColor;
+}
+
+.pa-avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--acc);
+  color: var(--acc-ink);
+  font-weight: 800;
+}
+
+.pa-join {
+  display: grid;
+  gap: 8px;
+}
+
+.pa-join p {
+  font-size: 0.8125rem;
+  color: var(--c-ink2);
+}
+
+.pa-join p b {
+  color: var(--c-ink);
+}
+
+.pa-join__go {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.pa-join__main {
+  background: var(--c-mine);
+  color: var(--c-mine-ink);
+}
+
+.pa-join__line {
+  border: 1px solid var(--c-line);
+  color: var(--c-ink);
+}
+
+.pa-join__prefs {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--c-link);
+}
+
+.pa-who:active,
+.pa-sl:active,
+.pa-side__two button:active {
+  transform: scale(0.97);
+}
+
+/* Una página que no es la conversación (perfil, guardadas): cabecera con «volver» y el contenido. */
+.pa-bar--page .pa-bar__in {
+  grid-template-columns: 44px minmax(0, 1fr);
+}
+
+.pa-bar--page .pa-icon {
+  color: inherit;
+}
+
+/* --- Escritorio: la barra lateral fija y la conversación al centro ----------------------------- */
+
+.pa-side {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .pa {
+    --pa-col: 820px;
+  }
+
+  .pa-frame {
+    grid-template-columns: 292px minmax(0, 1fr);
+  }
+
+  .pa-frame > .pa-bar {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .pa-frame > .pa-msgs {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .pa-frame > .pa-dock {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  /* En el escritorio, la página ocupa todo el alto: su cabecera de «volver» sobra, la barra lateral ya lleva. */
+  .pa-frame--page > .pa-bar--page {
+    display: none;
+  }
+
+  .pa-frame--page > .pa-msgs {
+    grid-row: 1 / -1;
+  }
+
+  .pa-bar__in[data-wide] {
+    grid-template-columns: 56px minmax(0, 1fr) 44px 44px;
+  }
+
+  .pa-msgs {
+    scrollbar-width: thin;
+  }
+
+  .pa-side {
+    --pa-side-line: color-mix(in srgb, var(--c-bar-ink) 22%, transparent);
+    --pa-side-chip: color-mix(in srgb, var(--c-bar-ink) 12%, transparent);
+    grid-column: 1;
+    grid-row: 1 / -1;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 12px;
+    min-width: 0;
+    min-height: 0;
+    padding: 18px 12px 14px;
+    border-right: 1px solid var(--c-line);
+    background: var(--c-bar);
+    color: var(--c-bar-ink);
+  }
+
+  .pa-side :focus-visible {
+    outline-color: var(--c-bar-ink);
+  }
+
+  .pa-side__top {
+    display: grid;
+    gap: 12px;
+  }
+
+  .pa-side__brand {
+    padding: 0 10px;
+    font: 700 1.2rem/1.15 var(--font-display);
+  }
+
+  .pa-side__brand small {
+    display: block;
+    font: 600 0.75rem/1.4 var(--font-sans);
+    color: var(--c-bar-muted);
+  }
+
+  .pa-sl {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-align: left;
+    text-decoration: none;
+    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease;
+  }
+
+  .pa-sl .pa-i {
+    width: 18px;
+    height: 18px;
+  }
+
+  .pa-sl > span {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pa-sl > span small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--c-bar-muted);
+  }
+
+  .pa-sl em {
+    padding: 1px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--pa-side-chip);
+    font-style: normal;
+    font-size: 0.75rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* La actual no se marca solo con el fondo: lleva un filete a la izquierda. */
+  .pa-sl[aria-current] {
+    background: var(--pa-side-chip);
+    box-shadow: inset 3px 0 0 currentColor;
+  }
+
+  .pa-sl--new {
+    border: 1px solid var(--pa-side-line);
+  }
+
+  .pa-side__two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--pa-side-line);
+    border-radius: var(--radius-sm);
+  }
+
+  .pa-side__two button {
+    min-height: 44px;
+    border-radius: var(--radius-xs);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    color: var(--c-bar-muted);
+    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease;
+  }
+
+  .pa-side__two button[aria-pressed="true"] {
+    background: var(--pa-side-chip);
+    box-shadow: inset 0 0 0 1px var(--pa-side-line);
+    color: var(--c-bar-ink);
+  }
+
+  .pa-side__nav {
+    display: grid;
+    align-content: start;
+    gap: 2px;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  .pa-side__nav ul {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pa-side__label {
+    padding: 12px 10px 4px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--c-bar-muted);
+  }
+
+  .pa-side__empty {
+    padding: 4px 10px;
+    font-size: 0.8125rem;
+    color: var(--c-bar-muted);
+  }
+
+  .pa-side__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 44px;
+    align-items: center;
+  }
+
+  .pa-side__row .pa-icon {
+    color: var(--c-bar-muted);
+  }
+
+  .pa-side .pa-who {
+    border-color: var(--pa-side-line);
+  }
+
+  .pa-side .pa-who small,
+  .pa-side .pa-join p {
+    color: var(--c-bar-muted);
+  }
+
+  .pa-side .pa-join p b {
+    color: var(--c-bar-ink);
+  }
+
+  .pa-side .pa-join__main {
+    background: var(--acc);
+    color: var(--acc-ink);
+  }
+
+  .pa-side .pa-join__line {
+    border-color: var(--pa-side-line);
+    color: var(--c-bar-ink);
+  }
+
+  .pa-side .pa-join__prefs {
+    color: var(--c-bar-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pa-side .pa-who[aria-current="page"] {
+    box-shadow: inset 3px 0 0 currentColor;
+  }
+
+  .pa-side .pa-join__prefs[aria-current="page"] {
+    text-decoration-thickness: 2px;
+  }
+
+  /* Las hojas (fuentes, la invitación) se abren sobre la conversación, no sobre la barra lateral. */
+  .pa-sheet {
+    left: calc(292px + (100% - 292px) / 2);
+  }
+}
+
+@media (min-width: 960px) and (hover: hover) and (pointer: fine) {
+  .pa-sl:hover,
+  .pa-side__two button[aria-pressed="false"]:hover {
+    background: var(--pa-side-chip);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-who:active,
+  .pa-sl:active,
+  .pa-side__two button:active {
+    transform: none;
+  }
+}
+
+/* Una fuente de otro ámbito de Pilo (0122): su procedencia, con texto y glifo. */
+.pa-sheet li small.pa-from {
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+/* --- El menú, por lo que más se usa ---------------------------------------------------------------
+   La persona encabeza el cajón; «Para estudiar» reúne Mis clases, Gemini y las guardadas; las
+   conversaciones muestran las más recientes; y los ajustes (tema, bienvenida, política) salen a una
+   hoja en el teléfono y a un menú junto a la persona en el escritorio. */
+
+.pa-menu-head__top .pa-who {
+  flex: 1;
+  min-width: 0;
+}
+
+.pa-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pa-tile {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+  min-height: 104px;
+  padding: 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+  transition: transform var(--dur-press) var(--ease-out), border-color var(--dur-fast) ease;
+}
+
+.pa-tile:active {
+  transform: scale(0.97);
+}
+
+.pa-tile__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.pa-tile__ico {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: var(--radius-xs);
+  background: var(--c-chip);
+  color: var(--c-link);
+}
+
+.pa-tile strong {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.pa-tile small {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--c-ink2);
+}
+
+.pa-tile em {
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--c-chip);
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+/* Lo nuevo se dice con la palabra; el color solo la acompaña. */
+.pa-tile em[data-new],
+.pa-sl em[data-new] {
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+
+.pa-tile--wide {
+  grid-column: 1 / -1;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 0;
+}
+
+.pa-tile--wide b {
+  font: 700 1.2rem/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Las recientes no llevan papelera: se borra desde «Ver todas». */
+.pa-row[data-plain] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.pa-mi--more {
+  border-top: 1px solid var(--c-line);
+}
+
+.pa-mi--more strong {
+  color: var(--c-link);
+}
+
+.pa-mi--set {
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.pa-mi--set > span {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pa-tile:hover {
+    border-color: var(--c-link);
+  }
+}
+
+@media (min-width: 960px) {
+  /* La barra lateral, sobre el papel de las hojas: sus tintas son las de la conversación. */
+  .pa-side {
+    --c-bar: var(--c-sheet);
+    --c-bar-ink: var(--c-ink);
+    --c-bar-muted: var(--c-ink2);
+    --pa-side-line: var(--c-line);
+    --pa-side-chip: var(--c-chip);
+  }
+
+  .pa-sl--new {
+    justify-content: center;
+    min-height: 48px;
+    border: 0;
+    background: var(--c-mine);
+    color: var(--c-mine-ink);
+  }
+
+  .pa-sl--new > span {
+    flex: none;
+  }
+
+  .pa-sl--more {
+    color: var(--c-link);
+  }
+
+  .pa-side .pa-join__main {
+    background: var(--c-mine);
+    color: var(--c-mine-ink);
+  }
+
+  .pa-side__me {
+    position: relative;
+    display: grid;
+    gap: 6px;
+  }
+
+  /* Los ajustes salen de su botón, hacia arriba. */
+  .pa-side__pop {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 8px);
+    z-index: 3;
+    display: grid;
+    gap: 6px;
+    padding: 12px;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-md);
+    background: var(--c-sheet);
+    color: var(--c-ink);
+    box-shadow: 0 18px 40px -16px var(--c-shadow);
+    transform-origin: 20% 100%;
+    animation: pa-pop 180ms var(--ease-out);
+  }
+
+  .pa-side__pop .pa-side__label {
+    padding: 0 0 2px;
+  }
+}
+
+@keyframes pa-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+}
+
+/* Con ratón, la papelera de cada conversación aparece al pasar por su fila (o al enfocarla). */
+@media (min-width: 960px) and (hover: hover) and (pointer: fine) {
+  .pa-side__row .pa-icon {
+    opacity: 0;
+    transition: opacity var(--dur-fast) ease;
+  }
+
+  .pa-side__row:hover .pa-icon,
+  .pa-side__row:focus-within .pa-icon {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-tile:active {
+    transform: none;
+  }
+
+  .pa-side__pop {
+    animation: none;
+  }
+}
+
+/* --- La app de Android: el APK de la universidad ------------------------------------------- */
+
+/* La ficha del archivo: versión, tamaño y firma. La firma la dice el texto; el verde solo la acompaña. */
+.pa-apk__meta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c-ink2);
+}
+
+.pa-apk__sign {
+  color: var(--c-ok);
+}
+
+/* Las dos vías: descargar el APK o, si el navegador lo ofrece, instalar sin archivo. */
+.pa-apk__actions {
+  display: grid;
+  gap: 8px;
+}
+
+.pa-apk__alt {
+  border: 1px solid var(--c-line);
+  background: none;
+  color: var(--c-ink);
+  transition: background-color var(--dur-fast) ease;
+}
+
+.pa-apk__note {
+  font-size: 0.75rem;
+  color: var(--c-ink2);
+}

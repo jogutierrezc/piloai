@@ -1,0 +1,1875 @@
+/* =============================================================================
+   Pregúntele a Pilo · la página.
+
+   Tres temas propios, elegidos por quien pregunta y recordados en su
+   navegador: «blanco» (el institucional, barra marina), «soleado» (blanco
+   cálido con el naranja de las gafas de Pilo) y «negro» (negro de verdad,
+   no azul). Cada tema redefine los mismos tokens --ap-*; ninguna regla usa
+   un color suelto. La escena de bienvenida toma los suyos (--ap-stage-*).
+   ========================================================================== */
+
+.ap {
+  --ap-page: #ffffff;
+  --ap-surface: #ffffff;
+  --ap-soft: #f5f7fb;
+  --ap-soft-2: #eef2f8;
+  --ap-ink: #0d1c31;
+  --ap-ink-2: #45566d;
+  --ap-ink-3: #66778e;
+  --ap-line: rgba(13, 40, 84, 0.1);
+  --ap-line-2: rgba(13, 40, 84, 0.2);
+  --ap-primary: #2166d6;
+  --ap-primary-ink: #ffffff;
+  --ap-primary-soft: #eaf1fd;
+  --ap-primary-text: #1b52ad;
+  --ap-side: #0a2d63;
+  --ap-side-ink: #ffffff;
+  --ap-side-muted: #c3d5f2;
+  --ap-side-line: rgba(255, 255, 255, 0.14);
+  --ap-side-hover: rgba(255, 255, 255, 0.07);
+  --ap-side-active: rgba(127, 231, 240, 0.16);
+  --ap-accent: #7fe7f0;
+  --ap-accent-ink: #0a2d63;
+  --ap-mem: #0a6f7c;
+  --ap-mem-soft: #e3f4f5;
+  --ap-warn: #8a5700;
+  --ap-warn-soft: #fbf2e0;
+  --ap-mark: #fff0b8;
+  --ap-q: #eef2f8;
+  --ap-ticket: #eef2f8;
+  --ap-ticket-ink: #0d1c31;
+  --ap-ticket-muted: #45566d;
+  --ap-shadow: 0 12px 32px rgba(10, 34, 73, 0.12), 0 2px 6px rgba(10, 34, 73, 0.06);
+  --ap-shadow-sm: 0 1px 2px rgba(10, 34, 73, 0.06), 0 1px 1px rgba(10, 34, 73, 0.04);
+  --ap-ring: 0 0 0 3px rgba(33, 102, 214, 0.3);
+  --ap-scrim: rgba(6, 20, 43, 0.42);
+  --ap-stage-1: #1d4f98;
+  --ap-stage-2: #0a2d63;
+  --ap-stage-3: #061c40;
+  --ap-stage-glow: rgba(127, 231, 240, 0.22);
+  --ap-stage-ink: #ffffff;
+  --ap-stage-muted: #c3d5f2;
+  --ap-stage-line: rgba(255, 255, 255, 0.14);
+  --ap-stage-chip: rgba(255, 255, 255, 0.08);
+  --moji-shadow: rgba(10, 34, 73, 0.22);
+  --ap-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --ap-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ap-sans: "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ap-serif: "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+
+.ap[data-tema="soleado"] {
+  --ap-page: #fffcf2;
+  --ap-surface: #ffffff;
+  --ap-soft: #fff6df;
+  --ap-soft-2: #ffeec6;
+  --ap-ink: #22190a;
+  --ap-ink-2: #5a4521;
+  --ap-ink-3: #75603c;
+  --ap-line: rgba(120, 80, 10, 0.14);
+  --ap-line-2: rgba(120, 80, 10, 0.26);
+  --ap-primary: #b45309;
+  --ap-primary-ink: #ffffff;
+  --ap-primary-soft: #ffedd0;
+  --ap-primary-text: #92400e;
+  --ap-side: #fff0cc;
+  --ap-side-ink: #2b1d06;
+  --ap-side-muted: #6f5220;
+  --ap-side-line: rgba(120, 80, 10, 0.16);
+  --ap-side-hover: rgba(245, 158, 11, 0.12);
+  --ap-side-active: rgba(245, 158, 11, 0.26);
+  --ap-accent: #f59e0b;
+  --ap-accent-ink: #2b1d06;
+  --ap-mem: #0f766e;
+  --ap-mem-soft: #dff4ee;
+  --ap-warn: #9a3412;
+  --ap-warn-soft: #ffe6d5;
+  --ap-mark: #ffe08a;
+  --ap-q: #fff0cf;
+  --ap-ticket: #fff4dc;
+  --ap-ticket-ink: #22190a;
+  --ap-ticket-muted: #5a4521;
+  --ap-shadow: 0 12px 32px rgba(120, 72, 0, 0.12), 0 2px 6px rgba(120, 72, 0, 0.06);
+  --ap-shadow-sm: 0 1px 2px rgba(120, 72, 0, 0.08), 0 1px 1px rgba(120, 72, 0, 0.04);
+  --ap-ring: 0 0 0 3px rgba(180, 83, 9, 0.28);
+  --ap-scrim: rgba(60, 36, 0, 0.3);
+  --ap-stage-1: #fff3c4;
+  --ap-stage-2: #ffc46b;
+  --ap-stage-3: #f28a2e;
+  --ap-stage-glow: rgba(255, 255, 255, 0.6);
+  --ap-stage-ink: #2b1606;
+  --ap-stage-muted: #5c3410;
+  --ap-stage-line: rgba(60, 30, 0, 0.18);
+  --ap-stage-chip: rgba(255, 255, 255, 0.5);
+  --moji-shadow: rgba(120, 60, 0, 0.3);
+}
+
+.ap[data-tema="negro"] {
+  --ap-page: #000000;
+  --ap-surface: #0d0d0d;
+  --ap-soft: #141414;
+  --ap-soft-2: #1d1d1d;
+  --ap-ink: #f3f3f3;
+  --ap-ink-2: #bdbdbd;
+  --ap-ink-3: #939393;
+  --ap-line: rgba(255, 255, 255, 0.09);
+  --ap-line-2: rgba(255, 255, 255, 0.18);
+  --ap-primary: #7fe7f0;
+  --ap-primary-ink: #000000;
+  --ap-primary-soft: rgba(127, 231, 240, 0.14);
+  --ap-primary-text: #9df0f6;
+  --ap-side: #000000;
+  --ap-side-ink: #f3f3f3;
+  --ap-side-muted: #9a9a9a;
+  --ap-side-line: rgba(255, 255, 255, 0.1);
+  --ap-side-hover: rgba(255, 255, 255, 0.06);
+  --ap-side-active: rgba(127, 231, 240, 0.12);
+  --ap-accent: #7fe7f0;
+  --ap-accent-ink: #000000;
+  --ap-mem: #6fd3dc;
+  --ap-mem-soft: rgba(111, 211, 220, 0.12);
+  --ap-warn: #f0c46a;
+  --ap-warn-soft: rgba(240, 196, 106, 0.12);
+  --ap-mark: rgba(240, 196, 106, 0.32);
+  --ap-q: #1c1c1c;
+  --ap-ticket: #e9e9e9;
+  --ap-ticket-ink: #111111;
+  --ap-ticket-muted: #444444;
+  --ap-shadow: 0 14px 36px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.5);
+  --ap-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+  --ap-ring: 0 0 0 3px rgba(127, 231, 240, 0.3);
+  --ap-scrim: rgba(0, 0, 0, 0.6);
+  --ap-stage-1: #1b1b1b;
+  --ap-stage-2: #080808;
+  --ap-stage-3: #000000;
+  --ap-stage-glow: rgba(127, 231, 240, 0.14);
+  --ap-stage-ink: #ffffff;
+  --ap-stage-muted: #a8a8a8;
+  --ap-stage-line: rgba(255, 255, 255, 0.12);
+  --ap-stage-chip: rgba(255, 255, 255, 0.06);
+  --moji-shadow: rgba(0, 0, 0, 0.8);
+  color-scheme: dark;
+}
+
+/* --- La página ---------------------------------------------------------------- */
+
+.ap {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 276px minmax(0, 1fr);
+  background: var(--ap-page);
+  color: var(--ap-ink);
+  font: 500 15px/1.55 var(--ap-sans);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+.ap ::selection {
+  background: var(--ap-accent);
+  color: var(--ap-accent-ink);
+}
+
+:where(.ap) button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.ap :focus-visible {
+  outline: 2px solid var(--ap-primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.ap-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* --- Barra lateral -------------------------------------------------------------- */
+
+.ap-side {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--ap-side);
+  color: var(--ap-side-ink);
+  border-right: 1px solid var(--ap-side-line);
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+.ap-side__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 18px 14px;
+}
+
+.ap-side__name {
+  font: 700 1.12rem/1.1 var(--ap-serif);
+  letter-spacing: -0.02em;
+}
+
+.ap-side__sub {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ap-side-muted);
+}
+
+.ap-side__close {
+  display: none;
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  place-items: center;
+  color: var(--ap-side-muted);
+}
+
+.ap-new {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 14px 6px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--ap-side-line);
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: background-color 180ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap-new:active {
+  transform: scale(0.97);
+}
+
+.ap-side__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 0 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ap-side-line) transparent;
+}
+
+.ap-side h2 {
+  margin: 0;
+  padding: 18px 20px 8px;
+  font: 700 0.6875rem/1 var(--ap-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ap-side-muted);
+}
+
+.ap-hist {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  width: calc(100% - 16px);
+  margin: 0 8px;
+  border-radius: 10px;
+  transition: background-color 180ms ease;
+}
+
+.ap-hist > button:first-child {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ap-side-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 180ms ease;
+}
+
+.ap-hist[aria-current="true"] {
+  background: var(--ap-side-active);
+}
+
+.ap-hist[aria-current="true"] > button:first-child {
+  color: var(--ap-side-ink);
+}
+
+.ap-hist__del {
+  width: 28px;
+  height: 28px;
+  margin-right: 4px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--ap-side-muted);
+  opacity: 0;
+  transition: opacity 160ms ease, background-color 160ms ease;
+}
+
+.ap-hist:focus-within .ap-hist__del,
+.ap-hist[aria-current="true"] .ap-hist__del {
+  opacity: 1;
+}
+
+.ap-empty-hist {
+  margin: 0 20px;
+  font-size: 0.78rem;
+  color: var(--ap-side-muted);
+}
+
+.ap-knows {
+  list-style: none;
+  margin: 0;
+  padding: 0 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.ap-knows li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.ap-knows small {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  color: var(--ap-side-muted);
+}
+
+.ap-code {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  font: 800 0.6rem/1 var(--ap-sans);
+  letter-spacing: 0.04em;
+  color: #ffffff;
+}
+
+.ap-code[data-s="cifras"] { background: #1f5fbf; }
+.ap-code[data-s="boletines"] { background: #a4471f; }
+.ap-code[data-s="pdi"] { background: #6b3fa0; }
+.ap-code[data-s="observatorio"] { background: #0b7481; }
+.ap-code[data-s="impacto"] { background: #2e6b2f; }
+.ap-code[data-s="catalogo"] { background: #0a2d63; }
+/* Mr. Pilo en Enseñanza (0113): sus fuentes, con los mismos tonos de la paleta. */
+.ap-code[data-s="innovacion"] { background: #a4471f; }
+.ap-code[data-s="politicas"] { background: #1f5fbf; }
+.ap-code[data-s="global"] { background: #0b7481; }
+.ap-code[data-s="moodle"] { background: #6b3fa0; }
+
+.ap-side__foot {
+  display: grid;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--ap-side-line);
+}
+
+.ap-access {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ap-side-muted);
+}
+
+.ap-access b {
+  color: var(--ap-side-ink);
+}
+
+.ap-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ap-side-ink);
+}
+
+.ap-replay svg {
+  color: var(--ap-accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ap-new:hover,
+  .ap-hist:hover {
+    background: var(--ap-side-hover);
+  }
+  .ap-hist:hover .ap-hist__del {
+    opacity: 1;
+  }
+  .ap-hist__del:hover {
+    background: var(--ap-side-hover);
+  }
+}
+
+/* --- Zona principal ---------------------------------------------------------------- */
+
+.ap-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.ap-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 10px 24px;
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms ease;
+}
+
+.ap-bar[data-scrolled] {
+  border-bottom-color: var(--ap-line);
+}
+
+.ap-bar__menu {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  place-items: center;
+  color: var(--ap-ink-2);
+}
+
+.ap-crumb {
+  min-width: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ap-ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ap-crumb a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ap-crumb a:hover {
+  color: var(--ap-ink);
+}
+
+.ap-crumb b {
+  color: var(--ap-ink);
+  font-weight: 700;
+}
+
+/* El selector de tema: tres botones que se leen con palabra al pasar y con
+   icono siempre; el activo se marca con relleno, no solo con color. */
+.ap-temas {
+  margin-left: auto;
+  flex: none;
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 999px;
+  background: var(--ap-soft);
+  border: 1px solid var(--ap-line);
+}
+
+.ap-temas button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ap-ink-2);
+  transition: background-color 180ms ease, color 180ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap-temas button:active {
+  transform: scale(0.95);
+}
+
+.ap-temas button[aria-pressed="true"] {
+  background: var(--ap-surface);
+  color: var(--ap-ink);
+  box-shadow: var(--ap-shadow-sm);
+}
+
+.ap-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ap-line-2) transparent;
+}
+
+.ap-col {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 8px 0 28px;
+}
+
+/* --- Saludo ------------------------------------------------------------------------- */
+
+.ap-hello {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+  padding: clamp(20px, 7vh, 80px) 0 8px;
+}
+
+.ap-hello__slot {
+  width: 108px;
+  height: 108px;
+}
+
+.ap-hello h1 {
+  margin: 0;
+  max-width: 19ch;
+  font: 700 clamp(1.9rem, 2.4vw + 1.2rem, 2.75rem) / 1.07 var(--ap-serif);
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+.ap-hello p {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--ap-ink-2);
+}
+
+.ap-sugs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.ap-sug {
+  display: block;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-line);
+  box-shadow: var(--ap-shadow-sm);
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.4;
+  transition: border-color 180ms ease, box-shadow 200ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap-sug:active {
+  transform: scale(0.98);
+}
+
+.ap-sug small {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ap-ink-3);
+}
+
+.ap-sug small[data-trick] {
+  color: var(--ap-warn);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ap-sug:hover {
+    border-color: var(--ap-line-2);
+    box-shadow: var(--ap-shadow);
+  }
+}
+
+/* --- Conversación --------------------------------------------------------------------- */
+
+.ap-msgs {
+  display: grid;
+  gap: 28px;
+  padding-top: 18px;
+}
+
+.ap-q {
+  justify-self: end;
+  max-width: min(560px, 86%);
+  padding: 11px 16px;
+  border-radius: 18px 18px 4px 18px;
+  background: var(--ap-q);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.ap-a {
+  --ap-face: 52px;
+  display: grid;
+  grid-template-columns: var(--ap-face) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+/* La cara de quien responde. El dibujo es más alto que ancho (450 × 631) y se
+   encaja entero en un cuadro: en 42 px quedaba de 30 px de ancho y se perdía.
+   Acompaña a la respuesta mientras se lee: en una larga se queda a la vista,
+   arriba, en vez de irse con el primer renglón. Nunca se recorta ni se estira. */
+.ap-a__face {
+  position: sticky;
+  top: 10px;
+  width: var(--ap-face);
+  height: var(--ap-face);
+}
+
+.ap-a__body {
+  display: grid;
+  /* Una columna que no crece con su contenido: sin esto, el título largo de una fuente
+     (que no parte línea) ensanchaba la respuesta entera y el texto se salía de la pantalla. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+}
+
+.ap-a__text {
+  max-width: 68ch;
+  font-size: 0.97rem;
+  line-height: 1.68;
+}
+
+.ap-a__text p {
+  margin: 0 0 10px;
+}
+
+.ap-a__text p:last-child {
+  margin: 0;
+}
+
+.ap-thinking {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  font-size: 0.86rem;
+  color: var(--ap-ink-2);
+}
+
+.ap-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.ap-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ap-primary);
+  animation: ap-dot 1s var(--ap-ease) infinite;
+}
+
+.ap-dots i:nth-child(2) { animation-delay: 0.15s; }
+.ap-dots i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes ap-dot {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
+}
+
+.ap-prov {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.ap-badge[data-kind="memoria"],
+.ap-badge[data-kind="extracto"] {
+  background: var(--ap-mem-soft);
+  color: var(--ap-mem);
+}
+
+.ap-badge[data-kind="ia"] {
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+}
+
+.ap-badge[data-kind="regla"],
+.ap-badge[data-kind="nada"] {
+  background: var(--ap-warn-soft);
+  color: var(--ap-warn);
+}
+
+.ap-trail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ap-ink-3);
+}
+
+.ap-trail-btn svg {
+  transition: transform 200ms var(--ap-ease);
+}
+
+.ap-trail-btn[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.ap-trail {
+  list-style: none;
+  margin: 0;
+  padding: 12px 14px;
+  display: grid;
+  gap: 10px;
+  border-radius: 12px;
+  background: var(--ap-soft);
+  border: 1px solid var(--ap-line);
+  font-size: 0.8125rem;
+  color: var(--ap-ink-2);
+}
+
+.ap-trail li {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.ap-trail b {
+  color: var(--ap-ink);
+  font-weight: 700;
+}
+
+.ap-trail em {
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ap-ink-3);
+  white-space: nowrap;
+}
+
+.ap-st {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.ap-st[data-s="ok"] {
+  background: var(--ap-mem);
+  color: var(--ap-page);
+}
+
+.ap-st[data-s="ai"] {
+  background: var(--ap-primary);
+  color: var(--ap-primary-ink);
+}
+
+.ap-st[data-s="skip"] {
+  border: 1.5px dashed var(--ap-ink-3);
+  color: var(--ap-ink-3);
+}
+
+.ap-cite {
+  display: inline-grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  margin: 0 1px;
+  padding: 0 5px;
+  border-radius: 6px;
+  vertical-align: 2px;
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+  font: 800 0.6875rem/1 var(--ap-sans);
+  font-variant-numeric: tabular-nums;
+  transition: background-color 160ms ease, color 160ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap-cite:active {
+  transform: scale(0.9);
+}
+
+.ap-cite[aria-pressed="true"] {
+  background: var(--ap-primary);
+  color: var(--ap-primary-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ap-cite:hover {
+    background: var(--ap-primary);
+    color: var(--ap-primary-ink);
+  }
+}
+
+.ap-srcs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ap-src {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 5px 12px 5px 5px;
+  border-radius: 10px;
+  border: 1px solid var(--ap-line);
+  background: var(--ap-surface);
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: border-color 160ms ease, background-color 160ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap-src:active {
+  transform: scale(0.97);
+}
+
+.ap-src > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ap-src small {
+  font-weight: 600;
+  color: var(--ap-ink-3);
+}
+
+.ap-src[aria-pressed="true"] {
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+}
+
+.ap-src__n {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+  font-size: 0.6875rem;
+  font-weight: 800;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ap-src:hover {
+    border-color: var(--ap-line-2);
+  }
+}
+
+.ap-acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+
+.ap-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ap-ink-3);
+  transition: background-color 160ms ease, color 160ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap-ic:active {
+  transform: scale(0.94);
+}
+
+.ap-ic[aria-pressed="true"] {
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ap-ic:hover {
+    background: var(--ap-soft-2);
+    color: var(--ap-ink);
+  }
+}
+
+.ap-warn {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ap-warn);
+}
+
+.ap-error {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--ap-warn-soft);
+  color: var(--ap-warn);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.ap-error button {
+  justify-self: start;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* --- Campo de pregunta -------------------------------------------------------------- */
+
+.ap-dock {
+  padding: 8px 24px 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.ap-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 10px 10px 10px 18px;
+  border-radius: 22px;
+  border: 1px solid var(--ap-line-2);
+  background: var(--ap-surface);
+  box-shadow: var(--ap-shadow);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.ap-composer:focus-within {
+  border-color: var(--ap-primary);
+  box-shadow: var(--ap-shadow), var(--ap-ring);
+}
+
+.ap-composer textarea {
+  flex: 1;
+  min-width: 0;
+  max-height: 160px;
+  padding: 7px 0;
+  border: 0;
+  outline: 0;
+  resize: none;
+  background: transparent;
+  color: var(--ap-ink);
+  font: 500 1rem/1.5 var(--ap-sans);
+}
+
+.ap-composer textarea::placeholder {
+  color: var(--ap-ink-3);
+}
+
+.ap-send {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ap-primary);
+  color: var(--ap-primary-ink);
+  transition: transform 140ms var(--ap-ease), opacity 160ms ease;
+}
+
+.ap-send:active {
+  transform: scale(0.92);
+}
+
+.ap-send:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ap-note {
+  max-width: 760px;
+  margin: 8px auto 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--ap-ink-3);
+}
+
+/* --- La fuente (cajón) ----------------------------------------------------------------- */
+
+.ap-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 100%);
+  background: var(--ap-surface);
+  border-left: 1px solid var(--ap-line);
+  box-shadow: var(--ap-shadow);
+  transform: translateX(104%);
+  visibility: hidden;
+  transition: transform 220ms var(--ap-ease), visibility 0s 220ms;
+}
+
+.ap-drawer[data-open] {
+  transform: none;
+  visibility: visible;
+  transition: transform 320ms var(--ap-ease-drawer);
+}
+
+.ap-drawer__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 12px 20px;
+  border-bottom: 1px solid var(--ap-line);
+}
+
+.ap-drawer__head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+.ap-x {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--ap-ink-2);
+  transition: background-color 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ap-x:hover {
+    background: var(--ap-soft-2);
+  }
+}
+
+.ap-drawer__body {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.ap-dr__portal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ap-ink-2);
+}
+
+.ap-dr__title {
+  margin: 0;
+  font: 700 1.35rem/1.15 var(--ap-serif);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.ap-dr__sec {
+  margin: -8px 0 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--ap-ink-3);
+}
+
+.ap-excerpt {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--ap-soft);
+  border: 1px solid var(--ap-line);
+  font-size: 0.86rem;
+  line-height: 1.62;
+  overflow-wrap: anywhere;
+}
+
+.ap-excerpt mark {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: var(--ap-mark);
+  color: inherit;
+}
+
+.ap-ticket {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px 12px 24px;
+  border-radius: 3px;
+  background: var(--ap-ticket);
+  color: var(--ap-ticket-ink);
+  font-size: 0.8rem;
+  -webkit-mask: radial-gradient(circle 6px at 0 50%, transparent 5.5px, #000 6px);
+  mask: radial-gradient(circle 6px at 0 50%, transparent 5.5px, #000 6px);
+}
+
+.ap-ticket::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 12px;
+  border-left: 1.5px dashed currentColor;
+  opacity: 0.3;
+}
+
+.ap-ticket b {
+  font-weight: 800;
+}
+
+.ap-ticket__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-weight: 600;
+  color: var(--ap-ticket-muted);
+}
+
+.ap-ticket__cut {
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #0a6f7c;
+}
+
+.ap-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--ap-primary);
+  color: var(--ap-primary-ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 140ms var(--ap-ease);
+}
+
+.ap-open:active {
+  transform: scale(0.97);
+}
+
+.ap-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: var(--ap-scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+
+.ap-scrim[data-on] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* --- Estados de la página: cerrada, con sesión, cargando ------------------------------ */
+
+.ap-gate {
+  grid-column: 1 / -1;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 16px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.ap-gate h1 {
+  margin: 0;
+  font: 700 clamp(1.6rem, 2vw + 1rem, 2.2rem) / 1.1 var(--ap-serif);
+  letter-spacing: -0.02em;
+}
+
+.ap-gate p {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--ap-ink-2);
+}
+
+.ap-gate a {
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--ap-primary);
+  color: var(--ap-primary-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* --- Pantallas angostas ---------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .ap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ap-side {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(300px, 86vw);
+    transform: translateX(-102%);
+    transition: transform 300ms var(--ap-ease-drawer), background-color 240ms ease;
+    box-shadow: var(--ap-shadow);
+  }
+  .ap-side[data-open] {
+    transform: none;
+  }
+  .ap-side__close,
+  .ap-bar__menu {
+    display: grid;
+  }
+  .ap-bar {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .ap-scroll {
+    padding: 0 16px;
+  }
+  .ap-dock {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .ap-drawer {
+    top: auto;
+    left: 0;
+    width: 100%;
+    max-height: 82%;
+    border-left: 0;
+    border-top: 1px solid var(--ap-line);
+    border-radius: 20px 20px 0 0;
+    transform: translateY(104%);
+  }
+  .ap-drawer[data-open] {
+    transform: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .ap-sugs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ap-temas button span {
+    display: none;
+  }
+  .ap-temas button {
+    padding: 0 9px;
+  }
+  .ap-crumb span {
+    display: none;
+  }
+  .ap-hello__slot {
+    width: 88px;
+    height: 88px;
+  }
+  /* En el teléfono la cara cede ancho al texto, sin bajar de un tamaño en que se reconoce. */
+  .ap-a {
+    --ap-face: 44px;
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-side,
+  .ap-drawer,
+  .ap-scrim {
+    transition-duration: 1ms !important;
+  }
+  .ap-dots i {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+/* Los títulos del sitio traen su color; aquí mandan los del tema. */
+.ap :where(h1, h2, h3) {
+  color: var(--ap-ink);
+}
+
+.ap .apw :where(h1, h2, h3) {
+  color: var(--ap-stage-ink);
+}
+
+.ap-composer textarea::placeholder {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ap-badge[data-kind="curada"],
+.ap-badge[data-kind="malla"] {
+  background: var(--ap-mem-soft);
+  color: var(--ap-mem);
+}
+
+.ap-badge[data-kind="capciosa"] {
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+}
+
+/* --- El mapa de una respuesta (MeshAnswer.tsx) ------------------------------------------
+   El Mapa numerado leído de arriba abajo: cada nivel entra 18px y un filete
+   une cada fila con la de arriba. El nodo de la respuesta va resaltado. */
+
+.apm {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--ap-line);
+  background: var(--ap-soft);
+}
+
+.apm-tree {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.apm-row {
+  position: relative;
+  padding-left: calc(var(--d) * 18px);
+}
+
+.apm-row:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--d) * 18px - 11px);
+  top: -2px;
+  width: 8px;
+  height: 17px;
+  border-left: 1.5px solid var(--ap-line-2);
+  border-bottom: 1.5px solid var(--ap-line-2);
+  border-bottom-left-radius: 4px;
+}
+
+.apm-row > a,
+.apm-row > span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  max-width: 100%;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: var(--ap-ink);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: background-color 160ms ease;
+}
+
+.apm-row small {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ap-ink-3);
+  white-space: nowrap;
+}
+
+.apm-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.apm-code {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-line-2);
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--ap-ink-2);
+}
+
+.apm-row[data-focus] > a,
+.apm-row[data-focus] > span {
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+}
+
+.apm-row[data-focus] .apm-code {
+  background: var(--ap-primary);
+  border-color: var(--ap-primary);
+  color: var(--ap-primary-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .apm-row > a:hover {
+    background: var(--ap-soft-2);
+  }
+}
+
+.apm-more {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  color: var(--ap-ink-3);
+}
+
+/* --- Escritura y lectura (AnswerText.tsx) -------------------------------------------------
+   El cursor parpadea al paso de la escritura; la frase que Pilo lee lleva un
+   fondo suave del color de lectura. «Leer en voz alta» en la barra lee sola
+   cada respuesta nueva. */
+
+.ap-after {
+  display: contents;
+}
+
+.ap-a__text[data-typing] {
+  cursor: pointer;
+}
+
+.ap-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  border-radius: 1px;
+  background: var(--ap-primary);
+  animation: ap-caret 1s steps(2, jump-none) infinite;
+}
+
+@keyframes ap-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.ap-sent {
+  border-radius: 4px;
+  transition: background-color 200ms ease, box-shadow 200ms ease;
+}
+
+.ap-sent[data-reading] {
+  background: var(--ap-mark);
+  box-shadow: 0 0 0 3px var(--ap-mark);
+}
+
+.ap-readall {
+  flex: none;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid var(--ap-line);
+  background: var(--ap-soft);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ap-ink-2);
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap-readall:active {
+  transform: scale(0.96);
+}
+
+.ap-readall[aria-pressed="true"] {
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+}
+
+.ap-readall + .ap-temas {
+  margin-left: 0;
+}
+
+@media (max-width: 600px) {
+  .ap-readall span {
+    display: none;
+  }
+  .ap-readall {
+    padding: 0 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-caret {
+    animation: none;
+  }
+}
+
+/* --- El Markdown de una respuesta (markdown.ts, AnswerText.tsx) ----------------------------
+   Párrafos, listas, títulos modestos, código y enlaces, con los tokens del tema.
+   Los títulos no compiten con el saludo: mismo cuerpo, más peso. */
+
+.ap-a__text {
+  overflow-wrap: anywhere;
+}
+
+.ap-a__text > :last-child {
+  margin-bottom: 0;
+}
+
+.ap-a__text strong {
+  font-weight: 800;
+}
+
+.ap-h {
+  margin: 16px 0 6px;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+.ap-h:first-child {
+  margin-top: 0;
+}
+
+.ap-list {
+  display: grid;
+  gap: 5px;
+  margin: 0 0 10px;
+  padding: 0 0 0 1.5em;
+}
+
+ul.ap-list {
+  list-style: disc outside;
+}
+
+ol.ap-list {
+  list-style: decimal outside;
+}
+
+.ap-list li::marker {
+  color: var(--ap-ink-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-list li[data-depth] {
+  margin-left: 1.3em;
+  list-style-type: circle;
+}
+
+.ap-list li[data-depth="2"] {
+  margin-left: 2.6em;
+}
+
+.ap-a__text code {
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--ap-soft-2);
+  font: 600 0.86em/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+.ap-pre {
+  margin: 0 0 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--ap-line);
+  background: var(--ap-soft);
+  overflow-x: auto;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ap-line-2) transparent;
+}
+
+.ap-pre code {
+  padding: 0;
+  background: none;
+  font-size: 1em;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.ap-link {
+  color: var(--ap-primary-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* --- De dónde sale la respuesta ----------------------------------------------------------
+   La marca lleva texto y glifo: nunca solo color. «Conocimiento general» es
+   neutra (ni alerta ni adorno): un borde, el globo y la frase completa. */
+
+.ap-badge[data-tone="oficial"] {
+  background: var(--ap-mem-soft);
+  color: var(--ap-mem);
+}
+
+.ap-badge[data-tone="ia"] {
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary-text);
+}
+
+.ap-badge[data-tone="general"] {
+  background: var(--ap-soft-2);
+  color: var(--ap-ink-2);
+  box-shadow: inset 0 0 0 1px var(--ap-line-2);
+}
+
+.ap-badge[data-tone="aviso"] {
+  background: var(--ap-warn-soft);
+  color: var(--ap-warn);
+}
+
+.ap-quiet {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  max-width: 68ch;
+  font-size: 0.8rem;
+  color: var(--ap-ink-2);
+}
+
+.ap-quiet svg {
+  flex: none;
+  translate: 0 1px;
+  color: var(--ap-ink-3);
+}
+
+.ap-cut {
+  display: grid;
+  gap: 10px;
+  max-width: 68ch;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px dashed var(--ap-line-2);
+  background: var(--ap-soft);
+  color: var(--ap-ink-2);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.ap-cut button {
+  justify-self: start;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--ap-line-2);
+  background: var(--ap-surface);
+  color: var(--ap-ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: border-color 160ms ease, transform 140ms var(--ap-ease);
+}
+
+.ap-cut button:active,
+.ap-error button:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ap-cut button:hover {
+    border-color: var(--ap-primary);
+  }
+}
+
+/* --- Pensando… ---------------------------------------------------------------------------
+   Mientras Pilo trabaja, el paso en curso es el titular (con los segundos que
+   lleva); al empezar a escribir se recoge en «Pensó durante 12 s». El panel se
+   abre con una rejilla (0fr → 1fr): no se mide ni se anima ninguna altura. */
+
+.ap-prov[data-working] {
+  min-height: 42px;
+}
+
+.ap-how {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ap-ink-3);
+  text-align: left;
+}
+
+.ap-prov[data-working] .ap-how {
+  padding-left: 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ap-ink-2);
+}
+
+.ap-how__time {
+  font-weight: 700;
+  color: var(--ap-ink-3);
+}
+
+.ap-think {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: -12px;
+  visibility: hidden;
+  transition: grid-template-rows 220ms var(--ap-ease), margin-top 220ms var(--ap-ease), visibility 0s 220ms;
+}
+
+.ap-think[data-open] {
+  grid-template-rows: 1fr;
+  margin-top: 0;
+  visibility: visible;
+  transition: grid-template-rows 300ms var(--ap-ease), margin-top 300ms var(--ap-ease);
+}
+
+.ap-think__in {
+  display: grid;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ap-think__text {
+  margin: 0;
+  padding: 0 14px;
+  max-width: 68ch;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--ap-ink-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ap-st[data-s="now"] {
+  border: 1.5px solid var(--ap-primary);
+}
+
+.ap-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ap-primary);
+  animation: ap-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ap-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* Fuera de pantalla o con el panel cerrado, nada late. */
+.ap-a__body[data-paused] .ap-pulse,
+.ap-a__body[data-paused] .ap-dots i {
+  animation-play-state: paused;
+}
+
+.ap-think:not([data-open]) .ap-pulse {
+  animation: none;
+}
+
+/* Detener: el mismo botón del campo, en tinta, con el cuadrado. */
+.ap-send[data-stop] {
+  background: var(--ap-ink);
+  color: var(--ap-page);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-think,
+  .ap-think[data-open] {
+    transition: none;
+  }
+  .ap-pulse {
+    animation: none;
+  }
+}
+
+/* Funciones ampliadas (0119): el clip dentro de la caja de escribir y el archivo encima de ella. */
+.ap-composer .px-clip {
+  width: 40px;
+  height: 40px;
+  margin-left: -8px;
+  border: 0;
+  background: transparent;
+}
+
+.ap-dock .px-tray {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* Una fuente de otro ámbito de Pilo (0122): su procedencia va junto a la cita, con texto y glifo. */
+.ap-src[data-from] {
+  align-items: flex-start;
+  border-style: dashed;
+}
+
+.ap-src[data-from] > span:last-child {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.ap-from {
+  display: block;
+  margin-top: 2px;
+}
+
+/* --- El consejo mientras espera -------------------------------------------------------
+   Aparte del titular (que dice en qué va Pilo de verdad): un consejo o una
+   ocurrencia que cambia cada tanto. Más callado que el titular, y entra con un
+   fundido corto cada vez que cambia. */
+
+.ap-tip {
+  max-width: 46ch;
+  margin: 6px 0 0;
+  color: var(--ap-ink-2, var(--c-ink2, inherit));
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.45;
+  animation: ap-tip-in 0.32s var(--ap-ease, cubic-bezier(0.23, 1, 0.32, 1)) both;
+}
+
+.pe-tip { align-self: flex-start; margin: 0; padding-left: 4px; }
+
+@keyframes ap-tip-in {
+  from { opacity: 0; transform: translateY(4px); filter: blur(2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-tip { animation: none; }
+}
