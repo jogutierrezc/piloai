@@ -63,14 +63,18 @@ export function afterLoginPath(from: unknown, _who?: unknown): string {
 /** Exportado para montar la administración con una sesión simulada (pruebas y bancos de pruebas). */
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
-/** Lee la fila de pilo_staff de la persona. Un fallo (migración sin aplicar, RLS) es «sin fila». */
-async function readStaff(userId: string): Promise<PiloStaffRow | null> {
+/**
+ * Lee la fila de pilo_staff de la persona. `ok: false` = la lectura falló
+ * (migración sin aplicar, RLS, red); no es lo mismo que «no tiene fila».
+ */
+async function readStaff(userId: string): Promise<{ row: PiloStaffRow | null; ok: boolean }> {
   try {
     const { data, error } = await supabase.from("pilo_staff").select("*").eq("user_id", userId).maybeSingle();
-    if (error || !data || !isStaffRole((data as { role?: unknown }).role)) return null;
-    return data as PiloStaffRow;
+    if (error) return { row: null, ok: false };
+    if (!data || !isStaffRole((data as { role?: unknown }).role)) return { row: null, ok: true };
+    return { row: data as PiloStaffRow, ok: true };
   } catch {
-    return null;
+    return { row: null, ok: false };
   }
 }
 
@@ -87,36 +91,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /** Cuándo se anotó el último ingreso (pilo_staff_touch); null = aún no. */
   const touchedAt = useRef<number | null>(null);
 
-  // Perfil y personal se leen juntos y se publican de una vez: si el perfil
-  // llegara antes que el rol, la guarda vería «sesión sin rol» un instante y
-  // mandaría a «Sin permiso» a quien sí tiene acceso.
-  const loadPerson = useCallback(async (userId: string | undefined) => {
+  /** A quién pertenecen el perfil y el personal que hay en memoria. */
+  const loadedFor = useRef<string | null>(null);
+
+  // Sesión, perfil y personal se publican de una vez: si la sesión llegara
+  // antes que el rol, la guarda vería «sesión sin rol» un instante y mandaría a
+  // «Sin permiso» a quien sí tiene acceso. Y si la relectura de la misma
+  // persona falla (red, token en renovación), se conserva lo que ya se sabía en
+  // lugar de quitarle el rol.
+  const loadPerson = useCallback(async (next: Session | null) => {
     const mine = ++ticket.current;
-    const publish = (person: Profile | null, row: PiloStaffRow | null) => {
-      if (mine !== ticket.current) return;
-      // Releer sin cambios no debe repintar toda la administración.
-      setProfile((previous) => (JSON.stringify(previous) === JSON.stringify(person) ? previous : person));
-      setStaff((previous) => (JSON.stringify(previous) === JSON.stringify(row) ? previous : row));
-    };
+    const userId = next?.user.id;
 
     if (!userId) {
-      publish(null, null);
+      loadedFor.current = null;
+      setSession(null);
+      setProfile(null);
+      setStaff(null);
       return;
     }
 
-    const [profileResult, row] = await Promise.all([
+    const [profileResult, staffResult] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       readStaff(userId),
     ]);
+    if (mine !== ticket.current) return;
 
-    if (profileResult.error && mine === ticket.current) setError(profileResult.error.message);
-    const data = profileResult.error ? null : profileResult.data;
-    publish(data && data.is_active ? (data as Profile) : null, row);
+    const ok = !profileResult.error && staffResult.ok;
+    if (profileResult.error) setError(profileResult.error.message);
+    const keepPrevious = !ok && loadedFor.current === userId;
 
-    // Anota el ingreso del personal, sin esperar y como mucho cada ~10 min (no en
-    // cada refresco al volver a la pestaña). Si falla —migración sin aplicar,
-    // sin fila— no pasa nada: solo queda sin anotar.
-    if (row?.active && mine === ticket.current && shouldTouch(touchedAt.current, Date.now())) {
+    setSession(next);
+    if (!keepPrevious) {
+      const data = profileResult.error ? null : profileResult.data;
+      const person = data && data.is_active ? (data as Profile) : null;
+      // Releer sin cambios no debe repintar toda la administración.
+      setProfile((previous) => (JSON.stringify(previous) === JSON.stringify(person) ? previous : person));
+      setStaff((previous) => (JSON.stringify(previous) === JSON.stringify(staffResult.row) ? previous : staffResult.row));
+      loadedFor.current = userId;
+    }
+
+    // Anota el ingreso del personal, sin esperar y como mucho cada ~10 min.
+    if (staffResult.row?.active && shouldTouch(touchedAt.current, Date.now())) {
       touchedAt.current = Date.now();
       void Promise.resolve(supabase.rpc("pilo_staff_touch")).catch(() => undefined);
     }
@@ -127,18 +143,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     supabase.auth.getSession().then(async ({ data }) => {
       if (cancelled) return;
-      setSession(data.session);
-      await loadPerson(data.session?.user.id);
+      await loadPerson(data.session);
       if (!cancelled) setLoading(false);
     });
 
     // Cubre el inicio de sesión, el cierre, la renovación del token y —lo que
     // más importa aquí— la vuelta desde un enlace de invitación o recuperación.
-    const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, next) => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, next) => {
       if (cancelled) return;
-      setSession(next);
-      await loadPerson(next?.user.id);
-      setLoading(false);
+      // Fuera del callback: Supabase no admite esperar otra llamada suya dentro.
+      setTimeout(() => {
+        if (cancelled) return;
+        void loadPerson(next).then(() => {
+          if (!cancelled) setLoading(false);
+        });
+      }, 0);
     });
 
     // Un administrador puede cambiar el rol de alguien que ya tiene la
@@ -147,7 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const refresh = () => {
       if (document.visibilityState !== "visible") return;
       void supabase.auth.getSession().then(({ data }) => {
-        if (!cancelled && data.session) void loadPerson(data.session.user.id);
+        if (!cancelled && data.session) void loadPerson(data.session);
       });
     };
     document.addEventListener("visibilitychange", refresh);
@@ -175,7 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
       }
 
-      await loadPerson(data.session?.user.id);
+      await loadPerson(data.session);
     },
     [loadPerson],
   );
@@ -184,6 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     ticket.current += 1;
     touchedAt.current = null;
+    loadedFor.current = null;
     setProfile(null);
     setStaff(null);
     setSession(null);

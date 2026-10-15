@@ -148,7 +148,7 @@ export const ASK_SPACES: Record<SpaceId, SpaceProfile> = {
     placeholder: "Pregunte por una cifra, un pilar, un boletín…",
     note: "Pilo redacta con IA. Las cifras de la UDES llevan su fuente; lo demás va marcado como conocimiento general.",
     gate: {
-      login: "Por ahora, Pregúntele a Pilo es para quienes tienen cuenta en la intranet de Planeación. Inicie sesión y vuelva.",
+      login: "Por ahora, Pregúntele a Pilo es para quienes tienen cuenta en la intranet de la Universidad. Inicie sesión y vuelva.",
       closed: "Pregúntele a Pilo no está abierto por ahora. Mientras tanto, las cifras oficiales están en UDES en Cifras.",
       missing: "Pregúntele a Pilo no está abierto por ahora. Mientras tanto, las cifras oficiales están en UDES en Cifras.",
     },
@@ -244,7 +244,7 @@ export const ASK_SPACES: Record<SpaceId, SpaceProfile> = {
       closed: "Mr. Pilo en Enseñanza no está abierto por ahora.",
       missing: "Mr. Pilo en Enseñanza todavía no está instalado: a la base de datos le falta la migración 0113 de los espacios. La administración debe aplicarla.",
     },
-    gateFallback: { to: "/", label: "Ir al portal de Planeación" },
+    gateFallback: { to: "/", label: "Ir al portal de la Universidad" },
     demo: {
       questions: [
         { q: "¿Qué es el aprendizaje activo?" },

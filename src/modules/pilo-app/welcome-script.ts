@@ -141,7 +141,7 @@ export const WELCOME_EXAMPLES: WelcomeExample[] = [
   {
     id: "quien",
     q: "¿Quién publica las cifras?",
-    a: "La Oficina de Planeación Institucional, a partir de lo que reporta cada oficina, siempre con su corte y su procedencia.",
+    a: "La Universidad de Santander, a partir de lo que reporta cada dependencia, siempre con su corte y su procedencia.",
     source: "UDES en Cifras",
   },
 ];

@@ -28,7 +28,7 @@ describe("el perfil «planeacion» es Pregúntele a Pilo tal como era", () => {
     expect(p.placeholder).toBe("Pregunte por una cifra, un pilar, un boletín…");
     expect(p.note).toBe("Pilo redacta con IA. Las cifras de la UDES llevan su fuente; lo demás va marcado como conocimiento general.");
     expect(p.office).toBe("Universidad de Santander");
-    expect(p.gate.login).toBe("Por ahora, Pregúntele a Pilo es para quienes tienen cuenta en la intranet de Planeación. Inicie sesión y vuelva.");
+    expect(p.gate.login).toBe("Por ahora, Pregúntele a Pilo es para quienes tienen cuenta en la intranet de la Universidad. Inicie sesión y vuelva.");
     expect(p.gate.closed).toBe("Pregúntele a Pilo no está abierto por ahora. Mientras tanto, las cifras oficiales están en UDES en Cifras.");
     expect(p.gateFallback).toEqual({ to: "/datos-abiertos", label: "Ir a UDES en Cifras" });
   });
