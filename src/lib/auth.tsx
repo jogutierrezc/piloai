@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // «Sin permiso» a quien sí tiene acceso. Y si la relectura de la misma
   // persona falla (red, token en renovación), se conserva lo que ya se sabía en
   // lugar de quitarle el rol.
-  const loadPerson = useCallback(async (next: Session | null) => {
+  const loadPerson = useCallback(async (next: Session | null): Promise<boolean> => {
     const mine = ++ticket.current;
     const userId = next?.user.id;
 
@@ -108,14 +108,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(null);
       setProfile(null);
       setStaff(null);
-      return;
+      return true;
     }
 
     const [profileResult, staffResult] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       readStaff(userId),
     ]);
-    if (mine !== ticket.current) return;
+    if (mine !== ticket.current) return false;
 
     const ok = !profileResult.error && staffResult.ok;
     if (profileResult.error) setError(profileResult.error.message);
@@ -136,6 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       touchedAt.current = Date.now();
       void Promise.resolve(supabase.rpc("pilo_staff_touch")).catch(() => undefined);
     }
+    return true;
   }, []);
 
   useEffect(() => {
@@ -143,8 +144,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     supabase.auth.getSession().then(async ({ data }) => {
       if (cancelled) return;
-      await loadPerson(data.session);
-      if (!cancelled) setLoading(false);
+      // Si otra lectura más nueva la reemplazó, ella es quien termina la carga:
+      // soltar `loading` aquí dejaría pasar la guarda sin sesión ni rol.
+      const latest = await loadPerson(data.session);
+      if (!cancelled && latest) setLoading(false);
     });
 
     // Cubre el inicio de sesión, el cierre, la renovación del token y —lo que
@@ -154,8 +157,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Fuera del callback: Supabase no admite esperar otra llamada suya dentro.
       setTimeout(() => {
         if (cancelled) return;
-        void loadPerson(next).then(() => {
-          if (!cancelled) setLoading(false);
+        void loadPerson(next).then((latest) => {
+          if (!cancelled && latest) setLoading(false);
         });
       }, 0);
     });
