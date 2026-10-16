@@ -630,6 +630,8 @@
 
 .pc-pane {
   display: grid;
+  /* Una pista de ancho fijo: los hijos con container-type (Pilo U) no se encogen a cero dentro de una pista automática. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-content: start;
   width: 100%;

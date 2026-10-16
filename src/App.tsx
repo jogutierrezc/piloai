@@ -74,7 +74,7 @@ export default function App() {
       <AlertaEmergencia />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
-          <Route path="/" element={<Navigate to="/pregunta" replace />} />
+          <Route path="/" element={<Navigate to="/app" replace />} />
           <Route path="/pregunta" element={<AskPilo />} />
           <Route path="/pilo-ensenanza" element={<AskPilo key="ensenanza" space="ensenanza" />} />
           <Route path="/pilo-embed" element={<PiloEmbed />} />

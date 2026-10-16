@@ -10,7 +10,8 @@
 
 /* --- El aviso previo ------------------------------------------------------------------------ */
 
-.pc-preview {
+/* El nombre .pc-preview lo usa también el perfil (account.css) con otra disposición: aquí va el suyo. */
+.pc-aviso {
   gap: 16px;
 }
 

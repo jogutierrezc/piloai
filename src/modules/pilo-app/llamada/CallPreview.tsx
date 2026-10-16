@@ -81,7 +81,7 @@ export function CallPreview({
 
   return (
     <Layer kind="sheet" open={open} quick={quick} label={tr("Llamar a Mr. Pilo")} onClose={onClose}>
-      <div className="pa-sheet__in pc-preview" ref={root}>
+      <div className="pa-sheet__in pc-aviso" ref={root}>
         <span className="pa-sheet__grip" aria-hidden="true" />
         <div className="pa-sheet__head">
           <h2>{tr("Llamar a Pilo")}</h2>

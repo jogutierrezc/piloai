@@ -27,7 +27,7 @@
    como sesión («miembro»); en la intranet no abre nada.
    ========================================================================== */
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../lib/auth";
 import { usePiloAiConfig } from "../../components/pilo/ai/config";
@@ -39,8 +39,6 @@ import type { Rol, SpaceId } from "../pregunta/space";
 import { spaceDoor } from "./access";
 import { APP_ACCOUNT, APP_BASE, APP_LOGIN, APP_PATHS, readAppPath, startTarget } from "./routes";
 import { AppTabs } from "./AppTabs";
-import { UPane } from "./u/UPane";
-import { CarnetPane } from "./carnet/CarnetPane";
 import { desktopGate, isDesktopApp } from "./desktop";
 import { isNative } from "./native";
 import { AppPage, AppSide, useWide } from "./AppSide";
@@ -50,12 +48,7 @@ import type { SavedEntry } from "./saved";
 import { usePiloAccount } from "./account/useAccount";
 import { useSavedAnswers } from "./account/answers";
 import { memberAskRol, personCard } from "./account/rules";
-import { AccountGate } from "./account/AccountGate";
-import { ProfilePane } from "./account/ProfilePane";
-import { SavedPane } from "./account/SavedPane";
-import { ClasesPane } from "./clases/ClasesPane";
 import { canUseClases, clearLink } from "./clases/logic";
-import { NotasPane } from "./notas/NotasPane";
 import { canUseNotas, clearLink as clearNotasLink } from "./notas/logic";
 import { clearGoals as clearNotasGoals } from "./notas/guia";
 import { APP_PREFIX, readTheme, writeTheme } from "./themes";
@@ -71,6 +64,15 @@ import "./pilo-app-themes.css";
 import "./pilo-app.css";
 import "./account/account.css";
 import { tr, useLang, localizeDeep } from "../../components/pilo/i18n";
+
+/* Los paneles que no son la conversación se bajan solo cuando la persona los abre: el arranque de /app pesa lo de Pilo, nada más. */
+const AccountGate = lazy(() => import("./account/AccountGate").then((m) => ({ default: m.AccountGate })));
+const ProfilePane = lazy(() => import("./account/ProfilePane").then((m) => ({ default: m.ProfilePane })));
+const SavedPane = lazy(() => import("./account/SavedPane").then((m) => ({ default: m.SavedPane })));
+const ClasesPane = lazy(() => import("./clases/ClasesPane").then((m) => ({ default: m.ClasesPane })));
+const NotasPane = lazy(() => import("./notas/NotasPane").then((m) => ({ default: m.NotasPane })));
+const UPane = lazy(() => import("./u/UPane").then((m) => ({ default: m.UPane })));
+const CarnetPane = lazy(() => import("./carnet/CarnetPane").then((m) => ({ default: m.CarnetPane })));
 
 const KEY_VOICE = storageKey(APP_PREFIX, "voz");
 const KEY_INSTALL = storageKey(APP_PREFIX, "instalar");

@@ -14,6 +14,8 @@
 .pu {
   container-type: inline-size;
   container-name: pu;
+  /* Con container-type el navegador no lo estira dentro de un grid: sin esto mide 0. */
+  width: 100%;
   min-width: 0;
   color: var(--c-ink);
   font-family: var(--font-sans);

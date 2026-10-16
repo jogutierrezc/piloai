@@ -846,10 +846,12 @@ button.cn-row:active {
 }
 
 @media (min-width: 880px) {
+  /* Centrada en la ventana: arriba y abajo cabe el alto máximo, y el cuerpo se desplaza por dentro. */
   .cn-sheet {
-    bottom: 50%;
-    translate: 0 50%;
+    top: 50%;
+    bottom: auto;
+    translate: 0 -50%;
     border-radius: var(--radius-md);
-    max-height: 86%;
+    max-height: min(86dvh, 860px);
   }
 }
